@@ -1,0 +1,30 @@
+# Category browsing and search settings (F003.2).
+#
+# Per-persona view and search ranges live in the generators, matching the
+# feature specification. These settings are the global envelope every persona
+# range is clamped into.
+
+# Category views per session.
+min_category_views: 1
+max_category_views: 10
+
+# Time spent on a single category page, in seconds.
+min_view_seconds: 5
+max_view_seconds: 180
+
+# Searches per session.
+min_searches: 0
+max_searches: 10
+
+# Largest result count a search may report.
+max_results_count: 250
+
+# Share of searches that return nothing. A search with no results can never
+# have been clicked.
+no_results_rate: 0.06
+
+# Share of searches with results that lead to a click.
+click_through_rate: 0.55
+
+# Rows generated per batch.
+batch_size: 100000

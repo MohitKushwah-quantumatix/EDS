@@ -1,0 +1,22 @@
+# Shopping cart settings (F004).
+#
+# Per-persona cart rates, sizes, and status splits live in the generators,
+# matching the feature specification. These settings are the global envelope.
+
+# Scales a persona's cart propensity, recorded in F003.1, into a per-session
+# chance of starting a cart. Bounced sessions never start one.
+cart_session_rate: 0.5
+
+# Units of a single product in a cart.
+min_quantity: 1
+max_quantity: 5
+
+# Upper bound on distinct products in one cart. The size distribution's
+# top bucket is "5 or more", so this is where that tail stops.
+max_cart_items: 7
+
+# Share of cart items the customer later removes.
+removal_rate: 0.12
+
+# Rows generated per batch.
+batch_size: 100000

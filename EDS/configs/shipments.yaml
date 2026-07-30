@@ -1,0 +1,55 @@
+# Shipment settings (F008).
+#
+# A shipment is created for every captured payment. What varies is who carries
+# it, how long it takes, and how far along the lifecycle it has got by the end
+# of the simulated window.
+
+# Carriers available for each shipping method. One is chosen per shipment, so
+# the method the customer picked at checkout determines the candidates.
+carriers:
+  STANDARD:
+    - UPS
+    - FedEx
+    - DHL
+  EXPRESS:
+    - FedEx Priority
+    - DHL Express
+  NEXT_DAY:
+    - UPS Next Day
+  STORE_PICKUP:
+    - Store Pickup
+
+# Inclusive [min, max] delivery days promised for each method, counted from
+# the moment the shipment is created. Store pickup is same-day.
+delivery_days:
+  STANDARD: [3, 7]
+  EXPRESS: [1, 3]
+  NEXT_DAY: [1, 1]
+  STORE_PICKUP: [0, 0]
+
+# Delay between a payment being captured and its shipment being created.
+shipment_lead_seconds: 1
+
+# How far along the lifecycle each shipment has got. These three must sum to
+# 1.0, so every shipment reaches at least SHIPPED.
+delivered_rate: 0.90
+in_transit_rate: 0.07
+shipped_rate: 0.03
+
+# How long each transition takes.
+min_pack_minutes: 30
+max_pack_minutes: 1440
+min_dispatch_minutes: 60
+max_dispatch_minutes: 1440
+min_transit_hours: 2
+max_transit_hours: 48
+min_delivery_hours: 4
+max_delivery_hours: 120
+
+# Leading tokens of the business identifiers, as in SHP-20250131-000001 and
+# TRK-4738105562.
+shipment_number_prefix: SHP
+tracking_number_prefix: TRK
+
+# Rows generated per batch.
+batch_size: 100000

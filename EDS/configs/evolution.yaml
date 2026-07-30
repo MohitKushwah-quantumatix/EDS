@@ -1,0 +1,23 @@
+# Daily business evolution settings.
+#
+# These describe change rather than shape. Every other business configuration
+# file says what the enterprise looks like; this one says what one simulated
+# day does to it.
+#
+# The founding day ignores all of them. It runs the snapshot generators, which
+# build an enterprise that already has a history behind it. From the second
+# simulated day onwards, these rates decide how the business grows.
+
+# Customers registering on a simulated day. Zero is meaningful: a business
+# that acquires nobody still trades with the customers it has.
+new_customers_per_day: 5
+
+# Share of the existing customer base that opens a session on a given day.
+active_customer_rate: 0.02
+
+# Most sessions one active customer starts in a day.
+max_daily_sessions: 2
+
+# Loyalty points awarded per unit of settled spend. Balances are recomputed
+# from lifetime spend and never decrease.
+loyalty_points_per_unit: 1.0

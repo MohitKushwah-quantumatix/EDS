@@ -1,0 +1,64 @@
+# Review settings (F010).
+#
+# Everything a review says is chosen from the phrases below rather than
+# generated: titles and bodies are short, fixed, and grouped by rating, so the
+# text always matches the stars it sits next to.
+
+# Share of eligible delivered items that get reviewed. An item is eligible
+# when its shipment was delivered and the item was not sent back.
+review_rate: 0.18
+
+# How often each star rating is left. These must sum to 1.0.
+rating_weights:
+  5: 0.40
+  4: 0.30
+  3: 0.15
+  2: 0.10
+  1: 0.05
+
+# Review titles, grouped by rating. Every rating above must appear here.
+titles:
+  5:
+    - Excellent Product
+    - Highly Recommended
+    - Loved It
+  4:
+    - Good Quality
+    - Worth Buying
+  3:
+    - Average Experience
+    - Meets Expectations
+  2:
+    - Could Be Better
+    - Not As Expected
+  1:
+    - Very Disappointed
+    - Poor Quality
+
+# Review bodies, grouped by rating. One sentence each, by design.
+texts:
+  5:
+    - The product exceeded my expectations.
+    - Excellent quality and it arrived quickly.
+  4:
+    - The product is well made and does the job.
+    - Good value for the money.
+  3:
+    - The product is acceptable for the price.
+    - It works, but nothing stood out.
+  2:
+    - The product is not quite what I expected.
+    - The quality is lower than the description suggested.
+  1:
+    - The product did not meet expectations.
+    - The item arrived in poor condition.
+
+# How long after delivery the customer writes, in days.
+min_review_days: 1
+max_review_days: 30
+
+# Leading token of the business review number, as in REV-20250131-000001.
+review_number_prefix: REV
+
+# Rows generated per batch.
+batch_size: 100000

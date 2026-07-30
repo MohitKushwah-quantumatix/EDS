@@ -1,0 +1,21 @@
+# Customer generation settings (F002).
+#
+# Business configuration for the customer master datasets. Platform settings
+# such as the random seed and output directory live in simulation.yaml.
+
+# Number of customers to generate.
+customer_count: 1000
+
+# Addresses per customer. Exactly one of them is marked primary.
+min_addresses: 1
+max_addresses: 2
+
+# Registration dates span this many years back from reference_date.
+registration_years: 5
+
+# The "as of" date the dataset is generated relative to. Fixed rather than
+# today's date so that a run with a given seed is reproducible on any day.
+reference_date: 2026-01-01
+
+# Rows generated per batch.
+batch_size: 100000

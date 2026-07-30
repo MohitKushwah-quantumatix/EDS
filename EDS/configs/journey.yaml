@@ -1,0 +1,21 @@
+# Customer journey settings (F003.1).
+#
+# Persona distributions and behaviour profiles are fixed catalogues defined in
+# the generators, matching the feature specification. Only the tunable
+# session-shape settings live here.
+#
+# The reference date and registration window are deliberately absent: a
+# session is anchored to its customer's registration date, so both are taken
+# from customers.yaml and cannot disagree with the customer data.
+
+# Share of sessions that end on the landing page having viewed one page.
+bounce_rate: 0.25
+
+# Upper bound on pages viewed in a non-bounce session.
+max_pages_viewed: 25
+
+# Sessions must fall within this many years of the reference date.
+session_years: 5
+
+# Rows generated per batch.
+batch_size: 100000

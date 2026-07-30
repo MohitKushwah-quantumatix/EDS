@@ -1,0 +1,30 @@
+# Master data generation settings (F001).
+#
+# Business configuration: entity volumes and catalog shape. Platform settings
+# such as the random seed and output directory live in simulation.yaml.
+
+# ISO 3166-1 alpha-2 codes of the countries to generate geography for.
+countries:
+  - US
+
+# Cities generated per state.
+cities_per_state: 5
+
+# Category tree shape. Depth 3 with 8 roots and 4 children per node yields
+# 8 + 32 + 128 = 168 categories, of which 128 are leaves that hold products.
+category_depth: 3
+root_categories: 8
+children_per_category: 4
+
+# Entity volumes.
+brand_count: 50
+supplier_count: 25
+warehouse_count: 10
+product_count: 1000
+
+# Warehouses each product is stocked in. Determines the inventory row count
+# as product_count * warehouses_per_product. Must not exceed warehouse_count.
+warehouses_per_product: 3
+
+# Rows generated per batch for large datasets.
+batch_size: 100000

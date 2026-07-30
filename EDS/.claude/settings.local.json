@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(python --version)",
+      "PowerShell(python -c \"import sys; print\\(sys.executable\\)\")",
+      "PowerShell(pip --version)",
+      "PowerShell(Push-Location 'd:\\\\Project\\\\EDS'; ruff check . --fix; \"fix exit: $LASTEXITCODE\"; ruff check .; \"check exit: $LASTEXITCODE\"; ruff format --check .; \"format exit: $LASTEXITCODE\"; Pop-Location)"
+    ]
+  }
+}

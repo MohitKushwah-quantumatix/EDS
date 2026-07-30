@@ -1,0 +1,19 @@
+# Checkout settings (F005).
+#
+# Status, shipping method, and payment method splits live in the generator,
+# matching the feature specification. These settings are the global envelope.
+
+# Tax applied to the subtotal.
+min_tax_rate: 0.05
+max_tax_rate: 0.18
+
+# Share of checkouts billed to the shipping address. A customer with only one
+# address always bills to it, whatever this value is.
+same_address_rate: 0.80
+
+# How long the checkout flow takes, in seconds.
+min_checkout_seconds: 30
+max_checkout_seconds: 900
+
+# Rows generated per batch.
+batch_size: 100000

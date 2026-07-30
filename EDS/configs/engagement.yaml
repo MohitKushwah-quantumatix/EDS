@@ -1,0 +1,21 @@
+# Product view and wishlist settings (F003.3).
+#
+# Per-persona view counts, durations, and wishlist adoption rates live in the
+# generators, matching the feature specification. These settings are the
+# global envelope every persona range is clamped into.
+
+# Product views per category view.
+min_product_views: 1
+max_product_views: 8
+
+# Time spent on a single product page, in seconds.
+min_view_seconds: 5
+max_view_seconds: 600
+
+# Scales a persona's wishlist propensity into a per-product-view chance of
+# adding to the wishlist. Only customers who adopt the wishlist at all are
+# offered the chance, which is what keeps wishlist usage to a minority.
+wishlist_view_rate: 0.28
+
+# Rows generated per batch.
+batch_size: 100000

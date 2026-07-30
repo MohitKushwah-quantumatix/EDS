@@ -1,0 +1,1 @@
+"""Inventory reference-data generators."""

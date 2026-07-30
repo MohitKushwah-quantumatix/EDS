@@ -1,0 +1,41 @@
+# Return settings (F009).
+#
+# Return reasons are NOT here: they are master data, read from
+# return_reasons.parquet. What lives here is how often a delivered order comes
+# back, how it is settled, and how long the reverse journey takes.
+
+# Share of eligible delivered shipments the customer sends back.
+return_rate: 0.12
+
+# How a return is settled. These shares must sum to 1.0.
+refund_types:
+  FULL_REFUND: 0.70
+  STORE_CREDIT: 0.20
+  REPLACEMENT: 0.10
+
+# How long after delivery the customer asks, in days.
+min_request_days: 1
+max_request_days: 21
+
+# How far along the lifecycle each return has got. These four must sum to 1.0,
+# so every return reaches at least APPROVED.
+completed_rate: 0.85
+received_rate: 0.08
+in_transit_rate: 0.05
+approved_rate: 0.02
+
+# How long each transition takes, in hours.
+min_approval_hours: 2
+max_approval_hours: 72
+min_dispatch_hours: 4
+max_dispatch_hours: 120
+min_transit_hours: 24
+max_transit_hours: 168
+min_completion_hours: 2
+max_completion_hours: 96
+
+# Leading token of the business return number, as in RET-20250131-000001.
+return_number_prefix: RET
+
+# Rows generated per batch.
+batch_size: 100000

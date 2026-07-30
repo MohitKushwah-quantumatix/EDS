@@ -1,0 +1,72 @@
+[build-system]
+requires = ["hatchling>=1.25"]
+build-backend = "hatchling.build"
+
+[project]
+name = "eds"
+description = "Enterprise Data Simulator - deterministic, event-driven synthetic enterprise data generation."
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.12"
+dynamic = ["version"]
+authors = [{ name = "Makin Laboratories" }]
+keywords = ["synthetic-data", "simulation", "data-generation", "enterprise"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Typing :: Typed",
+]
+
+dependencies = [
+  "polars>=1.0",
+  "pydantic>=2.7",
+  "faker>=25.0",
+  "typer>=0.12",
+  "pyyaml>=6.0",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.0",
+  "ruff>=0.5",
+  "mypy>=1.10",
+  "types-PyYAML>=6.0",
+]
+
+[project.scripts]
+eds = "eds.cli.main:app"
+
+[tool.hatch.version]
+path = "eds/version.py"
+# Explicit pattern: the default regex does not accept the `: str` annotation
+# that the type-hinting requirement puts on `__version__`.
+pattern = '^__version__: str = "(?P<version>[^"]+)"'
+
+[tool.hatch.build.targets.wheel]
+packages = ["eds"]
+
+[tool.hatch.build.targets.sdist]
+include = ["eds", "configs", "docs", "README.md", "LICENSE"]
+
+# Ruff is configured in ruff.toml and pytest in pytest.ini, per the
+# repository foundation specification. Mypy has no dedicated file in that
+# specification, so its configuration lives here.
+[tool.mypy]
+python_version = "3.12"
+namespace_packages = true
+explicit_package_bases = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+disallow_untyped_decorators = true
+check_untyped_defs = true
+no_implicit_optional = true
+strict_equality = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_return_any = true
+warn_unused_configs = true
+pretty = true

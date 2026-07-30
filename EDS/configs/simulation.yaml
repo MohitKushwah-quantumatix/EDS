@@ -1,0 +1,18 @@
+# Platform defaults for the Enterprise Data Simulator.
+#
+# Platform configuration only. Business configuration - entity volumes, event
+# probabilities, workflow parameters - does not belong in this file and is
+# introduced by subsequent features.
+
+# Random seed for all stochastic components. A fixed seed makes a run
+# reproducible; set to null for a non-deterministic run.
+seed: 42
+
+# IANA timezone used to interpret and emit every simulated timestamp.
+timezone: UTC
+
+# Faker locale used by reference-data generators.
+locale: en_US
+
+# Root directory for generated datasets, relative to the repository root.
+output_directory: output

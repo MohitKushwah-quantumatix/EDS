@@ -1,0 +1,30 @@
+# Payment settings (F007).
+#
+# Payments copy their amount from the order and their method from the
+# checkout, so nothing here influences money or method. These settings shape
+# the outcome, the timings, and the reference.
+
+# Currency recorded on every payment. Read from here rather than inferred
+# from the order's geography.
+currency: USD
+
+# How payment attempts end. These three must sum to 1.0.
+# A captured or voided payment was authorised first; a failed one was not.
+capture_rate: 0.92
+void_rate: 0.03
+failure_rate: 0.05
+
+# Delay between an order being created and its payment being authorised.
+authorization_lead_seconds: 1
+
+# How long each transition takes, in minutes.
+min_capture_minutes: 1
+max_capture_minutes: 180
+min_void_minutes: 5
+max_void_minutes: 1440
+
+# Leading token of the payment reference, as in PAY-20250131-000001.
+payment_reference_prefix: PAY
+
+# Rows generated per batch.
+batch_size: 100000

@@ -1,0 +1,25 @@
+# Order settings (F006).
+#
+# Orders copy their financial values from the checkout, so nothing here
+# influences money. These settings shape the lifecycle and the order number.
+
+# Delay between a checkout completing and its order being created.
+order_lead_seconds: 1
+
+# Share of orders reaching each lifecycle stage. Every order is CREATED.
+# processing_rate cannot exceed confirmed_rate: an order is only processed
+# after it has been confirmed.
+confirmed_rate: 0.95
+processing_rate: 0.90
+
+# How long each transition takes, in minutes.
+min_confirm_minutes: 1
+max_confirm_minutes: 1440
+min_processing_minutes: 30
+max_processing_minutes: 2880
+
+# Leading token of the business order number, as in ORD-20250131-000001.
+order_number_prefix: ORD
+
+# Rows generated per batch.
+batch_size: 100000
