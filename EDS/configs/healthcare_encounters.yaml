@@ -1,0 +1,9 @@
+# Encounter generation settings (F004).
+
+daily_encounter_rate: 0.1
+inpatient_rate: 0.3
+appointment_rate: 0.8
+min_encounter_duration: 15
+max_encounter_duration: 120
+
+batch_size: 100000

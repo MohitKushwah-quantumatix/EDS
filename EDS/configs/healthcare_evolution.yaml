@@ -1,0 +1,6 @@
+# Daily healthcare evolution settings.
+
+new_patients_per_day: 5
+active_patient_rate: 0.02
+max_daily_encounters: 10
+loyalty_points_per_unit: 1.0

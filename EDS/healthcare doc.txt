@@ -1,0 +1,429 @@
+1. Domain Identity
+Property	Value
+Domain name	"healthcare"
+Package	eds.domains.healthcare
+Runner package	eds.runners.healthcare
+Registry name	HEALTHCARE_DOMAIN_NAME = "healthcare"
+Class	HealthcareDomain
+
+
+2. Stages (4 stages, matching Retail's count)
+Stage	Name	Retail Equivalent	Dependency
+1	master-data	master-data	() (nothing)
+2	patients	customers	("departments", "specialties", "insurance_plans", "facilities")
+3	providers	(new)	("departments", "specialties", "facilities")
+4	encounters	commerce	("patients", "providers", "medications", "diagnosis_codes", "procedure_codes", "billing_codes", "insurance_plans", "room_types")
+
+
+3. Folder Structure
+eds/
+  domains/
+    healthcare/
+      __init__.py
+      config.py
+      registry.py
+      domain/
+        __init__.py
+        enums.py
+        master_data.py
+        patient/
+          __init__.py
+          schema.py
+          enums.py
+        provider/
+          __init__.py
+          schema.py
+          enums.py
+        encounter/
+          __init__.py
+          schema.py
+          enums.py
+        billing/
+          __init__.py
+          schema.py
+      generators/
+        __init__.py
+        master_data.py
+        patient_data.py
+        provider_data.py
+        encounter_data.py
+        patients/
+          __init__.py
+          patient_generator.py
+          address_generator.py
+          insurance_generator.py
+          allergy_generator.py
+        providers/
+          __init__.py
+          provider_generator.py
+          department_generator.py
+          specialty_generator.py
+        encounters/
+          __init__.py
+          encounter_generator.py
+          appointment_generator.py
+          vitals_generator.py
+          medication_generator.py
+          diagnosis_generator.py
+          procedure_generator.py
+        billing/
+          __init__.py
+          billing_generator.py
+          claim_generator.py
+      temporal/
+        __init__.py
+        context.py
+        datasets.py
+        day.py
+        evolution.py
+        identity.py
+        merge.py
+        rules.py
+        temporality.py
+      validation/
+        __init__.py
+        patient_validation.py
+        provider_validation.py
+        encounter_validation.py
+        billing_validation.py
+        business_rules.py
+        master_data.py
+        referential.py
+  runners/
+    healthcare/
+      __init__.py
+      executor.py
+      stages.py
+  tests/
+    test_healthcare_runner.py
+    test_healthcare_temporal.py
+    test_healthcare_master_data.py
+    test_healthcare_patient.py
+    test_healthcare_provider.py
+    test_healthcare_encounter.py
+    test_healthcare_billing.py
+    conftest.py
+
+configs/
+  healthcare_master_data.yaml
+  healthcare_patients.yaml
+  healthcare_providers.yaml
+  healthcare_encounters.yaml
+  healthcare_billing.yaml
+  healthcare_evolution.yaml
+
+my-healthcare/                  (output directory, like my-shop)
+  data/
+  manifest.json
+  state.json
+
+
+4. Domain Enums (domain/enums.py)
+Following Retail's pattern — shared system reference enums in domain/enums.py:
+
+class PatientStatus(StrEnum): ...
+class ProviderType(StrEnum): ...
+class EncounterType(StrEnum): ...
+class BillingStatus(StrEnum): ...
+class InsuranceType(StrEnum): ...
+class RoomStatus(StrEnum): ...
+class MedicationForm(StrEnum): ...
+class AdmitSource(StrEnum): ...
+class DischargeDisposition(StrEnum): ...
+Feature-specific enums go in each feature's own enums.py:
+
+domain/patient/enums.py — PatientGender, PatientSegment
+domain/provider/enums.py — ProviderStatus
+domain/encounter/enums.py — EncounterStatus, AppointmentStatus
+domain/billing/enums.py — ClaimStatus, PaymentMethod
+
+
+5. Domain Schemas (domain/<feature>/schema.py)
+Each feature subpackage has a schema.py declaring Dataset objects with columns, primary keys, foreign keys, and unique columns — exactly like Retail's pattern.
+
+domain/master_data.py — registry of all master datasets in dependency order:
+
+MASTER_DATA_DATASETS = (
+    *DEPARTMENT_DATASETS,
+    *SPECIALTY_DATASETS,
+    *INSURANCE_PLAN_DATASETS,
+    *ROOM_TYPE_DATASETS,
+    *MEDICATION_DATASETS,
+    *DIAGNOSIS_CODE_DATASETS,
+    *PROCEDURE_CODE_DATASETS,
+    *BILLING_CODE_DATASETS,
+    *FACILITY_DATASETS,
+)
+domain/patient/schema.py — patient datasets:
+
+PATIENTS — patient_id, patient_number, first_name, last_name, full_name, gender, date_of_birth, email, phone, registration_date, status, insurance_type, primary_facility_id, created_at, updated_at
+PATIENT_ADDRESSES — address_id, patient_id, address_type, line1, line2, city_id, state_id, country_id, postal_code, is_primary, latitude, longitude, created_at
+PATIENT_INSURANCE — insurance_id, patient_id, insurance_plan_id, policy_number, group_number, effective_date, expiration_date, is_primary, created_at
+PATIENT_ALLERGIES — allergy_id, patient_id, allergen, severity, reaction, status, recorded_at, created_at
+domain/provider/schema.py — provider datasets:
+
+PROVIDERS — provider_id, provider_number, first_name, last_name, full_name, provider_type, specialty_id, department_id, license_number, status, hire_date, termination_date, created_at
+PROVIDER_DEPARTMENTS — provider_department_id, provider_id, department_id, role, is_primary, start_date, end_date, created_at
+PROVIDER_SPECIALTIES — provider_specialty_id, provider_id, specialty_id, certification_date, created_at
+domain/encounter/schema.py — encounter datasets:
+
+ENCOUNTERS — encounter_id, encounter_number, patient_id, provider_id, department_id, encounter_type, admit_source, status, admission_date, discharge_date, discharge_disposition, facility_id, room_number, bed_number, created_at
+APPOINTMENTS — appointment_id, encounter_id, patient_id, provider_id, department_id, appointment_type, scheduled_date, start_time, end_time, status, created_at
+VITALS — vital_id, encounter_id, patient_id, temperature, heart_rate, blood_pressure_systolic, blood_pressure_diastolic, respiratory_rate, oxygen_saturation, height_cm, weight_kg, bmi, recorded_at, created_at
+MEDICATIONS_PRESCRIBED — prescription_id, encounter_id, patient_id, provider_id, medication_id, dosage, frequency, route, duration_days, status, prescribed_at, created_at
+DIAGNOSES — diagnosis_id, encounter_id, patient_id, provider_id, diagnosis_code_id, diagnosis_type, onset_date, status, recorded_at, created_at
+PROCEDURES — procedure_id, encounter_id, patient_id, provider_id, procedure_code_id, procedure_description, performed_at, created_at
+domain/billing/schema.py — billing datasets:
+
+BILLING — billing_id, billing_number, encounter_id, patient_id, provider_id, billing_code_id, charge_amount, discount_amount, tax_amount, total_amount, billing_date, status, created_at
+CLAIMS — claim_id, claim_number, billing_id, insurance_plan_id, patient_id, claim_amount, approved_amount, denied_amount, status, submitted_date, processed_date, created_at
+
+
+6. Config Models (config.py)
+Following Retail's pattern — one frozen Pydantic model per feature, aggregated into SimulationConfig, plus YAML loaders:
+
+Model	Key Settings
+MasterDataConfig	department_count, specialty_count, insurance_plan_count, room_type_count, medication_count, diagnosis_code_count, procedure_code_count, billing_code_count, facility_count, batch_size
+PatientConfig	patient_count, min_addresses, max_addresses, registration_years, reference_date, batch_size
+ProviderConfig	provider_count, min_specialties, max_specialties, department_count, batch_size
+EncounterConfig	daily_encounter_rate, inpatient_rate, appointment_rate, min_encounter_duration, max_encounter_duration, batch_size
+BillingConfig	billing_rate, claim_rate, min_bill_amount, max_bill_amount, batch_size
+EvolutionConfig	new_patients_per_day, active_patient_rate, max_daily_encounters, batch_size
+SimulationConfig	aggregates all of the above + PlatformConfig
+YAML loaders: load_master_data_config, load_patient_config, load_provider_config, load_encounter_config, load_billing_config, load_evolution_config, load_config
+
+
+7. Generators
+Following Retail's pattern — orchestrator functions per stage, plus per-feature subpackages:
+
+Generator	Produces
+generators/master_data.py	MasterData bundle (all master datasets)
+generators/patient_data.py	PatientData bundle (patients, addresses, insurance, allergies)
+generators/provider_data.py	ProviderData bundle (providers, departments, specialties)
+generators/encounter_data.py	EncounterData bundle (encounters, appointments, vitals, prescriptions, diagnoses, procedures, billing, claims)
+Each orchestrator follows the same pattern as Retail's generate_master_data / generate_customer_data:
+
+Resolve seed from config
+Generate datasets in dependency order
+Order them according to the registry
+Return a frozen dataclass with datasets, seed, row_counts(), total_rows()
+
+
+
+8. Temporal Module
+Following Retail's exact pattern — 8 modules in temporal/:
+
+Module	Purpose
+context.py	BusinessContext(business_date, seed)
+datasets.py	HEALTHCARE_DATASETS registry, healthcare_dataset(), temporality_of()
+day.py	DayOfBusiness, advance_day(stage, config, context, upstream, history)
+evolution.py	What happens on each tick for each stage
+identity.py	identity_offsets(), continue_daily_sequences(), renumber(), disambiguate()
+merge.py	merge_dataset(), merge_history()
+rules.py	validate_temporal_history() — temporal invariant checks
+temporality.py	Temporality enum, DATASET_TEMPORALITY mapping
+Temporal classifications:
+
+APPEND_ONLY: encounters, appointments, vitals, medications_prescribed, diagnoses, procedures, billing, claims
+MUTABLE_SNAPSHOT: patient_allergies, patient_insurance
+SLOWLY_CHANGING: patients (status), providers (status)
+
+
+
+
+9. Validation Module
+Following Retail's pattern — per-feature validators + cross-cutting rules:
+
+Validator	Validates
+patient_validation.py	Patient demographics, insurance coverage, allergy severity
+provider_validation.py	Provider-department mapping, specialty consistency
+encounter_validation.py	Encounter dates chronological, vitals in range, prescriptions don't conflict with allergies
+billing_validation.py	Billing amounts positive, claims reference valid encounters, dates don't precede encounter dates
+business_rules.py	Cross-cutting temporal rules (encounter precedes discharge, billing follows encounter, etc.)
+master_data.py	Master data integrity
+referential.py	Shared referential integrity
+
+
+
+10. Runner
+Following Retail's exact pattern:
+
+File	Purpose
+runners/healthcare/executor.py	HealthcareExecutor implementing StageExecutor
+runners/healthcare/stages.py	HEALTHCARE_STAGES mapping, run_stage() function
+The executor reads upstream datasets, creates a BusinessContext, calls advance_day, runs validation, writes output — identical to Retail's flow.
+
+
+11. Test Structure
+Test File	Mirrors
+test_healthcare_runner.py	test_retail_runner.py — E2E, equivalence, determinism, events, persistence, resume, targeted, dry run, failure modes, integration seam
+test_healthcare_temporal.py	test_retail_temporal.py — temporality, merge, identity, business context, rules, evolution, determinism
+test_healthcare_master_data.py	Per-feature master data generator tests
+test_healthcare_patient.py	Per-feature patient generator + validator tests
+test_healthcare_provider.py	Per-feature provider generator + validator tests
+test_healthcare_encounter.py	Per-feature encounter generator + validator tests
+test_healthcare_billing.py	Per-feature billing generator + validator tests
+conftest.py	Shared fixtures (small configs, master data, patient data, etc.)
+
+
+
+12. Configuration Files
+YAML File	Purpose
+configs/healthcare_master_data.yaml	department_count, specialty_count, etc.
+configs/healthcare_patients.yaml	patient_count, address range, etc.
+configs/healthcare_providers.yaml	provider_count, specialty range, etc.
+configs/healthcare_encounters.yaml	daily encounter rate, inpatient rate, etc.
+configs/healthcare_billing.yaml	billing rate, claim rate, amount ranges
+configs/healthcare_evolution.yaml	new_patients_per_day, active_patient_rate
+
+
+
+13. What I Need From You Before Implementation
+The only remaining open items are Q8 specifics. Here is what I need you to confirm:
+
+Department names — Do you want me to use my defaults (CARDIOLOGY, ONCOLOGY, NEUROLOGY, ORTHOPEDICS, PEDIATRICS, DERMATOLOGY, PSYCHIATRY, RADIOLOGY, EMERGENCY, SURGERY, INTERNAL_MEDICINE, OBSTETRICS, GYNECOLOGY, UROLOGY, ENT, OPHTHALMOLOGY, ANESTHESIOLOGY, PATHOLOGY, LABORATORY, PHARMACY)? Or do you have a specific list?
+Specialty names — Same question. My defaults would map 1:1 with departments.
+Insurance plans — My defaults: BLUE_CROSS, AETNA, UNITEDHEALTH, CIGNA, MEDICARE, MEDICAID, SELF_PAY. Do you want to change these?
+Room types — My defaults: ICU, GENERAL, PRIVATE, SEMI_PRIVATE, EMERGENCY, OBSERVATION, SURGERY, RECOVERY. Do you want to change these?
+Medication forms — My defaults: TABLET, CAPSULE, INJECTION, TOPICAL, INHALER, LIQUID, PATCH, DROPS, SUPPOSITORY, INTRAVENOUS. Do you want to change these?
+Any CSV/Parquet seed files you want to supply for departments, specialties, medications, ICD codes, CPT codes, etc.?
+Any specific numeric targets for patient_count, provider_count, department_count, etc.? Or should I use Retail-style defaults (e.g., patient_count=1000, department_count=10, etc.)?
+Once you confirm these, I'll have everything needed to start implementing.
+
+
+
+
+
+Test Cases / Files
+Healthcare Test Files — Full Mapping to Retail's Structure
+A. Runner & Temporal (2 files)
+Retail	Healthcare
+test_retail_runner.py	test_healthcare_runner.py
+test_retail_temporal.py	test_healthcare_temporal.py
+B. Per-Feature Generator Tests (10 files)
+Retail	Healthcare
+test_master_data.py	test_healthcare_master_data.py
+test_customer_generator.py	test_healthcare_patient_generator.py
+test_customer_data.py	test_healthcare_patient_data.py
+test_customer_related.py	test_healthcare_patient_related.py
+(no retail equivalent)	test_healthcare_provider_generator.py
+(no retail equivalent)	test_healthcare_provider_data.py
+test_journey.py	test_healthcare_encounter.py
+test_journey_personas.py	test_healthcare_encounter_personas.py
+test_journey_sessions.py	test_healthcare_encounter_sessions.py
+test_commerce.py	test_healthcare_billing.py
+C. Per-Feature Validation Tests (6 files)
+Retail	Healthcare
+test_customer_validation.py	test_healthcare_patient_validation.py
+test_journey_validation.py	test_healthcare_encounter_validation.py
+test_commerce_validation.py	test_healthcare_encounter_validation.py (combined)
+test_master_data.py (validation part)	test_healthcare_master_data_validation.py
+(no retail equivalent)	test_healthcare_provider_validation.py
+(no retail equivalent)	test_healthcare_billing_validation.py
+(no retail equivalent)	test_healthcare_referential.py
+D. CLI Tests (6 files)
+Retail	Healthcare
+test_cli_generate.py	test_cli_healthcare_generate.py
+test_cli_customers.py	test_cli_healthcare_patients.py
+test_cli_commerce.py	test_cli_healthcare_encounters.py
+test_cli_payments.py	test_cli_healthcare_billing.py
+(no retail equivalent)	test_cli_healthcare_providers.py
+(no retail equivalent)	test_cli_healthcare_master_data.py
+E. Feature-Specific Engagement/Browsing (mapped to Healthcare equivalents)
+Retail	Healthcare
+test_engagement.py	test_healthcare_encounter_engagement.py
+test_engagement_product_views.py	test_healthcare_encounter_product_views.py
+test_engagement_wishlists.py	test_healthcare_encounter_wishlists.py
+test_browsing.py	test_healthcare_encounter_browsing.py
+test_browsing_categories.py	test_healthcare_encounter_browsing_categories.py
+test_browsing_searches.py	test_healthcare_encounter_browsing_searches.py
+test_browsing_validation.py	test_healthcare_encounter_browsing_validation.py
+F. Per-Feature Transaction Tests (mapped)
+Retail	Healthcare
+test_checkout.py	test_healthcare_encounter_checkout.py
+test_orders.py	test_healthcare_encounter_orders.py
+test_order_validation.py	test_healthcare_encounter_order_validation.py
+test_payments.py	test_healthcare_billing_payments.py
+test_payment_validation.py	test_healthcare_billing_payment_validation.py
+test_shipments.py	test_healthcare_encounter_shipments.py
+test_shipment_validation.py	test_healthcare_encounter_shipment_validation.py
+test_returns.py	test_healthcare_encounter_returns.py
+test_return_validation.py	test_healthcare_encounter_return_validation.py
+test_reviews.py	test_healthcare_encounter_reviews.py
+test_review_validation.py	test_healthcare_encounter_review_validation.py
+G. Shared Infrastructure (same as Retail, not domain-specific)
+These are shared across all domains and don't need Healthcare equivalents: test_config.py, test_configs.py, test_frames.py, test_package_layout.py, test_parquet_exporter.py, test_parquet_reader.py, test_platform_execution.py, test_platform_layout.py, test_platform_project.py, test_platform_run.py, test_platform_runtime.py, test_platform_scheduler.py, test_platform_time.py, test_random_streams.py, test_validation.py, test_version.py, conftest.py
+
+Total Count
+Category	Count
+Runner & Temporal	2
+Per-Feature Generator	10
+Per-Feature Validation	7
+CLI Tests	6
+Feature-Specific (engagement/browsing)	7
+Per-Feature Transaction	11
+Domain-Specific Total	43
+Shared Infrastructure	16 (reuse from Retail)
+Grand Total	59
+This matches Retail's approach — one test file per feature per concern, with shared infrastructure reused across domains.
+
+Summary: Everything Is Now Decided
+Question	Answer
+Q1. Domain name	healthcare, eds.domains.healthcare, eds.runners.healthcare
+Q2. Stages	4 stages: master-data, patients, providers, encounters
+Q3. Datasets	22 datasets across 4 stages (listed above)
+Q4. Enums	Shared in domain/enums.py, feature-specific in each subpackage
+Q5. Config models	6 models + SimulationConfig aggregate
+Q6. Temporal	APPEND_ONLY / MUTABLE_SNAPSHOT / SLOWLY_CHANGING (listed above)
+Q7. Validation	Per-feature validators + cross-cutting temporal rules
+Q8. Reference data	Generated from code (no seed files), generators/reference.py for curated vocabularies
+Q9. Features	F001–F010 numbering
+Q10. Runner	Custom HealthcareExecutor + run_stage()
+Q11. Tests	43 domain-specific + 16 shared = 59 total
+Q12. Initial data	None needed — all generated from code
+
+
+
+
+                                    Comparison btw Retail and Healthcare
+
+
+
+Similarity Score: ~85-90%
+What's 100% Similar (Architecture & Patterns)
+Aspect	Similarity
+Package structure	100% - mirrors eds/domains/retail/
+Stage pipeline	100% - 4 stages: master-data → patients → providers → encounters
+Generator pattern	100% - orchestrator + sub-generators
+Config system	100% - Pydantic models + YAML files
+Validation pattern	100% - per-stage validators
+Temporal module	100% - same 8-file structure
+Runner/executor	100% - same platform integration
+Test patterns	100% - same fixtures and assertions
+What's Different (Domain-Specific)
+Aspect	Retail	Healthcare
+Entities	Products, customers, orders, payments	Patients, providers, encounters, billing
+Geography	US states/cities	Indian states/cities
+Insurance	None	Indian plans (STAR_HEALTH, HDFC_ERGO, etc.)
+Dataset count	39	27
+Stage count	4	4 (same)
+Changes Made to Retail-Linked Files
+Only 1 file was modified:
+
+eds/cli/main.py - Added 2 lines:
+
+from eds.cli.healthcare import healthcare_app
+app.add_typer(healthcare_app)
+Why? The CLI needs to know about the healthcare command group. Just like generate_app is mounted for Retail's eds generate ... commands, healthcare_app needs to be mounted for eds healthcare ... commands. This is the entry point that makes the CLI commands work.
+
+No other Retail files were touched. The Healthcare domain is completely isolated in:
+
+eds/domains/healthcare/
+eds/runners/healthcare/
+eds/tests/test_healthcare_*.py
+configs/healthcare_*.yaml
+Summary
+Code patterns: 90% identical
+Architecture: 100% identical
+Retail files modified: 1 file (eds/cli/main.py) - only to register the new CLI command group
+Reason for modification: CLI entry point needs to expose the new healthcare command, just like it exposes generate for Retail

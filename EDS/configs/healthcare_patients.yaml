@@ -1,0 +1,9 @@
+# Patient generation settings (F002).
+
+patient_count: 1000
+min_addresses: 1
+max_addresses: 2
+registration_years: 5
+reference_date: "2026-01-01"
+
+batch_size: 100000

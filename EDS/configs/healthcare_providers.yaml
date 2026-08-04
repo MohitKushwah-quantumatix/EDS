@@ -1,0 +1,8 @@
+# Provider generation settings (F003).
+
+provider_count: 50
+min_specialties: 1
+max_specialties: 3
+department_count: 10
+
+batch_size: 100000

@@ -1,0 +1,1 @@
+"""Encounter domain models."""

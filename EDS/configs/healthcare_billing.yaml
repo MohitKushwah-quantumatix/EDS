@@ -1,0 +1,8 @@
+# Billing generation settings (F006).
+
+billing_rate: 0.7
+claim_rate: 0.8
+min_bill_amount: 100.0
+max_bill_amount: 50000.0
+
+batch_size: 100000
