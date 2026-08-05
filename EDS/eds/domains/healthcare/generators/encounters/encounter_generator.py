@@ -52,7 +52,7 @@ def generate_encounters(
             admission_date = f"{admission_year}-{admission_month:02d}-{admission_day:02d}"
             discharge_date = None
             if encounter_type == "INPATIENT":
-                discharge_day = admission_day + rng.randint(1, 30)
+                discharge_day = min(admission_day + rng.randint(1, 30), 28)
                 discharge_date = f"{admission_year}-{admission_month:02d}-{discharge_day:02d}"
 
             rows.append({
@@ -75,3 +75,4 @@ def generate_encounters(
             encounter_id += 1
 
     return pl.DataFrame(rows)
+

@@ -1,4 +1,4 @@
-"""Generate patient allergy records."""
+﻿"""Generate patient allergy records."""
 
 from __future__ import annotations
 
@@ -13,7 +13,7 @@ def generate_allergies(
     config, patients: pl.DataFrame, seed: int
 ) -> pl.DataFrame:
     rng = make_rng(seed, "patient_allergies")
-    allergens = ["Penicillin", "Sulfa", "Aspirin", "Ibuprofen", "Codeine", "Morphine", "Latex", "Peanuts", "Shellfish", "Dust Mites"]
+    allergens = ["Penicillin", "Sulfa", "Aspirin", "Ibuprofen", "Codeine", "Morphine", "Latex", "Peanuts", "Shellfish", "Dust Mites", "Pollen", "Dust", "Mold", "Eggs", "Milk", "Soy", "Wheat", "Tree Nuts", "Fish", "Sesame", "Bee Sting", "Cotton", "Nickel", "Latex Gloves", "Contrast Dye"]
 
     rows = []
     allergy_id = 1
@@ -27,7 +27,7 @@ def generate_allergies(
                     "patient_id": patient_id,
                     "allergen": rng.choice(allergens),
                     "severity": rng.choice(["MILD", "MODERATE", "SEVERE"]),
-                    "reaction": rng.choice(["RASH", "SWELLING", "ANAPHYLAXIS", "NAUSEA"]),
+                    "reaction": rng.choice(["RASH", "SWELLING", "ANAPHYLAXIS", "NAUSEA", "VOMITING", "DIARRHEA", "HIVES", "ITCHING", "WHEEZING", "COUGH", "FEVER", "HEADACHE", "DIZZINESS", "SHORTNESS_OF_BREATH", "CHEST_PAIN"]),
                     "status": "ACTIVE",
                     "recorded_at": f"{config.reference_date.year - rng.randint(0, 365)}-01-01",
                     "created_at": config.reference_date.isoformat(),
@@ -35,3 +35,4 @@ def generate_allergies(
                 allergy_id += 1
 
     return pl.DataFrame(rows)
+

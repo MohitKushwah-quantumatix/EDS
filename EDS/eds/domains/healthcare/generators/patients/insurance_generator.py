@@ -1,4 +1,4 @@
-"""Generate patient insurance records."""
+﻿"""Generate patient insurance records."""
 
 from __future__ import annotations
 
@@ -26,11 +26,12 @@ def generate_insurance(
             "insurance_plan_id": plan_id,
             "policy_number": f"POL-{rng.randint(100000, 999999)}",
             "group_number": f"GRP-{rng.randint(1000, 9999)}",
-            "effective_date": f"{config.reference_date.year - rng.randint(0, 365)}-01-01",
-            "expiration_date": f"{config.reference_date.year + rng.randint(0, 365)}-12-31",
+            "effective_date": f"{config.reference_date.year - rng.randint(0, 15)}-01-01",
+            "expiration_date": f"{config.reference_date.year + rng.randint(10, 15)}-12-31",
             "is_primary": True,
             "created_at": config.reference_date.isoformat(),
         })
         insurance_id += 1
 
     return pl.DataFrame(rows)
+

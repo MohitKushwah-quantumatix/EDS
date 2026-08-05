@@ -1,4 +1,4 @@
-"""Generate provider demographic records."""
+﻿"""Generate provider demographic records."""
 
 from __future__ import annotations
 
@@ -25,7 +25,7 @@ def generate_providers(
     for i in range(1, config.provider_count + 1):
         department_id = rng.choice(department_ids)
         specialty_id = rng.choice(specialty_ids)
-        provider_type = ["PHYSICIAN", "NURSE", "SPECIALIST", "TECHNICIAN", "ADMIN"][i % 5]
+        provider_type = rng.choice(["PHYSICIAN", "NURSE", "SPECIALIST", "TECHNICIAN", "ADMIN", "SURGEON", "ANESTHETIST", "RADIOLOGIST", "LAB_TECHNICIAN", "PHARMACIST", "RESIDENT", "FELLOW", "COORDINATOR", "THERAPIST", "ATTENDING"])
         first_name = rng.choice(first_names)
         last_name = rng.choice(last_names)
         rows.append({
@@ -45,3 +45,4 @@ def generate_providers(
         })
 
     return pl.DataFrame(rows)
+

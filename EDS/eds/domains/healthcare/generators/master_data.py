@@ -1,4 +1,4 @@
-"""Generate all master data datasets."""
+﻿"""Generate all master data datasets."""
 
 from __future__ import annotations
 
@@ -16,6 +16,7 @@ from eds.domains.healthcare.generators.reference import (
     INSURANCE_PLANS,
     ROOM_TYPES,
     MEDICATION_FORMS,
+    MEDICATIONS,
     DIAGNOSIS_CODES,
     PROCEDURE_CODES,
     COUNTRIES,
@@ -67,8 +68,8 @@ def generate_master_data(config: SimulationConfig) -> MasterData:
     insurance_plans = pl.DataFrame([{
         "insurance_plan_id": i,
         "plan_name": plan,
-        "plan_type": "HEALTH",
-        "coverage_tier": "TIER_1",
+        "plan_type": rng.choice(["HEALTH", "TERM", "CRITICAL_ILLNESS", "MATERNITY", "SENIOR_CITIZEN", "GROUP", "INDIVIDUAL", "TOP_UP"]),
+        "coverage_tier": rng.choice(["TIER_1", "TIER_2", "TIER_3"]),
         "premium_amount": round(rng.uniform(1000.0, 50000.0), 2),
         "currency_code": "INR",
     } for i, plan in enumerate(INSURANCE_PLANS[:config.master_data.insurance_plan_count], 1)])
@@ -84,7 +85,7 @@ def generate_master_data(config: SimulationConfig) -> MasterData:
     medications = pl.DataFrame([{
         "medication_id": i,
         "medication_code": f"MED-{i:05d}",
-        "medication_name": f"Medication {i}",
+        "medication_name": rng.choice(MEDICATIONS),
         "form": rng.choice(MEDICATION_FORMS),
         "strength": f"{rng.choice([10, 20, 50, 100, 250, 500])}mg",
         "unit_of_measure": "UNIT",
@@ -93,15 +94,15 @@ def generate_master_data(config: SimulationConfig) -> MasterData:
     diagnosis_codes = pl.DataFrame([{
         "diagnosis_code_id": i,
         "code": f"ICD10-{i:05d}",
-        "description": f"Diagnosis code {i}",
-        "category": rng.choice(["INFECTIOUS", "NEOPLASMS", "BLOOD", "ENDOCRINE", "MENTAL", "NERVOUS", "EYE", "EAR", "CIRCULATORY", "RESPIRATORY"]),
+        "description": DIAGNOSIS_CODES[i - 1]["description"],
+        "category": DIAGNOSIS_CODES[i - 1]["category"],
     } for i in range(1, config.master_data.diagnosis_code_count + 1)])
 
     procedure_codes = pl.DataFrame([{
         "procedure_code_id": i,
         "code": f"CPT-{i:05d}",
-        "description": f"Procedure code {i}",
-        "category": rng.choice(["EVALUATION", "SURGERY", "RADIOLOGY", "LABORATORY", "PATHOLOGY"]),
+        "description": PROCEDURE_CODES[i - 1]["description"],
+        "category": PROCEDURE_CODES[i - 1]["category"],
     } for i in range(1, config.master_data.procedure_code_count + 1)])
 
     billing_codes = pl.DataFrame([{
@@ -115,8 +116,8 @@ def generate_master_data(config: SimulationConfig) -> MasterData:
     facilities = pl.DataFrame([{
         "facility_id": i,
         "facility_code": f"FAC-{i:03d}",
-        "facility_name": f"Hospital {i}",
-        "facility_type": "HOSPITAL",
+        "facility_name": rng.choice(["Apollo Hospitals", "Fortis Healthcare", "AIIMS", "Max Healthcare", "Medanta", "Kokilaben Hospital", "Hinduja Hospital", "Lilavati Hospital", "Breach Candy Hospital", "Jaslok Hospital", "Sakra World Hospital", "Manipal Hospital", "Narayana Health", "Columbia Asia", "Paras Healthcare", "BLK Hospital", "Sir Ganga Ram Hospital", "Apollo Gleneagles", "Tata Memorial Hospital", "PGIMER"]),
+        "facility_type": rng.choice(["HOSPITAL", "DIAGNOSTIC_LAB", "CLINIC", "PHARMACY", "SPECIALTY_CENTER"]),
     } for i in range(1, config.master_data.facility_count + 1)])
 
     # Geography datasets
@@ -157,3 +158,4 @@ def generate_master_data(config: SimulationConfig) -> MasterData:
 
     ordered = {dataset.name: datasets[dataset.name] for dataset in MASTER_DATA_DATASETS if dataset.name in datasets}
     return MasterData(datasets=ordered, seed=seed)
+

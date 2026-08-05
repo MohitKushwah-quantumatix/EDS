@@ -1,13 +1,13 @@
 # Master data generation settings (F001).
 
-department_count: 10
-specialty_count: 10
-insurance_plan_count: 6
+department_count: 15
+specialty_count: 20
+insurance_plan_count: 10
 room_type_count: 5
 medication_count: 50
-diagnosis_code_count: 20
-procedure_code_count: 20
+diagnosis_code_count: 50
+procedure_code_count: 30
 billing_code_count: 15
-facility_count: 3
+facility_count: 8
 
 batch_size: 100000
