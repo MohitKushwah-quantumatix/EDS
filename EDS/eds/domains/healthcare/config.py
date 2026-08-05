@@ -1,4 +1,4 @@
-"""Business configuration for the Healthcare domain."""
+﻿"""Business configuration for the Healthcare domain."""
 
 from __future__ import annotations
 
@@ -14,6 +14,23 @@ from eds.core.config import (
     build_model,
     read_yaml_mapping,
 )
+
+#: Healthcare-specific configuration directory.
+HEALTHCARE_CONFIG_DIR: Final[Path] = DEFAULT_CONFIG_DIR / "healthcare"
+
+
+def _healthcare_config_dir(config_dir: Path | None = None) -> Path:
+    """Resolve the healthcare configuration directory.
+
+    Supports both the flat layout (``configs/healthcare_master_data.yaml``) and
+    the domain-subdirectory layout (``configs/healthcare/healthcare_master_data.yaml``)
+    so that existing callers and tests continue to work unchanged.
+    """
+    base = config_dir or DEFAULT_CONFIG_DIR
+    if (base / MASTER_DATA_CONFIG_FILE).is_file():
+        return base
+    return base / "healthcare"
+
 from eds.platform.config import PlatformConfig, load_platform_config
 
 __all__ = [
@@ -163,32 +180,32 @@ class SimulationConfig(BaseModel):
 
 
 def load_master_data_config(config_dir: Path | None = None) -> MasterDataConfig:
-    path = (config_dir or DEFAULT_CONFIG_DIR) / MASTER_DATA_CONFIG_FILE
+    path = (_healthcare_config_dir(config_dir)) / MASTER_DATA_CONFIG_FILE
     return build_model(MasterDataConfig, read_yaml_mapping(path), path)
 
 
 def load_patient_config(config_dir: Path | None = None) -> PatientConfig:
-    path = (config_dir or DEFAULT_CONFIG_DIR) / PATIENT_CONFIG_FILE
+    path = (_healthcare_config_dir(config_dir)) / PATIENT_CONFIG_FILE
     return build_model(PatientConfig, read_yaml_mapping(path), path)
 
 
 def load_provider_config(config_dir: Path | None = None) -> ProviderConfig:
-    path = (config_dir or DEFAULT_CONFIG_DIR) / PROVIDER_CONFIG_FILE
+    path = (_healthcare_config_dir(config_dir)) / PROVIDER_CONFIG_FILE
     return build_model(ProviderConfig, read_yaml_mapping(path), path)
 
 
 def load_encounter_config(config_dir: Path | None = None) -> EncounterConfig:
-    path = (config_dir or DEFAULT_CONFIG_DIR) / ENCOUNTER_CONFIG_FILE
+    path = (_healthcare_config_dir(config_dir)) / ENCOUNTER_CONFIG_FILE
     return build_model(EncounterConfig, read_yaml_mapping(path), path)
 
 
 def load_billing_config(config_dir: Path | None = None) -> BillingConfig:
-    path = (config_dir or DEFAULT_CONFIG_DIR) / BILLING_CONFIG_FILE
+    path = (_healthcare_config_dir(config_dir)) / BILLING_CONFIG_FILE
     return build_model(BillingConfig, read_yaml_mapping(path), path)
 
 
 def load_evolution_config(config_dir: Path | None = None) -> EvolutionConfig:
-    path = (config_dir or DEFAULT_CONFIG_DIR) / EVOLUTION_CONFIG_FILE
+    path = (_healthcare_config_dir(config_dir)) / EVOLUTION_CONFIG_FILE
     if not path.is_file():
         return EvolutionConfig()
     return build_model(EvolutionConfig, read_yaml_mapping(path), path)
@@ -204,3 +221,4 @@ def load_config(config_dir: Path | None = None) -> SimulationConfig:
         billing=load_billing_config(config_dir),
         evolution=load_evolution_config(config_dir),
     )
+

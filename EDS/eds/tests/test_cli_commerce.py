@@ -214,6 +214,8 @@ def test_configuration_is_carried_through_overrides(
     config_dir.mkdir()
     for source in Path("configs").glob("*.yaml"):
         (config_dir / source.name).write_text(source.read_text(encoding="utf-8"), encoding="utf-8")
+    for source in Path("configs/retail").glob("*.yaml"):
+        (config_dir / source.name).write_text(source.read_text(encoding="utf-8"), encoding="utf-8")
     (config_dir / "commerce.yaml").write_text(
         "max_quantity: 2\nmax_cart_items: 2\n", encoding="utf-8"
     )

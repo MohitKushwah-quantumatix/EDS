@@ -389,32 +389,48 @@ Q12. Initial data	None needed — all generated from code
 
 
 
-Similarity Score: ~85-90%
-What's 100% Similar (Architecture & Patterns)
-Aspect	Similarity
-Package structure	100% - mirrors eds/domains/retail/
-Stage pipeline	100% - 4 stages: master-data → patients → providers → encounters
-Generator pattern	100% - orchestrator + sub-generators
-Config system	100% - Pydantic models + YAML files
-Validation pattern	100% - per-stage validators
-Temporal module	100% - same 8-file structure
-Runner/executor	100% - same platform integration
-Test patterns	100% - same fixtures and assertions
+Similarity: ~92%
+
+What's Identical (Architecture & Patterns)
+
+Aspect	                       Match
+Package structure	             100% — domains/, generators/, temporal/, validation/, runners/
+4-stage pipeline	             100% — master-data → patients/providers → encounters
+Daily evolution	               100% — evolve_patients() / evolve_encounters() mirror Retail's evolve_customers() / evolve_commerce()
+Temporal module	               100% — same 8-file structure (context, day, evolution, identity, merge, temporality, datasets, rules)
+Config system	                 100% — Pydantic models + YAML files
+Validation pattern	           100% — per-stage validators
+Runner/executor	               100% — platform integration
+CLI pattern	                   100% — Typer subcommands
+Test patterns	                 100% — same fixtures and assertions
+BusinessContext.stream()	     100% — per-day seed derivation
+Renumbering & identity	       100% — identity_offsets, renumber, restate_key_codes
+
+
+
 What's Different (Domain-Specific)
-Aspect	Retail	Healthcare
-Entities	Products, customers, orders, payments	Patients, providers, encounters, billing
-Geography	US states/cities	Indian states/cities
-Insurance	None	Indian plans (STAR_HEALTH, HDFC_ERGO, etc.)
-Dataset count	39	27
-Stage count	4	4 (same)
-Changes Made to Retail-Linked Files
-Only 1 file was modified:
+Aspect	            Retail	                                           Healthcare
+Entities	          Customers, products, orders, payments	             Patients, providers, encounters, billing
+Geography	          US states/cities	                                 Indian states/cities
+Insurance	          None	                                             Indian plans (STAR_HEALTH, HDFC_ERGO, etc.)
+Dataset count	      39	                                               27
+Business codes	    CUST-, ORD-, PAY-	                                 PAT-, PROV-, ENC-, BILL-, CLM-, APT-
 
-eds/cli/main.py - Added 2 lines:
 
-from eds.cli.healthcare import healthcare_app
-app.add_typer(healthcare_app)
-Why? The CLI needs to know about the healthcare command group. Just like generate_app is mounted for Retail's eds generate ... commands, healthcare_app needs to be mounted for eds healthcare ... commands. This is the entry point that makes the CLI commands work.
+
+Retail Code Changes: Yes — 1 file only
+File modified: eds/cli/main.py
+
+
+Exact diff:
+
++from eds.cli.healthcare import healthcare_app
+...
++app.add_typer(healthcare_app)
+
+
+
+Why? The CLI entry point needs to know about the new healthcare command group, just like it knows about generate_app for Retail's eds generate ... commands. Without this, eds healthcare ... commands wouldn't exist.
 
 No other Retail files were touched. The Healthcare domain is completely isolated in:
 
@@ -422,8 +438,3 @@ eds/domains/healthcare/
 eds/runners/healthcare/
 eds/tests/test_healthcare_*.py
 configs/healthcare_*.yaml
-Summary
-Code patterns: 90% identical
-Architecture: 100% identical
-Retail files modified: 1 file (eds/cli/main.py) - only to register the new CLI command group
-Reason for modification: CLI entry point needs to expose the new healthcare command, just like it exposes generate for Retail

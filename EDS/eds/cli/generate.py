@@ -1,4 +1,4 @@
-"""The ``eds generate`` command group.
+﻿"""The ``eds generate`` command group.
 
 Exposes master data generation to the command line. CLI options override the
 values loaded from the configuration files, so a demo can be resized without
@@ -129,6 +129,10 @@ def _apply_overrides(
         platform_updates["seed"] = seed
     if output is not None:
         platform_updates["output_directory"] = output
+    else:
+        # Default to a domain-specific subdirectory so retail and healthcare
+        # outputs do not share the same folder.
+        platform_updates["output_directory"] = config.platform.output_directory / "retail"
 
     master_updates: dict[str, object] = {}
     if products is not None:
@@ -609,3 +613,4 @@ def commerce(
         raise typer.Exit(code=_EXIT_EXPORT_ERROR) from exc
 
     _report(produced, data.seed, config.platform.output_directory)
+

@@ -1,4 +1,4 @@
-"""Business configuration for the Retail domain.
+﻿"""Business configuration for the Retail domain.
 
 One Pydantic model per feature, aggregated by :class:`SimulationConfig`, plus
 the loader for each ``configs/*.yaml`` file. Every model is frozen and forbids
@@ -25,6 +25,23 @@ from eds.core.config import (
     build_model,
     read_yaml_mapping,
 )
+
+#: Retail-specific configuration directory.
+RETAIL_CONFIG_DIR: Final[Path] = DEFAULT_CONFIG_DIR / "retail"
+
+
+def _retail_config_dir(config_dir: Path | None = None) -> Path:
+    """Resolve the retail configuration directory.
+
+    Supports both the flat layout (``configs/master_data.yaml``) and the
+    domain-subdirectory layout (``configs/retail/master_data.yaml``) so that
+    existing callers and tests continue to work unchanged.
+    """
+    base = config_dir or DEFAULT_CONFIG_DIR
+    if (base / MASTER_DATA_CONFIG_FILE).is_file():
+        return base
+    return base / "retail"
+
 from eds.platform.config import PlatformConfig, load_platform_config
 
 __all__ = [
@@ -925,7 +942,7 @@ def load_master_data_config(config_dir: Path | None = None) -> MasterDataConfig:
     Raises:
         ConfigError: If the file is missing or invalid.
     """
-    path = (config_dir or DEFAULT_CONFIG_DIR) / MASTER_DATA_CONFIG_FILE
+    path = (_retail_config_dir(config_dir)) / MASTER_DATA_CONFIG_FILE
     return build_model(MasterDataConfig, read_yaml_mapping(path), path)
 
 
@@ -942,7 +959,7 @@ def load_customer_config(config_dir: Path | None = None) -> CustomerConfig:
     Raises:
         ConfigError: If the file is missing or invalid.
     """
-    path = (config_dir or DEFAULT_CONFIG_DIR) / CUSTOMER_CONFIG_FILE
+    path = (_retail_config_dir(config_dir)) / CUSTOMER_CONFIG_FILE
     return build_model(CustomerConfig, read_yaml_mapping(path), path)
 
 
@@ -959,7 +976,7 @@ def load_journey_config(config_dir: Path | None = None) -> JourneyConfig:
     Raises:
         ConfigError: If the file is missing or invalid.
     """
-    path = (config_dir or DEFAULT_CONFIG_DIR) / JOURNEY_CONFIG_FILE
+    path = (_retail_config_dir(config_dir)) / JOURNEY_CONFIG_FILE
     return build_model(JourneyConfig, read_yaml_mapping(path), path)
 
 
@@ -976,7 +993,7 @@ def load_browsing_config(config_dir: Path | None = None) -> BrowsingConfig:
     Raises:
         ConfigError: If the file is missing or invalid.
     """
-    path = (config_dir or DEFAULT_CONFIG_DIR) / BROWSING_CONFIG_FILE
+    path = (_retail_config_dir(config_dir)) / BROWSING_CONFIG_FILE
     return build_model(BrowsingConfig, read_yaml_mapping(path), path)
 
 
@@ -993,7 +1010,7 @@ def load_engagement_config(config_dir: Path | None = None) -> EngagementConfig:
     Raises:
         ConfigError: If the file is missing or invalid.
     """
-    path = (config_dir or DEFAULT_CONFIG_DIR) / ENGAGEMENT_CONFIG_FILE
+    path = (_retail_config_dir(config_dir)) / ENGAGEMENT_CONFIG_FILE
     return build_model(EngagementConfig, read_yaml_mapping(path), path)
 
 
@@ -1010,7 +1027,7 @@ def load_commerce_config(config_dir: Path | None = None) -> CommerceConfig:
     Raises:
         ConfigError: If the file is missing or invalid.
     """
-    path = (config_dir or DEFAULT_CONFIG_DIR) / COMMERCE_CONFIG_FILE
+    path = (_retail_config_dir(config_dir)) / COMMERCE_CONFIG_FILE
     return build_model(CommerceConfig, read_yaml_mapping(path), path)
 
 
@@ -1027,7 +1044,7 @@ def load_checkout_config(config_dir: Path | None = None) -> CheckoutConfig:
     Raises:
         ConfigError: If the file is missing or invalid.
     """
-    path = (config_dir or DEFAULT_CONFIG_DIR) / CHECKOUT_CONFIG_FILE
+    path = (_retail_config_dir(config_dir)) / CHECKOUT_CONFIG_FILE
     return build_model(CheckoutConfig, read_yaml_mapping(path), path)
 
 
@@ -1044,7 +1061,7 @@ def load_order_config(config_dir: Path | None = None) -> OrderConfig:
     Raises:
         ConfigError: If the file is missing or invalid.
     """
-    path = (config_dir or DEFAULT_CONFIG_DIR) / ORDER_CONFIG_FILE
+    path = (_retail_config_dir(config_dir)) / ORDER_CONFIG_FILE
     return build_model(OrderConfig, read_yaml_mapping(path), path)
 
 
@@ -1061,7 +1078,7 @@ def load_payment_config(config_dir: Path | None = None) -> PaymentConfig:
     Raises:
         ConfigError: If the file is missing or invalid.
     """
-    path = (config_dir or DEFAULT_CONFIG_DIR) / PAYMENT_CONFIG_FILE
+    path = (_retail_config_dir(config_dir)) / PAYMENT_CONFIG_FILE
     return build_model(PaymentConfig, read_yaml_mapping(path), path)
 
 
@@ -1078,7 +1095,7 @@ def load_shipment_config(config_dir: Path | None = None) -> ShipmentConfig:
     Raises:
         ConfigError: If the file is missing or invalid.
     """
-    path = (config_dir or DEFAULT_CONFIG_DIR) / SHIPMENT_CONFIG_FILE
+    path = (_retail_config_dir(config_dir)) / SHIPMENT_CONFIG_FILE
     return build_model(ShipmentConfig, read_yaml_mapping(path), path)
 
 
@@ -1095,7 +1112,7 @@ def load_return_config(config_dir: Path | None = None) -> ReturnConfig:
     Raises:
         ConfigError: If the file is missing or invalid.
     """
-    path = (config_dir or DEFAULT_CONFIG_DIR) / RETURN_CONFIG_FILE
+    path = (_retail_config_dir(config_dir)) / RETURN_CONFIG_FILE
     return build_model(ReturnConfig, read_yaml_mapping(path), path)
 
 
@@ -1112,7 +1129,7 @@ def load_review_config(config_dir: Path | None = None) -> ReviewConfig:
     Raises:
         ConfigError: If the file is missing or invalid.
     """
-    path = (config_dir or DEFAULT_CONFIG_DIR) / REVIEW_CONFIG_FILE
+    path = (_retail_config_dir(config_dir)) / REVIEW_CONFIG_FILE
     return build_model(ReviewConfig, read_yaml_mapping(path), path)
 
 
@@ -1137,7 +1154,7 @@ def load_evolution_config(config_dir: Path | None = None) -> EvolutionConfig:
     Raises:
         ConfigError: If the file exists but is invalid.
     """
-    path = (config_dir or DEFAULT_CONFIG_DIR) / EVOLUTION_CONFIG_FILE
+    path = (_retail_config_dir(config_dir)) / EVOLUTION_CONFIG_FILE
     if not path.is_file():
         return EvolutionConfig()
     return build_model(EvolutionConfig, read_yaml_mapping(path), path)
@@ -1172,3 +1189,7 @@ def load_config(config_dir: Path | None = None) -> SimulationConfig:
         reviews=load_review_config(config_dir),
         evolution=load_evolution_config(config_dir),
     )
+
+
+
+

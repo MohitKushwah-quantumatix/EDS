@@ -199,6 +199,8 @@ def test_configuration_is_carried_through_overrides(
     config_dir.mkdir()
     for source in Path("configs").glob("*.yaml"):
         (config_dir / source.name).write_text(source.read_text(encoding="utf-8"), encoding="utf-8")
+    for source in Path("configs/retail").glob("*.yaml"):
+        (config_dir / source.name).write_text(source.read_text(encoding="utf-8"), encoding="utf-8")
     (config_dir / "checkout.yaml").write_text(
         "min_tax_rate: 0.10\nmax_tax_rate: 0.10\nsame_address_rate: 1.0\n",
         encoding="utf-8",

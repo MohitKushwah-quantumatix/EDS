@@ -86,6 +86,10 @@ def _apply_overrides(
         platform_updates["seed"] = seed
     if output is not None:
         platform_updates["output_directory"] = output
+    else:
+        # Default to a domain-specific subdirectory so retail and healthcare
+        # outputs do not share the same folder.
+        platform_updates["output_directory"] = config.platform.output_directory / "healthcare"
 
     master_updates: dict[str, object] = {}
     if departments is not None:
@@ -443,3 +447,4 @@ def healthcare_encounters(
         raise typer.Exit(code=_EXIT_EXPORT_ERROR) from exc
 
     _report(data.datasets, data.seed, config.platform.output_directory)
+
