@@ -19,7 +19,8 @@ imported by the Retail domain. It depends on both; neither depends on it.
 """
 
 import eds.domains.retail  # noqa: F401  - importing the runner registers the domain
+from eds.runners.retail.dataset_registry import RETAIL_DATASET_SCHEMAS
 from eds.runners.retail.executor import RetailExecutor
 from eds.runners.retail.stages import RETAIL_STAGES, StageValidation, run_stage
 
-__all__ = ["RETAIL_STAGES", "RetailExecutor", "StageValidation", "run_stage"]
+__all__ = ["RETAIL_DATASET_SCHEMAS", "RETAIL_STAGES", "RetailExecutor", "StageValidation", "run_stage"]
