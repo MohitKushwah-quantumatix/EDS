@@ -17,10 +17,16 @@ def _master_data_stage() -> DomainStage:
 def _patients_stage() -> DomainStage:
     from eds.domains.healthcare.generators.patient_data import REQUIRED_MASTER_DATASETS
     from eds.domains.healthcare.domain.patient.schema import patient_dataset_names
+    produces = (
+        *patient_dataset_names(),
+        "immunizations",
+        "patient_emergency_contacts",
+    )
+    requires = dict.fromkeys(REQUIRED_MASTER_DATASETS)
     return DomainStage(
         name="patients",
-        requires=REQUIRED_MASTER_DATASETS,
-        produces=patient_dataset_names(),
+        requires=tuple(name for name in requires if name not in set(produces)),
+        produces=produces,
     )
 
 
@@ -38,7 +44,16 @@ def _encounters_stage() -> DomainStage:
     from eds.domains.healthcare.generators.encounter_data import REQUIRED_MASTER_DATASETS
     from eds.domains.healthcare.domain.encounter.schema import encounter_dataset_names
     from eds.domains.healthcare.domain.billing.schema import billing_dataset_names
-    produces = (*encounter_dataset_names(), *billing_dataset_names())
+    produces = (
+        *encounter_dataset_names(),
+        *billing_dataset_names(),
+        "lab_results",
+        "radiology_reports",
+        "medication_administration",
+        "admissions",
+        "discharge_summaries",
+        "referrals",
+    )
     requires = dict.fromkeys(REQUIRED_MASTER_DATASETS)
     return DomainStage(
         name="encounters",

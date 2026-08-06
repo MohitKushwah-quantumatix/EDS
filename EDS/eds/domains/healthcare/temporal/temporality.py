@@ -52,6 +52,15 @@ DATASET_TEMPORALITY: dict[str, Temporality] = {
     # Billing datasets: append only
     "billing": Temporality.APPEND_ONLY,
     "claims": Temporality.APPEND_ONLY,
+    # Additional datasets
+    "lab_results": Temporality.APPEND_ONLY,
+    "radiology_reports": Temporality.APPEND_ONLY,
+    "medication_administration": Temporality.APPEND_ONLY,
+    "admissions": Temporality.APPEND_ONLY,
+    "discharge_summaries": Temporality.APPEND_ONLY,
+    "immunizations": Temporality.APPEND_ONLY,
+    "referrals": Temporality.APPEND_ONLY,
+    "patient_emergency_contacts": Temporality.APPEND_ONLY,
 }
 
 

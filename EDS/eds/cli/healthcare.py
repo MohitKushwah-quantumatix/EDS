@@ -43,6 +43,22 @@ from eds.domains.healthcare.generators.provider_data import (
     REQUIRED_MASTER_DATASETS as REQUIRED_PROVIDER_DATASETS,
     generate_provider_data,
 )
+from eds.domains.healthcare.generators.additional.immunizations import generate_immunizations
+from eds.domains.healthcare.generators.additional.patient_emergency_contacts import (
+    generate_patient_emergency_contacts,
+)
+from eds.domains.healthcare.generators.additional.admissions import generate_admissions
+from eds.domains.healthcare.generators.additional.discharge_summaries import (
+    generate_discharge_summaries,
+)
+from eds.domains.healthcare.generators.additional.lab_results import generate_lab_results
+from eds.domains.healthcare.generators.additional.medication_administration import (
+    generate_medication_administration,
+)
+from eds.domains.healthcare.generators.additional.radiology_reports import (
+    generate_radiology_reports,
+)
+from eds.domains.healthcare.generators.additional.referrals import generate_referrals
 from eds.domains.healthcare.validation.billing_validation import validate_billing_data
 from eds.domains.healthcare.validation.encounter_validation import validate_encounter_data
 from eds.domains.healthcare.validation.master_data import validate_master_data
@@ -300,9 +316,23 @@ def healthcare_patients(
         typer.echo(f"Generation failed: {exc}", err=True)
         raise typer.Exit(code=_EXIT_CONFIG_ERROR) from exc
 
+    combined_upstream = {**master, **data.datasets}
+    try:
+        additional = {
+            "immunizations": generate_immunizations(config, combined_upstream),
+            "patient_emergency_contacts": generate_patient_emergency_contacts(
+                config, combined_upstream
+            ),
+        }
+    except Exception as exc:
+        typer.echo(f"Additional generation failed: {exc}", err=True)
+        raise typer.Exit(code=_EXIT_CONFIG_ERROR) from exc
+
+    datasets = {**data.datasets, **additional}
+
     if validate:
         issues = validate_patient_data(
-            {**master, **data.datasets},
+            combined_upstream,
             config.patients.min_addresses,
             config.patients.max_addresses,
         )
@@ -313,16 +343,16 @@ def healthcare_patients(
 
     if dry_run:
         typer.echo("Dry run: no files written.")
-        _report(data.datasets, data.seed, config.platform.output_directory)
+        _report(datasets, data.seed, config.platform.output_directory)
         return
 
     try:
-        write_datasets(data.datasets, config.platform.output_directory)
+        write_datasets(datasets, config.platform.output_directory)
     except ExportError as exc:
         typer.echo(f"Export failed: {exc}", err=True)
         raise typer.Exit(code=_EXIT_EXPORT_ERROR) from exc
 
-    _report(data.datasets, data.seed, config.platform.output_directory)
+    _report(datasets, data.seed, config.platform.output_directory)
 
 
 @healthcare_app.command("providers")
@@ -427,6 +457,24 @@ def healthcare_encounters(
         typer.echo(f"Generation failed: {exc}", err=True)
         raise typer.Exit(code=_EXIT_CONFIG_ERROR) from exc
 
+    combined_upstream = {**upstream, **data.datasets}
+    try:
+        additional = {
+            "lab_results": generate_lab_results(config, combined_upstream),
+            "radiology_reports": generate_radiology_reports(config, combined_upstream),
+            "medication_administration": generate_medication_administration(
+                config, combined_upstream
+            ),
+            "admissions": generate_admissions(config, combined_upstream),
+            "discharge_summaries": generate_discharge_summaries(config, combined_upstream),
+            "referrals": generate_referrals(config, combined_upstream),
+        }
+    except Exception as exc:
+        typer.echo(f"Additional generation failed: {exc}", err=True)
+        raise typer.Exit(code=_EXIT_CONFIG_ERROR) from exc
+
+    datasets = {**data.datasets, **additional}
+
     if validate:
         issues = validate_encounter_data({**upstream, **data.datasets})
         issues += validate_billing_data({**upstream, **data.datasets})
@@ -437,14 +485,14 @@ def healthcare_encounters(
 
     if dry_run:
         typer.echo("Dry run: no files written.")
-        _report(data.datasets, data.seed, config.platform.output_directory)
+        _report(datasets, data.seed, config.platform.output_directory)
         return
 
     try:
-        write_datasets(data.datasets, config.platform.output_directory)
+        write_datasets(datasets, config.platform.output_directory)
     except ExportError as exc:
         typer.echo(f"Export failed: {exc}", err=True)
         raise typer.Exit(code=_EXIT_EXPORT_ERROR) from exc
 
-    _report(data.datasets, data.seed, config.platform.output_directory)
+    _report(datasets, data.seed, config.platform.output_directory)
 

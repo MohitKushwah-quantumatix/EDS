@@ -13,6 +13,8 @@ from eds.domains.healthcare.domain.provider.schema import PROVIDER_DATASETS
 from eds.domains.healthcare.domain.encounter.schema import ENCOUNTER_DATASETS
 from eds.domains.healthcare.domain.billing.schema import BILLING_DATASETS
 
+from eds.domains.healthcare.domain.additional.schema import ADDITIONAL_DATASETS
+
 __all__ = ["HEALTHCARE_DATASETS", "healthcare_dataset"]
 
 HEALTHCARE_DATASETS: tuple[Dataset, ...] = (
@@ -21,6 +23,7 @@ HEALTHCARE_DATASETS: tuple[Dataset, ...] = (
     *PROVIDER_DATASETS,
     *ENCOUNTER_DATASETS,
     *BILLING_DATASETS,
+    *ADDITIONAL_DATASETS,
 )
 
 _BY_NAME: dict[str, Dataset] = {dataset.name: dataset for dataset in HEALTHCARE_DATASETS}
