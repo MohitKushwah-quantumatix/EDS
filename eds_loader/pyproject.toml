@@ -12,13 +12,16 @@ dynamic = ["version"]
 authors = [{ name = "Makin Laboratories" }]
 keywords = ["eds", "data-loader", "etl", "synthetic-data", "enterprise"]
 classifiers = [
-  "Development Status :: 3 - Alpha",
+  "Development Status :: 4 - Beta",
   "Intended Audience :: Developers",
   "License :: OSI Approved :: MIT License",
   "Programming Language :: Python :: 3",
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
   "Typing :: Typed",
+  "Topic :: Database",
+  "Topic :: System :: Archiving",
+  "Topic :: Utilities",
 ]
 
 # Core runtime deps — no eds_core here (FR-1).
@@ -56,6 +59,13 @@ dev = [
   "ruff>=0.5",
   "mypy>=1.10",
   "types-PyYAML>=6.0",
+  "paramiko>=3.4",
+  "psycopg[binary]>=3.1",
+  "pymysql>=1.1",
+  "pymongo>=4.5",
+  "boto3>=1.28",
+  "azure-storage-blob>=12.19",
+  "google-cloud-storage>=2.14",
 ]
 
 [project.scripts]

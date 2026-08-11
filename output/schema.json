@@ -1,0 +1,252 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "Customer",
+    "description": "Comprehensive customer profile schema including personal details, addresses, contact information, preferences, and account metadata.",
+    "type": "object",
+    "required": [
+        "customerId",
+        "personalInfo",
+        "contactInfo",
+        "accountStatus",
+        "createdAt"
+    ],
+    "properties": {
+        "customerId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Unique identifier for the customer."
+        },
+        "personalInfo": {
+            "type": "object",
+            "required": [
+                "firstName",
+                "lastName"
+            ],
+            "properties": {
+                "title": {
+                    "type": "string",
+                    "enum": [
+                        "Mr.",
+                        "Mrs.",
+                        "Ms.",
+                        "Dr.",
+                        "Prof.",
+                        "Mx.",
+                        "Other"
+                    ]
+                },
+                "firstName": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 50
+                },
+                "middleName": {
+                    "type": "string",
+                    "maxLength": 50
+                },
+                "lastName": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 50
+                },
+                "dateOfBirth": {
+                    "type": "string",
+                    "format": "date"
+                },
+                "gender": {
+                    "type": "string",
+                    "enum": [
+                        "male",
+                        "female",
+                        "non-binary",
+                        "prefer_not_to_say",
+                        "other"
+                    ]
+                }
+            }
+        },
+        "contactInfo": {
+            "type": "object",
+            "required": [
+                "email",
+                "phoneNumbers"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string",
+                    "format": "email"
+                },
+                "alternateEmail": {
+                    "type": "string",
+                    "format": "email"
+                },
+                "phoneNumbers": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                        "type": "object",
+                        "required": [
+                            "type",
+                            "number"
+                        ],
+                        "properties": {
+                            "type": {
+                                "type": "string",
+                                "enum": [
+                                    "mobile",
+                                    "home",
+                                    "work",
+                                    "other"
+                                ]
+                            },
+                            "countryCode": {
+                                "type": "string",
+                                "pattern": "^\\+[1-9]\\d{0,3}$"
+                            },
+                            "number": {
+                                "type": "string",
+                                "pattern": "^[0-9]{7,15}$"
+                            },
+                            "isPrimary": {
+                                "type": "boolean",
+                                "default": false
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "addresses": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "required": [
+                    "addressType",
+                    "streetLine1",
+                    "city",
+                    "state",
+                    "postalCode",
+                    "country"
+                ],
+                "properties": {
+                    "addressType": {
+                        "type": "string",
+                        "enum": [
+                            "billing",
+                            "shipping",
+                            "home",
+                            "work"
+                        ]
+                    },
+                    "streetLine1": {
+                        "type": "string",
+                        "maxLength": 100
+                    },
+                    "streetLine2": {
+                        "type": "string",
+                        "maxLength": 100
+                    },
+                    "city": {
+                        "type": "string",
+                        "maxLength": 50
+                    },
+                    "state": {
+                        "type": "string",
+                        "maxLength": 50
+                    },
+                    "postalCode": {
+                        "type": "string",
+                        "maxLength": 20
+                    },
+                    "country": {
+                        "type": "string",
+                        "description": "ISO 3166-1 alpha-2 country code",
+                        "pattern": "^[A-Z]{2}$"
+                    },
+                    "isDefault": {
+                        "type": "boolean",
+                        "default": false
+                    }
+                }
+            }
+        },
+        "accountStatus": {
+            "type": "string",
+            "enum": [
+                "active",
+                "inactive",
+                "suspended",
+                "pending_verification"
+            ],
+            "default": "pending_verification"
+        },
+        "loyaltyProgram": {
+            "type": "object",
+            "properties": {
+                "tier": {
+                    "type": "string",
+                    "enum": [
+                        "bronze",
+                        "silver",
+                        "gold",
+                        "platinum"
+                    ]
+                },
+                "points": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "default": 0
+                },
+                "joinedAt": {
+                    "type": "string",
+                    "format": "date-time"
+                }
+            }
+        },
+        "preferences": {
+            "type": "object",
+            "properties": {
+                "preferredLanguage": {
+                    "type": "string",
+                    "pattern": "^[a-z]{2}(-[A-Z]{2})?$",
+                    "default": "en-US"
+                },
+                "currency": {
+                    "type": "string",
+                    "pattern": "^[A-Z]{3}$",
+                    "default": "USD"
+                },
+                "marketingOptIn": {
+                    "type": "object",
+                    "properties": {
+                        "email": {
+                            "type": "boolean",
+                            "default": false
+                        },
+                        "sms": {
+                            "type": "boolean",
+                            "default": false
+                        },
+                        "push": {
+                            "type": "boolean",
+                            "default": false
+                        }
+                    }
+                }
+            }
+        },
+        "metadata": {
+            "type": "object",
+            "additionalProperties": true,
+            "description": "Custom key-value pairs for integration-specific or domain-specific data."
+        },
+        "createdAt": {
+            "type": "string",
+            "format": "date-time"
+        },
+        "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+        }
+    }
+}

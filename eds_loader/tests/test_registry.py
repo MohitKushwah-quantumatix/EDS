@@ -57,14 +57,25 @@ def test_register_connector_adds_to_registry() -> None:
     assert "test_kind" in CONNECTORS
 
 
-def test_register_connector_overwrites_existing() -> None:
+def test_register_connector_first_wins_when_implemented() -> None:
+    """When a connector_class is already registered, a second call is a no-op."""
     cls1 = _make_connector_class()
     cls2 = _make_connector_class()
     spec1 = ConnectorSpec(connector_class=cls1, description="first")
     spec2 = ConnectorSpec(connector_class=cls2, description="second")
     register_connector("my_kind", spec1)
-    register_connector("my_kind", spec2)
-    assert CONNECTORS["my_kind"].description == "second"
+    register_connector("my_kind", spec2)  # should be ignored
+    assert CONNECTORS["my_kind"].description == "first"   # first-wins
+
+
+def test_register_connector_placeholder_can_be_upgraded() -> None:
+    """A placeholder (connector_class=None) can be replaced by a real implementation."""
+    cls = _make_connector_class()
+    spec_placeholder = ConnectorSpec(connector_class=None, description="placeholder")
+    spec_real = ConnectorSpec(connector_class=cls, description="real")
+    register_connector("placeholder_kind", spec_placeholder)
+    register_connector("placeholder_kind", spec_real)  # should replace
+    assert CONNECTORS["placeholder_kind"].description == "real"
 
 
 # ---------------------------------------------------------------------------

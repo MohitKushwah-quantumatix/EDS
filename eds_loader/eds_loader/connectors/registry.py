@@ -71,21 +71,48 @@ def register_connector(kind: str, spec: ConnectorSpec) -> None:
     Called once per connector file, at module level, so the connector
     becomes available as soon as its module is imported.
 
+    If a connector with *kind* is already registered and its
+    ``connector_class`` is non-``None`` (i.e. fully implemented), the
+    existing registration wins.  This prevents stale system-installed
+    packages from clobbering a newer editable install or vice-versa.
+
     Args:
         kind: Short identifier used in config YAML (e.g. ``"local_fs"``,
             ``"postgres"``).
         spec: Complete specification for this connector.
     """
+    existing = CONNECTORS.get(kind)
+    if existing is not None and existing.connector_class is not None:
+        # Already registered with a working implementation — keep it.
+        return
     CONNECTORS[kind] = spec
 
 
 def _is_package_available(package: str) -> bool:
-    """Return ``True`` if *package* can be imported from the current environment."""
+    """Return ``True`` if *package* can be imported from the current environment.
+
+    Handles both import-style names (``"azure.storage.blob"``) and PyPI
+    distribution names with hyphens (``"azure-storage-blob"``).  Hyphens are
+    converted to underscores and the result is tried as an import; if that
+    fails, the original string is also attempted.
+    """
+    # Try the name as-is first (covers dotted paths like "azure.storage.blob")
     try:
         importlib.import_module(package)
         return True
-    except ImportError:
-        return False
+    except (ImportError, ModuleNotFoundError):
+        pass
+
+    # Normalise hyphens → underscores and retry
+    normalised = package.replace("-", "_")
+    if normalised != package:
+        try:
+            importlib.import_module(normalised)
+            return True
+        except (ImportError, ModuleNotFoundError):
+            pass
+
+    return False
 
 
 def get_connector(kind: str, raw_config: dict[str, Any]) -> Any:

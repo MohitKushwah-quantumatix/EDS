@@ -135,6 +135,14 @@ class LoaderConfig(BaseModel):
         default=True,
         description="Apply PK/FK/UNIQUE constraints on the target (where supported).",
     )
+    schema_required: bool = Field(
+        default=True,
+        description=(
+            "When False, schema.json is not read.  Datasets are auto-discovered "
+            "by listing *.parquet files from the source.  Constraint enforcement "
+            "is automatically disabled (no schema metadata to forward)."
+        ),
+    )
 
     @model_validator(mode="after")
     def _no_blank_table_names(self) -> "LoaderConfig":

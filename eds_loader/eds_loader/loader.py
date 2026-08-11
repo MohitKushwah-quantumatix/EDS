@@ -42,6 +42,7 @@ class LoadResult:
 
     tables_written: list[str] = field(default_factory=list)
     rows_written: dict[str, int] = field(default_factory=dict)
+    write_results: list[Any] = field(default_factory=list)  # list[WriteResult]
 
     @property
     def total_rows(self) -> int:
@@ -57,7 +58,8 @@ def load(config: LoaderConfig) -> LoadResult:
     1. Instantiate source and target connectors from the registry.
     2. Verify source is :class:`~eds_loader.connectors.base.Readable` and
        target is :class:`~eds_loader.connectors.base.Writable`.
-    3. Read ``schema.json`` from the source.
+    3. Read ``schema.json`` from the source (skipped when
+       ``config.schema_required`` is ``False``).
     4. Determine which tables to load (all, or the ``config.tables`` subset).
     5. Read those datasets from the source.
     6. Write them to the target (with or without constraint metadata).
@@ -100,6 +102,20 @@ def load(config: LoaderConfig) -> LoadResult:
             f"as a target.  Run `eds-loader connectors` to check connector capabilities."
         )
 
+    # ── Schema path ───────────────────────────────────────────────────────
+    if not config.schema_required:
+        # Skip schema.json entirely.  Auto-discover datasets by listing
+        # *.parquet files at the source.  No constraint metadata is forwarded.
+        names_to_load: list[str] | None = list(config.tables) if config.tables else None
+        datasets = source.read_datasets(names=names_to_load)
+        write_results = target.write_datasets(datasets, {})
+        return LoadResult(
+            tables_written=[r.dataset for r in write_results],
+            rows_written={r.dataset: r.rows for r in write_results},
+            write_results=write_results,
+        )
+
+    # ── Normal path (schema_required=True, default) ───────────────────────
     # Read the portable schema metadata (from schema.json at the source).
     schema_metadata: dict[str, Any] = source.read_schema_metadata()
 
@@ -134,4 +150,5 @@ def load(config: LoaderConfig) -> LoadResult:
     return LoadResult(
         tables_written=[r.dataset for r in write_results],
         rows_written={r.dataset: r.rows for r in write_results},
+        write_results=write_results,
     )
