@@ -54,7 +54,7 @@ listed are private and may change.
 | `eds.platform.scheduler` | 3 | 6 | Execution |
 | `eds.domains.retail` | 2 | 2 | Domain description |
 | `eds.domains.retail.temporal` | 8 | 10 | Evolution over simulated time |
-| `eds.adapters` | 1 + parquet | 6 | Store of Record |
+| `eds.adapters` | 1 + parquet + postgres | 8 | Store of Record |
 | `eds.runners.retail` | 2 | 4 | Integration boundary |
 | `eds.cli` | 2 | 4 | Command line |
 
@@ -97,6 +97,7 @@ framework.
 | `eds.core.frames` | `build_frame`, `empty_frame`, `format_code` |
 | `eds.core.random_streams` | `make_rng`, `make_faker`, `resolve_seed`, `stream_seed` |
 | `eds.core.config` | `DEFAULT_CONFIG_DIR`, `ConfigError`, `build_model`, `read_yaml_mapping` |
+| `eds.core.schema_export` | `SCHEMA_EXPORT_FILE`, `export_schema_json` |
 
 ### Important classes
 
@@ -131,6 +132,16 @@ EDS v1.0** — only `ForeignKey(nullable=True)` exists.
 | `resolve_seed(seed)` | Returns the seed, or draws entropy when it is `None` |
 | `read_yaml_mapping(path)` | Parses a YAML mapping. Raises `ConfigError` |
 | `build_model(model, mapping, path)` | Builds a Pydantic model, reporting the file on failure |
+
+**`export_schema_json(datasets, path, merge=True)`** (in `eds.core.schema_export`)
+writes `Dataset` declarations as plain JSON — primary key, foreign keys, unique
+columns, and column types under a small portable vocabulary (`"int64"`,
+`"string"`, ...), independent of Polars or any other EDS-specific type. Wired into
+`eds.cli.generate`: each of the four `eds generate` commands merges its own
+datasets into `<output_directory>/schema.json` rather than overwriting it, so the
+file accumulates into one complete picture regardless of command order. Exists so
+a process with no dependency on EDS's own code (the Loader Tool, per the EDS
+Loader Tool requirements) can still know a dataset's constraints.
 
 ### Why named streams exist
 
@@ -708,6 +719,8 @@ runner.
 | --- | --- |
 | `eds.adapters.base` | `DatasetWriter`, `DatasetReader`, `WriteResult`, `AdapterError` |
 | `eds.adapters.parquet.adapter` | `ParquetAdapter`, `PARQUET_ADAPTER_NAME` |
+| `eds.adapters.postgres.adapter` | `PostgresAdapter`, `POSTGRES_ADAPTER_NAME` |
+| `eds.adapters.postgres.config` | `PostgresConnectionConfig`, `load_postgres_config`, `POSTGRES_CONFIG_FILE` |
 
 ### Important interfaces
 
@@ -737,14 +750,50 @@ connection, Kafka has brokers, REST has a base URL, and none is a `Path`.
 **`ParquetAdapter(directory)`** satisfies both protocols. Snappy-compressed
 Parquet, one file per dataset, deterministic for the same input.
 
+**`PostgresAdapter(dsn, *, schema="public", dataset_schemas=None)`** satisfies both
+protocols. Each dataset becomes one table, `<schema>.<dataset>`; a write
+**replaces** the table in full rather than appending, so writing the same run
+twice against the same database never double-counts. `dataset_schemas` is a
+`name -> eds.core.schema.Dataset` mapping (PADR-018): a dataset named in it gets
+DDL with its declared primary key, foreign keys, and uniqueness constraints; a
+dataset written but not named in it falls back to a table Polars infers from the
+frame. Left empty by default, since `eds.adapters` may not import `eds.domains`
+(PADR-003) and so has no declarations of its own — see
+`eds.runners.retail.dataset_registry.RETAIL_DATASET_SCHEMAS` for the Retail
+mapping, built in the one package allowed to know both (also re-exported, for
+backward compatibility, as `eds.runners.retail.postgres_schema.RETAIL_DATASET_SCHEMAS`). `PostgresAdapter.from_engine(engine, schema=..., dataset_schemas=...)`
+builds one around an already-open `sqlalchemy.Engine`, for tests and for callers
+who manage their own connection pool. The adapter requires the `postgres` extra
+(`pip install -e ".[postgres]"` — `sqlalchemy`, `psycopg`, `pyarrow`, `pandas`,
+the last because Polars' `write_database` still goes through a pandas conversion
+step); the base install pulls in none of it. `.dispose()` closes the connection
+pool — offered on the class itself, not the protocol, since a `Path`-backed
+adapter has nothing to close and every `DatasetWriter`/`DatasetReader` must stay
+implementable by one.
+
+**`PostgresConnectionConfig`** (in `eds.adapters.postgres.config`) loads
+connection, schema, constraint, and table-selection settings from
+`configs/postgres.yaml` through the same `eds.core.config` machinery every other
+config uses — the adapter layer still may not know what a "customer" is, so
+`tables` is a plain list of names, resolved against `RETAIL_DATASET_SCHEMAS` (or
+just "every `.parquet` file present") by the caller, not by this model.
+`.dsn` builds the connection URL `PostgresAdapter` expects; `.resolved_password`
+prefers an environment variable named by `password_env` over the literal
+`password` field, so a committed config file need not hold a real password.
+`scripts/load_to_postgres.py` ties this, `RETAIL_DATASET_SCHEMAS`, and
+`PostgresAdapter` together into a script: point it at a Parquet output directory
+and it loads whatever `postgres.yaml` says to.
+
 **Implementations must be deterministic**: writing the same frames twice produces
-the same result. That is what lets determinism tests compare two runs byte for
-byte.
+the same result (byte-identical for Parquet; row-and-schema-identical for
+Postgres, where "identical bytes on disk" isn't a concept the target has). That
+is what lets determinism tests compare two runs.
 
-**Extension points.** `DatasetWriter` / `DatasetReader` for a second target.
+**Extension points.** `DatasetWriter` / `DatasetReader` for a further target.
 
-**Not implemented in EDS v1.0.** Any adapter other than Parquet.
-`eds/exporters/{csv,delta,sql}` are placeholders.
+**Not implemented in EDS v1.0.** CSV, Delta, and non-PostgreSQL SQL targets.
+`eds/exporters/{csv,delta,sql}` are placeholders. Writing to PostgreSQL is
+still full-table replace only — there is no incremental upsert/append mode.
 
 ---
 

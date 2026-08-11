@@ -1,0 +1,322 @@
+"""MongoDB connector — write target.
+
+Writes EDS-generated datasets to MongoDB as schemaless BSON document
+collections.  Each dataset becomes a collection; each row becomes one
+document.
+
+This connector does **not** inherit from
+:class:`~eds_loader.connectors._sql_base.BaseSQLConnector` — MongoDB is
+a document store with no DDL, no ``CREATE TABLE``, and no FK ordering
+requirement between collections.
+
+Driver
+------
+:pypi:`pymongo` v4+ (``pip install eds-loader[mongodb]``).
+
+When pymongo is not installed, this module still imports cleanly and
+registers the connector with ``connector_class=None``.
+
+Write strategy
+--------------
+For each collection (in original *datasets* iteration order):
+
+1. ``collection.drop()`` — removes the existing collection (no-op if absent).
+2. ``collection.insert_many(documents)`` — bulk-inserts all rows as BSON
+   documents.  Empty DataFrames skip the insert step.
+3. ``collection.create_index(...)`` — creates indexes derived from
+   ``schema.json`` when ``enforce_constraints=True``.
+
+Collections are independent — no topological sort needed.
+
+Type conversion
+---------------
+``df.to_dicts()`` serialises each Polars DataFrame row to a Python dict with
+native types (``int``, ``float``, ``str``, ``bool``, ``datetime``, ``list``,
+``dict``, ``None``). pymongo then maps those to BSON automatically.
+
+Index creation
+--------------
+When ``schema_metadata`` is non-empty:
+
+* ``primary_key`` column → ``unique`` index
+* ``unique_columns`` → ``unique`` index each
+* FK ``column`` entries → regular (non-unique) index each — aids lookups
+  but does not enforce referential integrity (MongoDB is schemaless)
+"""
+
+from __future__ import annotations
+
+import os
+from typing import Any
+
+import polars as pl
+
+from eds_loader.connectors.base import WriteResult
+from eds_loader.connectors.registry import ConnectorSpec, register_connector
+from eds_loader.exceptions import LoadError
+
+__all__ = ["MongoDBConnector"]
+
+# Optional dependency — wrapped so the module always imports cleanly.
+try:
+    import pymongo as _pymongo  # type: ignore[import]
+    _PYMONGO_AVAILABLE = True
+except ImportError:
+    _pymongo = None  # type: ignore[assignment]
+    _PYMONGO_AVAILABLE = False
+
+
+class MongoDBConnector:
+    """Write EDS datasets to a MongoDB database as document collections.
+
+    Implements :class:`~eds_loader.connectors.base.Writable`.
+
+    Config fields
+    -------------
+    ``host`` (required)
+        MongoDB server hostname or IP.
+    ``database`` (required)
+        Target database name.
+    ``port``
+        Server port (default: ``27017``).
+    ``username``
+        Login username.  Leave unset for unauthenticated connections.
+    ``password`` / ``password_env``
+        Inline password or env-var name.  ``password_env`` is preferred.
+    ``auth_source``
+        Database used for authentication (default: ``"admin"``).
+    ``connect_timeout``
+        Server-selection timeout in **milliseconds** (default: ``10000``).
+
+    Example config::
+
+        target:
+          kind: mongodb
+          host: localhost
+          port: 27017
+          database: eds_db
+          username: eds_loader
+          password_env: EDS_MONGO_PASSWORD
+    """
+
+    def __init__(
+        self,
+        host: str,
+        database: str,
+        port: int = 27017,
+        username: str | None = None,
+        password: str | None = None,
+        password_env: str | None = None,
+        auth_source: str = "admin",
+        connect_timeout: int = 10000,
+        **_kwargs: Any,
+    ) -> None:
+        self._host = host
+        self._database = database
+        self._port = int(port)
+        self._username = username
+        self._password = password
+        self._password_env = password_env
+        self._auth_source = auth_source
+        self._connect_timeout = int(connect_timeout)
+        self._mongo_client: Any = None  # pymongo.MongoClient, lazily created
+
+    # ------------------------------------------------------------------
+    # Internal helpers
+    # ------------------------------------------------------------------
+
+    def _resolve_password(self) -> str | None:
+        """Return the DB password, never logging it.
+
+        Raises:
+            LoadError: If ``password_env`` is set but the env-var is absent.
+        """
+        if self._password_env:
+            val = os.environ.get(self._password_env)
+            if val is None:
+                raise LoadError(
+                    f"Environment variable {self._password_env!r} is not set."
+                )
+            return val
+        return self._password
+
+    def _client(self) -> Any:
+        """Return (or create) the cached :class:`pymongo.MongoClient`.
+
+        pymongo connects lazily, so this only builds the client object.
+        Actual network errors surface on the first real operation.
+
+        Raises:
+            LoadError: If client construction fails (e.g. invalid params).
+        """
+        if self._mongo_client is not None:
+            return self._mongo_client
+
+        password = self._resolve_password()
+        try:
+            kwargs: dict[str, Any] = {
+                "host": self._host,
+                "port": self._port,
+                "serverSelectionTimeoutMS": self._connect_timeout,
+            }
+            if self._username:
+                kwargs["username"] = self._username
+                kwargs["password"] = password or ""
+                kwargs["authSource"] = self._auth_source
+
+            self._mongo_client = _pymongo.MongoClient(**kwargs)
+            return self._mongo_client
+        except Exception as exc:
+            raise LoadError(
+                f"Cannot create MongoDB client for "
+                f"{self._host}:{self._port}/{self._database}: {exc}"
+            ) from exc
+
+    def _db(self) -> Any:
+        """Return the target :class:`pymongo.Database`."""
+        return self._client()[self._database]
+
+    def _close(self) -> None:
+        """Close the MongoDB client connection pool gracefully."""
+        if self._mongo_client is not None:
+            try:
+                self._mongo_client.close()
+            except Exception:
+                pass
+            self._mongo_client = None
+
+    def __enter__(self) -> "MongoDBConnector":
+        self._client()
+        return self
+
+    def __exit__(self, *_args: object) -> None:
+        self._close()
+
+    def __del__(self) -> None:
+        self._close()
+
+    # ------------------------------------------------------------------
+    # Index creation from schema.json
+    # ------------------------------------------------------------------
+
+    @staticmethod
+    def _create_indexes(
+        collection: Any,
+        schema_entry: dict[str, Any],
+    ) -> None:
+        """Create MongoDB indexes derived from a ``schema.json`` entry.
+
+        * ``primary_key`` → unique index
+        * ``unique_columns`` → unique index per column
+        * ``foreign_keys[].column`` → regular index (aids lookups only)
+
+        Args:
+            collection: A :class:`pymongo.Collection` instance.
+            schema_entry: The ``schema.json`` entry for this dataset.
+        """
+        pk = schema_entry.get("primary_key")
+        if pk:
+            collection.create_index(pk, unique=True)
+
+        for col in schema_entry.get("unique_columns", []):
+            collection.create_index(col, unique=True)
+
+        for fk in schema_entry.get("foreign_keys", []):
+            col = fk.get("column")
+            if col:
+                collection.create_index(col, unique=False)
+
+    # ------------------------------------------------------------------
+    # Writable interface
+    # ------------------------------------------------------------------
+
+    def write_datasets(
+        self,
+        datasets: dict[str, pl.DataFrame],
+        schema_metadata: dict[str, Any],
+    ) -> list[WriteResult]:
+        """Write datasets to MongoDB collections — full replace (NFR-3).
+
+        Steps per collection:
+
+        1. ``collection.drop()``
+        2. ``collection.insert_many(df.to_dicts())``  (skipped if empty)
+        3. Index creation from ``schema_metadata`` (if non-empty)
+
+        Collections are written in *datasets* iteration order.  No
+        topological sort is applied — MongoDB has no FK enforcement
+        between collections.
+
+        Args:
+            datasets: Dataset name → Polars DataFrame.
+            schema_metadata: Parsed ``schema.json``.  Non-empty triggers
+                constraint-derived index creation.
+
+        Returns:
+            One :class:`~eds_loader.connectors.base.WriteResult` per
+            dataset in original order.  ``location`` is formatted as
+            ``mongodb://<host>:<port>/<database>/<collection>``.
+
+        Raises:
+            ~eds_loader.exceptions.LoadError: Connection, drop, insert,
+                or index creation error.
+        """
+        db = self._db()
+        enforce = bool(schema_metadata)
+        results: list[WriteResult] = []
+
+        for name, df in datasets.items():
+            schema_entry = schema_metadata.get(name, {})
+            location = (
+                f"mongodb://{self._host}:{self._port}"
+                f"/{self._database}/{name}"
+            )
+            try:
+                collection = db[name]
+
+                # Full replace — drop existing collection first.
+                collection.drop()
+
+                # Bulk insert using Polars' native Python-dict serialiser.
+                # df.to_dicts() converts Polars types → Python native types;
+                # pymongo handles Python → BSON mapping automatically.
+                if df.height > 0:
+                    collection.insert_many(df.to_dicts())
+
+                # Create indexes derived from schema.json.
+                if enforce:
+                    self._create_indexes(collection, schema_entry)
+
+            except LoadError:
+                raise
+            except Exception as exc:
+                raise LoadError(
+                    f"Failed to write dataset {name!r} to collection "
+                    f"{name!r} in {self._database}@{self._host}: {exc}"
+                ) from exc
+
+            results.append(
+                WriteResult(dataset=name, location=location, rows=df.height)
+            )
+
+        return results
+
+
+# ---------------------------------------------------------------------------
+# Self-registration
+# ---------------------------------------------------------------------------
+register_connector(
+    "mongodb",
+    ConnectorSpec(
+        connector_class=MongoDBConnector if _PYMONGO_AVAILABLE else None,
+        required_packages=["pymongo"],
+        install_extra="mongodb",
+        can_read=False,
+        can_write=True,
+        description=(
+            "MongoDB — writes datasets as schemaless document collections. "
+            "Creates indexes for PK/unique columns from schema.json. "
+            "Requires: pip install eds-loader[mongodb]"
+        ),
+    ),
+)

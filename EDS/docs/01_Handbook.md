@@ -477,6 +477,14 @@ eds generate commerce
 
 Output goes to `output/` by default (`output_directory` in `simulation.yaml`).
 
+Alongside the Parquet files, each command also writes/updates
+`output/schema.json`: a plain-JSON description of every dataset written so
+far (primary key, foreign keys, unique columns, column types), merged
+across the four commands regardless of the order they're run in. It exists
+so a consumer that is not EDS itself -- the Loader Tool, in particular --
+can know a dataset's constraints without importing any EDS Python code. See
+`eds.core.schema_export` in the Package Reference.
+
 Real output from the last command:
 
 ```

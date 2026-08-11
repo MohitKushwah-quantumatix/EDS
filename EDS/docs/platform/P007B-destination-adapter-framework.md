@@ -505,6 +505,13 @@ the design is tested, and discovering the protocol is wrong here is the cheapest
 it will ever be.
 *Gate:* a full Retail run delivers to Postgres; row counts and primary keys
 match the store of record; a multi-day run still continues correctly.
+*Status: implemented.* `eds.adapters.postgres` (PADR-018). The interface did
+not need to change — `DatasetWriter`/`DatasetReader` as specified in PADR-003
+were sufficient. A full Retail run's Parquet output was written to Postgres and
+re-read with row counts matching the store of record; primary-key and
+foreign-key *enforcement* in the database itself was descoped rather than built
+(tables are created from Polars' inferred schema, not from
+`eds.core.schema.Dataset`'s declared keys) and remains open for a future step.
 
 **Step 3 — the second and third SQL targets.** MSSQL and MySQL. Only now is
 duplication visible, and only now should a shared SQL component be considered.

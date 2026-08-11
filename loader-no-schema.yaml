@@ -1,0 +1,25 @@
+# EDS Loader configuration — schema_required: false mode
+# Use this when there is no schema.json in the source directory,
+# or when schema.json is a JSON Schema spec file (not EDS metadata).
+#
+# Validate:  eds-loader validate -c loader-no-schema.yaml
+# Dry-run:   eds-loader run -c loader-no-schema.yaml --dry-run
+# Run:       eds-loader run -c loader-no-schema.yaml
+
+source:
+  kind: local_fs
+  path: C:\Users\Mohit Patel\Downloads\EDS\EDS\output
+
+target:
+  kind: postgres
+  host: localhost
+  database: eds_db          # must already exist in PostgreSQL
+  user: postgres
+  password_env: EDS_PG_PASSWORD   # set: $env:EDS_PG_PASSWORD = "your-password"
+  port: 5432
+  schema: public
+
+# Loader settings
+tables: []                  # [] = auto-discover all *.parquet files
+enforce_constraints: false  # no schema.json → no constraint metadata available
+schema_required: false      # SKIP schema.json — just load every .parquet file found

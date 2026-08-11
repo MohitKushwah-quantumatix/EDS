@@ -25,6 +25,8 @@ from eds.config import (
     load_config,
 )
 from eds.core.validation.issues import ValidationError
+from eds.core.schema_export import SCHEMA_EXPORT_FILE, export_schema_json
+from eds.runners.retail.dataset_registry import RETAIL_DATASET_SCHEMAS
 from eds.domains.retail.generators.commerce.checkout_generator import (
     REQUIRED_CHECKOUT_DATASETS,
     generate_checkout_data,
@@ -201,6 +203,17 @@ def _report(datasets: Mapping[str, pl.DataFrame], seed: int, destination: Path) 
     typer.echo(f"Total: {sum(counts.values()):,} rows across {len(counts)} datasets")
 
 
+def _export_schema(datasets: Mapping[str, pl.DataFrame], output_directory: Path) -> None:
+    """Update schema.json with declarations for whatever was just written.
+
+    Merges into any schema.json already present (from an earlier stage's
+    run), so the four `eds generate` commands build up one complete file
+    between them regardless of the order they're run in.
+    """
+    known = {name: RETAIL_DATASET_SCHEMAS[name] for name in datasets if name in RETAIL_DATASET_SCHEMAS}
+    export_schema_json(known, output_directory / SCHEMA_EXPORT_FILE)
+
+
 @generate_app.command("master-data")
 def master_data(
     seed: Annotated[
@@ -268,6 +281,7 @@ def master_data(
 
     try:
         write_datasets(data.datasets, config.platform.output_directory)
+        _export_schema(data.datasets, config.platform.output_directory)
     except ExportError as exc:
         typer.echo(f"Export failed: {exc}", err=True)
         raise typer.Exit(code=_EXIT_EXPORT_ERROR) from exc
@@ -351,6 +365,7 @@ def customers(
 
     try:
         write_datasets(data.datasets, config.platform.output_directory)
+        _export_schema(data.datasets, config.platform.output_directory)
     except ExportError as exc:
         typer.echo(f"Export failed: {exc}", err=True)
         raise typer.Exit(code=_EXIT_EXPORT_ERROR) from exc
@@ -468,6 +483,7 @@ def journey(
 
     try:
         write_datasets(produced, config.platform.output_directory)
+        _export_schema(produced, config.platform.output_directory)
     except ExportError as exc:
         typer.echo(f"Export failed: {exc}", err=True)
         raise typer.Exit(code=_EXIT_EXPORT_ERROR) from exc
@@ -608,6 +624,7 @@ def commerce(
 
     try:
         write_datasets(produced, config.platform.output_directory)
+        _export_schema(produced, config.platform.output_directory)
     except ExportError as exc:
         typer.echo(f"Export failed: {exc}", err=True)
         raise typer.Exit(code=_EXIT_EXPORT_ERROR) from exc

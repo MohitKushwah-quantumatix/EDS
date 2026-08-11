@@ -691,6 +691,37 @@ complete copy.
 **References.** [PADR-017](platform/PADR-017-enterprise-distribution-architecture.md),
 [P007B design](platform/P007B-destination-adapter-framework.md).
 
+### PADR-018 — PostgreSQL adapter
+
+**Purpose.** Provide a second `DatasetWriter`/`DatasetReader` implementation and
+confirm, on real evidence rather than the shape of the protocol alone, that
+PADR-003 succeeded at keeping storage out of business code.
+**Problem.** Parquet is a file, read by whatever opens the file later. Some
+consumers want the data queryable where it lands — joins, filters, and BI tools
+against a live database rather than a load step someone still has to write. P007B
+already named PostgreSQL as the first non-file target to build (Step 2, "the most
+standard SQL"); this closes that step rather than opening a new one.
+**Decision.** `eds.adapters.postgres` binds `sqlalchemy` + `polars.write_database`/
+`read_database` behind the existing protocols. The destination is a DSN and a
+schema, bound at construction exactly as `ParquetAdapter` binds a directory
+(PADR-003). Each dataset becomes one table, named `<schema>.<dataset>`; a write
+replaces the table in full rather than appending, so the adapter never
+double-counts a dataset written twice against the same database — the same
+"regenerate, don't patch" guarantee every generator already gives Parquet.
+Table creation is left to Polars' schema inference rather than DDL derived from
+`eds.core.schema.Dataset`; primary keys, foreign keys, and other constraints
+enforced in the database itself are out of scope for this decision and remain
+future work.
+**Consequences.** A full Retail run delivers to Postgres with matching row counts,
+satisfying P007B's Step 2 gate. The adapter is optional: `sqlalchemy`, `psycopg`,
+and `pyarrow` sit behind the `postgres` extra (`pip install -e ".[postgres]"`), so
+installing EDS for Parquet-only use pulls in none of it. `eds.domains` and
+`eds.runners` required no changes to support it — the proof PADR-003 was written
+to eventually get.
+**Affected modules.** `eds.adapters.postgres` (new). `eds.domains`, `eds.runners`
+unchanged.
+**References.** PADR-003, PADR-017, [P007B design](platform/P007B-destination-adapter-framework.md).
+
 ---
 
 ## 11. Domain architecture decision records
