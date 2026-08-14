@@ -22,12 +22,15 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any
 
+from eds_loader._logging import get_logger
 from eds_loader.config import LoaderConfig
 from eds_loader.connectors.base import Readable, Writable
 from eds_loader.connectors.registry import get_connector
 from eds_loader.exceptions import ConfigError, LoadError
 
 __all__ = ["load", "LoadResult"]
+
+logger = get_logger(__name__)
 
 
 @dataclass
@@ -82,13 +85,31 @@ def load(config: LoaderConfig) -> LoadResult:
         ~eds_loader.exceptions.LoadError: Runtime I/O failure during reading
             or writing.
     """
+    try:
+        return _load_impl(config)
+    except (ConfigError, LoadError) as exc:
+        logger.error("Load failed: %s", exc)
+        raise
+    except Exception:  # unexpected — still log before propagating
+        logger.exception("Load failed with an unexpected error")
+        raise
+
+
+def _load_impl(config: LoaderConfig) -> LoadResult:
     source_cfg = config.source
     target_cfg = config.target
+
+    logger.info(
+        "Starting load: source=%s target=%s schema_required=%s enforce_constraints=%s",
+        source_cfg.kind, target_cfg.kind, config.schema_required, config.enforce_constraints,
+    )
 
     # Instantiate connectors via the registry (raises ConnectorNotFoundError /
     # ConnectorNotInstalledError if anything is wrong).
     source = get_connector(source_cfg.kind, source_cfg.extra_fields())
     target = get_connector(target_cfg.kind, target_cfg.extra_fields())
+    logger.debug("Source connector instantiated: %s", type(source).__name__)
+    logger.debug("Target connector instantiated: %s", type(target).__name__)
 
     # Validate role capability.
     if not isinstance(source, Readable):
@@ -106,9 +127,20 @@ def load(config: LoaderConfig) -> LoadResult:
     if not config.schema_required:
         # Skip schema.json entirely.  Auto-discover datasets by listing
         # *.parquet files at the source.  No constraint metadata is forwarded.
+        logger.info("schema_required=False — auto-discovering datasets at source")
         names_to_load: list[str] | None = list(config.tables) if config.tables else None
         datasets = source.read_datasets(names=names_to_load)
+        logger.info(
+            "Read %d dataset(s) from source: %s",
+            len(datasets), ", ".join(datasets) or "(none)",
+        )
         write_results = target.write_datasets(datasets, {})
+        total_rows = sum(r.rows for r in write_results)
+        logger.info(
+            "Load complete: %d row(s) written across %d table(s)",
+            total_rows, len(write_results),
+            extra={"progress": {"stage": "done"}},
+        )
         return LoadResult(
             tables_written=[r.dataset for r in write_results],
             rows_written={r.dataset: r.rows for r in write_results},
@@ -117,7 +149,9 @@ def load(config: LoaderConfig) -> LoadResult:
 
     # ── Normal path (schema_required=True, default) ───────────────────────
     # Read the portable schema metadata (from schema.json at the source).
+    logger.info("Reading schema.json from source")
     schema_metadata: dict[str, Any] = source.read_schema_metadata()
+    logger.debug("schema.json contains %d dataset definition(s)", len(schema_metadata))
 
     # Determine the set of tables to load.
     if config.tables:
@@ -130,9 +164,16 @@ def load(config: LoaderConfig) -> LoadResult:
         names_to_load = list(config.tables)
     else:
         names_to_load = list(schema_metadata)
+    logger.info("Loading %d table(s): %s", len(names_to_load), ", ".join(names_to_load))
 
     # Read datasets from source.
     datasets = source.read_datasets(names=names_to_load)
+    logger.info(
+        "Read %d dataset(s) from source, %d total row(s)",
+        len(datasets), sum(df.height for df in datasets.values()),
+    )
+    for name, df in datasets.items():
+        logger.debug("  %s: %d row(s), %d column(s)", name, df.height, df.width)
 
     # Build the schema metadata slice to forward to the target.
     # If enforce_constraints is False, pass an empty dict so the target
@@ -141,11 +182,21 @@ def load(config: LoaderConfig) -> LoadResult:
         effective_metadata: dict[str, Any] = {
             k: v for k, v in schema_metadata.items() if k in datasets
         }
+        logger.debug("Constraint enforcement enabled — forwarding schema metadata to target")
     else:
         effective_metadata = {}
+        logger.debug("Constraint enforcement disabled — target will create plain tables")
 
     # Write to target.
+    logger.info("Writing %d table(s) to target", len(datasets))
     write_results = target.write_datasets(datasets, effective_metadata)
+
+    total_rows = sum(r.rows for r in write_results)
+    logger.info(
+        "Load complete: %d row(s) written across %d table(s)",
+        total_rows, len(write_results),
+        extra={"progress": {"stage": "done"}},
+    )
 
     return LoadResult(
         tables_written=[r.dataset for r in write_results],

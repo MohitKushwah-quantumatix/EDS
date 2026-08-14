@@ -45,6 +45,7 @@ from typing import Any
 
 import polars as pl
 
+from eds_loader._logging import get_logger
 from eds_loader.connectors.base import WriteResult
 from eds_loader.connectors.registry import ConnectorSpec, register_connector
 from eds_loader.exceptions import LoadError
@@ -52,6 +53,7 @@ from eds_loader.exceptions import LoadError
 __all__ = ["RemoteFSConnector"]
 
 _SCHEMA_FILE = "schema.json"
+logger = get_logger(__name__)
 
 # Optional dependency — wrapped so the module always imports cleanly.
 try:
@@ -213,6 +215,10 @@ class RemoteFSConnector:
                     connect_kwargs["password"] = password
 
             client.connect(**connect_kwargs)
+            logger.info(
+                "Connected to SFTP %s@%s:%s", self._username, self._host, self._port,
+                extra={"progress": {"stage": "connect_source", "label": f"{self._host}:{self._port}"}},
+            )
 
         except _paramiko.AuthenticationException as exc:
             raise LoadError(
@@ -313,6 +319,7 @@ class RemoteFSConnector:
         """
         _, sftp = self._connect()
         remote_dir = str(self._remote_path)
+        logger.debug("Listing remote directory: %s", remote_dir)
         try:
             attrs = sftp.listdir_attr(remote_dir)
         except FileNotFoundError:
@@ -323,11 +330,13 @@ class RemoteFSConnector:
             raise LoadError(
                 f"Cannot list remote directory {remote_dir} on {self._host}: {exc}"
             ) from exc
-        return sorted(
+        names = sorted(
             PurePosixPath(attr.filename).stem
             for attr in attrs
             if attr.filename.endswith(".parquet")
         )
+        logger.debug("Found %d parquet file(s) in %s", len(names), remote_dir)
+        return names
 
     def _ensure_remote_dir(self) -> None:
         """Create ``remote_path`` on the server if it does not exist."""
@@ -394,7 +403,8 @@ class RemoteFSConnector:
             names = self._list_parquet_names()
 
         result: dict[str, pl.DataFrame] = {}
-        for name in names:
+        total = len(names)
+        for i, name in enumerate(names, start=1):
             remote_file = str(self._remote_path / f"{name}.parquet")
             try:
                 data = self._download_bytes(remote_file)
@@ -404,6 +414,10 @@ class RemoteFSConnector:
                 ) from None
             try:
                 result[name] = pl.read_parquet(io.BytesIO(data))
+                logger.info(
+                    "Downloaded %s: %d row(s) from %s", name, result[name].height, remote_file,
+                    extra={"progress": {"stage": "read", "current": i, "total": total, "label": name}},
+                )
             except Exception as exc:
                 raise LoadError(
                     f"Cannot parse dataset {name!r} downloaded from {self._host}: {exc}"

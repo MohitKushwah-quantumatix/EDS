@@ -182,6 +182,14 @@ class MySQLConnector(BaseSQLConnector):
     def _sql_type_map(self) -> dict[str, str]:
         return _MYSQL_TYPE_MAP
 
+    def _indexable_string_type(self, sql_type: str) -> str | None:
+        # MySQL error 1170: "BLOB/TEXT column used in key specification
+        # without a key length". Any PK/UNIQUE/FK column that resolved to
+        # TEXT must be bounded instead.
+        if sql_type == "TEXT":
+            return "VARCHAR(255)"
+        return None
+
     def _drop_table_sql(self, name: str) -> str:
         # MySQL does not support DROP TABLE … CASCADE.
         # FK checks are disabled via _pre_drop_hook instead.

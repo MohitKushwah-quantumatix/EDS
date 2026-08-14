@@ -25,13 +25,16 @@ Exit codes
 
 from __future__ import annotations
 
+import logging
 import time
 from pathlib import Path
-from typing import Annotated, Optional
+from typing import Annotated
 
 import typer
 
 import eds_loader  # triggers connector self-registration  # noqa: F401
+from eds_loader._logging import configure_logging, get_logger
+from eds_loader._progress import TerminalProgress
 from eds_loader.cli._templates import (
     SOURCE_TEMPLATES,
     TARGET_TEMPLATES,
@@ -47,6 +50,8 @@ from eds_loader.exceptions import (
 )
 from eds_loader.loader import load
 from eds_loader.version import __version__
+
+logger = get_logger(__name__)
 
 app = typer.Typer(
     name="eds-loader",
@@ -128,7 +133,12 @@ def _main(
         ),
     ] = False,
 ) -> None:
-    """EDS Loader — move EDS-generated data anywhere, driven by config."""
+    """EDS Loader — move EDS-generated data anywhere, driven by config.
+
+    Every run is automatically logged to ``logs/<date>.log`` — no flags
+    needed. The console shows a live progress bar instead of raw log text.
+    """
+    configure_logging()
 
 
 # ---------------------------------------------------------------------------
@@ -162,15 +172,28 @@ def run_cmd(
     Exits with code 2 on configuration errors, 3 on load failures.
     Use ``--dry-run`` to preview the load without writing any data.
     """
+    logger.info("eds-loader run invoked (config=%s, dry_run=%s)", config_file, dry_run)
     try:
         config = LoaderConfig.from_yaml(config_file)
     except ConfigError as exc:
+        logger.error("Config parse failed: %s", exc)
         typer.echo(f"Configuration error: {exc}", err=True)
         raise typer.Exit(code=_EXIT_CONFIG_ERROR)
+
+    logger.info(
+        "Config loaded: source=%s target=%s tables=%s enforce_constraints=%s "
+        "schema_required=%s",
+        config.source.kind, config.target.kind,
+        list(config.tables) or "(all)",
+        config.enforce_constraints, config.schema_required,
+    )
 
     # ── Dry-run branch ────────────────────────────────────
     if dry_run:
         typer.echo("\nDRY RUN — no data will be written.\n")
+        progress = TerminalProgress()
+        eds_root_logger = logging.getLogger("eds_loader")
+        eds_root_logger.addHandler(progress)
         try:
             source = get_connector(config.source.kind, config.source.extra_fields())
             if config.schema_required:
@@ -179,15 +202,22 @@ def run_cmd(
             else:
                 # No schema.json — auto-discover by listing parquet files
                 names = list(config.tables) if config.tables else None
+            logger.info("Dry-run: reading %s dataset(s) from source", names or "(auto-discovered)")
             datasets = source.read_datasets(names=names)
         except (ConnectorNotFoundError, ConnectorNotInstalledError, ConfigError) as exc:
+            logger.error("Dry-run configuration error: %s", exc)
             typer.echo(f"Configuration error: {exc}", err=True)
             raise typer.Exit(code=_EXIT_CONFIG_ERROR)
         except LoadError as exc:
+            logger.error("Dry-run read failed: %s", exc)
             typer.echo(f"Read failed: {exc}", err=True)
             raise typer.Exit(code=_EXIT_LOAD_ERROR)
+        finally:
+            eds_root_logger.removeHandler(progress)
+            progress.close()
 
         if not datasets:
+            logger.warning("Dry-run: no datasets found in source")
             typer.echo("  No datasets found in source.")
             raise typer.Exit(code=_EXIT_OK)
 
@@ -196,22 +226,35 @@ def run_cmd(
         for name, df in datasets.items():
             typer.echo(f"  {name:<{w}}  {df.width} cols, {df.height:,} rows")
             total += df.height
+        logger.info("Dry-run complete: %d row(s) across %d dataset(s)", total, len(datasets))
         typer.echo(f"\nTotal: {total:,} rows across {len(datasets)} dataset(s).")
         typer.echo("Run without --dry-run to write.")
         return
 
     # ── Live run ──────────────────────────────────────────────────────
     t0 = time.monotonic()
+    progress = TerminalProgress()
+    eds_root_logger = logging.getLogger("eds_loader")
+    eds_root_logger.addHandler(progress)
     try:
         result = load(config)
     except (ConnectorNotFoundError, ConnectorNotInstalledError, ConfigError) as exc:
+        logger.error("Configuration error: %s", exc)
         typer.echo(f"Configuration error: {exc}", err=True)
         raise typer.Exit(code=_EXIT_CONFIG_ERROR)
     except LoadError as exc:
+        logger.error("Load failed after %.1fs: %s", time.monotonic() - t0, exc)
         typer.echo(f"Load failed: {exc}", err=True)
         raise typer.Exit(code=_EXIT_LOAD_ERROR)
+    finally:
+        eds_root_logger.removeHandler(progress)
+        progress.close()
 
     elapsed = time.monotonic() - t0
+    logger.info(
+        "Run complete: %d row(s) across %d table(s) in %.1fs",
+        result.total_rows, len(result.tables_written), elapsed,
+    )
 
     _print_run_table(result.write_results)
     typer.echo(

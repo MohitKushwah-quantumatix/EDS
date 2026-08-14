@@ -5,21 +5,21 @@
 source:
   kind: remote_fs
   host: 192.168.1.20  # required
-  username: mohitkushwah       # required
-  remote_path: D:\EDS\EDS\my-shop  # required -- remote directory containing .parquet + schema.json
+  username: "Mohit Kushwah"       # required
+  remote_path: D:/EDS/EDS/my-hospital/data  # required -- remote directory containing .parquet + schema.json
   port: 22                 # optional -- default: 22
-  # password_env: SFTP_PASSWORD   # env-var holding the password (preferred)
+  password_env: SSH_PASSWORD   # env-var holding the password (preferred)
   # password: ""                  # inline password (not recommended for production)
   # key_filename: ~/.ssh/id_rsa   # path to private key file
 
 target:
   kind: postgres
-  host: localhost           # required
-  database: eds_db          # required
-  user: postgres          # required
-  #password_env: EDS_PG_PASSWORD  # env-var holding the password (preferred)
-  password: "root1234"                 # inline password (not recommended for production)
-  port: 5432                # optional -- default: 5432
+  host: 192.168.1.7           # required
+  database: eds_db1          # required
+  user: divya         # required
+  password_env: EDS_PG_PASSWORD  # env-var holding the password (preferred)
+  # password: ""                 # inline password (not recommended for production)
+  port: 55432                # optional -- default: 5432
   schema: public            # optional -- default: public
 
 # Optional loader settings

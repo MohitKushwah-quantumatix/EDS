@@ -23,6 +23,7 @@ from typing import Any
 
 import polars as pl
 
+from eds_loader._logging import get_logger
 from eds_loader.connectors.base import WriteResult
 from eds_loader.connectors.registry import ConnectorSpec, register_connector
 from eds_loader.exceptions import LoadError
@@ -30,6 +31,7 @@ from eds_loader.exceptions import LoadError
 __all__ = ["LocalFSConnector"]
 
 _SCHEMA_FILE = "schema.json"
+logger = get_logger(__name__)
 
 
 class LocalFSConnector:
@@ -86,13 +88,16 @@ class LocalFSConnector:
                 "Run `eds generate <stage>` to produce it alongside the Parquet files, "
                 "or check that the source path is correct."
             )
+        logger.debug("Reading schema.json from %s", schema_path)
         try:
             text = schema_path.read_text(encoding="utf-8")
         except OSError as exc:
             raise LoadError(f"Cannot read schema.json at {schema_path}: {exc}") from exc
 
         try:
-            return json.loads(text)
+            parsed = json.loads(text)
+            logger.debug("schema.json parsed: %d dataset(s)", len(parsed))
+            return parsed
         except json.JSONDecodeError as exc:
             raise LoadError(
                 f"schema.json at {schema_path} contains invalid JSON: {exc}"
@@ -125,9 +130,11 @@ class LocalFSConnector:
                     f"Cannot list directory {self._path}: {exc}"
                 ) from exc
             names = [f.stem for f in parquet_files]
+            logger.debug("Auto-discovered %d parquet file(s) in %s", len(names), self._path)
 
         result: dict[str, pl.DataFrame] = {}
-        for name in names:
+        total = len(names)
+        for i, name in enumerate(names, start=1):
             file_path = self._path / f"{name}.parquet"
             if not file_path.is_file():
                 raise LoadError(
@@ -136,6 +143,10 @@ class LocalFSConnector:
                 )
             try:
                 result[name] = pl.read_parquet(file_path)
+                logger.info(
+                    "Read %s: %d row(s) from %s", name, result[name].height, file_path,
+                    extra={"progress": {"stage": "read", "current": i, "total": total, "label": name}},
+                )
             except Exception as exc:
                 raise LoadError(
                     f"Cannot read dataset {name!r} from {file_path}: {exc}"
@@ -184,10 +195,15 @@ class LocalFSConnector:
             ) from exc
 
         results: list[WriteResult] = []
-        for name, df in datasets.items():
+        total = len(datasets)
+        for i, (name, df) in enumerate(datasets.items(), start=1):
             file_path = self._path / f"{name}.parquet"
             try:
                 df.write_parquet(file_path)
+                logger.info(
+                    "Wrote %s: %d row(s) to %s", name, df.height, file_path,
+                    extra={"progress": {"stage": "write", "current": i, "total": total, "label": name}},
+                )
             except Exception as exc:
                 raise LoadError(
                     f"Cannot write dataset {name!r} to {file_path}: {exc}"
@@ -197,6 +213,7 @@ class LocalFSConnector:
             )
 
         if schema_metadata:
+            logger.debug("Merging schema.json at target")
             self._write_schema_json(schema_metadata)
 
         return results

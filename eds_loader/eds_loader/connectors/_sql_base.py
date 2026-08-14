@@ -17,12 +17,16 @@ from __future__ import annotations
 
 import abc
 import os
+import time
 from typing import Any
 
 import polars as pl
 
+from eds_loader._logging import get_logger
 from eds_loader.connectors.base import WriteResult
 from eds_loader.exceptions import ConfigError, LoadError
+
+logger = get_logger(__name__)
 
 __all__ = ["BaseSQLConnector"]
 
@@ -184,6 +188,17 @@ class BaseSQLConnector(abc.ABC):
         """
         return self._sql_type_map().get(type(dtype).__name__, "TEXT")
 
+    def _indexable_string_type(self, sql_type: str) -> str | None:
+        """Return a bounded replacement for *sql_type* if it can't be keyed.
+
+        Most dialects can put a PRIMARY KEY / UNIQUE / FK on an unbounded
+        text column directly (e.g. Postgres ``TEXT``). Dialects that can't
+        (e.g. MySQL's ``TEXT``/``BLOB`` -- error 1170) override this to
+        return a bounded type such as ``VARCHAR(255)``. Return ``None`` to
+        leave *sql_type* unchanged.
+        """
+        return None
+
     @staticmethod
     def _topological_sort(
         schema_metadata: dict[str, Any],
@@ -209,7 +224,11 @@ class BaseSQLConnector(abc.ABC):
         for name in names:
             for fk in schema_metadata.get(name, {}).get("foreign_keys", []):
                 ref = fk.get("references")
-                if ref and ref in name_set:
+                # Self-referencing FKs (e.g. categories.parent_category_id ->
+                # categories.category_id) don't block table creation order --
+                # the column is defined inline in the same CREATE TABLE
+                # statement, so they must not be treated as a dependency.
+                if ref and ref in name_set and ref != name:
                     deps[name].add(ref)
 
         result: list[str] = []
@@ -262,6 +281,15 @@ class BaseSQLConnector(abc.ABC):
 
             is_pk = col_name == pk_col
             is_fk = col_name in fk_map
+            is_keyed = is_pk or is_fk or col_name in unique_set
+
+            # Some dialects (MySQL) can't index/key an unbounded TEXT/BLOB
+            # column without an explicit key length. Swap in a bounded type
+            # for columns that will be part of a PK / UNIQUE / FK.
+            if is_keyed:
+                bounded = self._indexable_string_type(sql_type)
+                if bounded:
+                    parts[-1] = bounded
 
             # NOT NULL for non-nullable FK (PK already implies NOT NULL)
             if is_fk and not is_pk:
@@ -358,6 +386,10 @@ class BaseSQLConnector(abc.ABC):
                 error.
         """
         conn = self._connect()
+        logger.info(
+            "Connected to %s@%s:%s/%s", self._user, self._host, self._port, self._database,
+            extra={"progress": {"stage": "connect_target", "label": f"{self._host}:{self._port}"}},
+        )
         enforce = bool(schema_metadata)
         names = list(datasets)
         ordered_names = (
@@ -365,10 +397,13 @@ class BaseSQLConnector(abc.ABC):
             if schema_metadata
             else names
         )
+        if schema_metadata:
+            logger.debug("Table write order (FK-sorted): %s", ", ".join(ordered_names))
 
         # 1. Ensure namespace exists.
         ns_sql = self._ensure_namespace_sql()
         if ns_sql:
+            logger.debug("Ensuring namespace exists: %s", ns_sql)
             try:
                 with conn.cursor() as cur:
                     cur.execute(ns_sql)
@@ -392,22 +427,29 @@ class BaseSQLConnector(abc.ABC):
 
         try:
             # 3. Per-table: DROP → CREATE → INSERT.
-            for name in ordered_names:
+            total_tables = len(ordered_names)
+            for i, name in enumerate(ordered_names, start=1):
                 df = datasets[name]
                 schema_entry = schema_metadata.get(name, {})
+                t0 = time.monotonic()
                 try:
                     with conn.cursor() as cur:
-                        cur.execute(self._drop_table_sql(name))
+                        drop_sql = self._drop_table_sql(name)
+                        logger.debug("[%s] %s", name, drop_sql)
+                        cur.execute(drop_sql)
+
                         col_defs = self._build_column_defs(df, schema_entry, enforce)
-                        cur.execute(
-                            f"CREATE TABLE {self._table_ref(name)} (\n"
-                            f"    {col_defs}\n)"
-                        )
+                        create_sql = f"CREATE TABLE {self._table_ref(name)} (\n    {col_defs}\n)"
+                        logger.debug("[%s] %s", name, create_sql)
+                        cur.execute(create_sql)
+
+                        logger.debug("[%s] inserting %d row(s)", name, df.height)
                         self._bulk_insert(cur, name, df)
                     conn.commit()
                 except (ConfigError, LoadError):
                     raise
                 except Exception as exc:
+                    logger.error("[%s] write failed: %s", name, exc)
                     try:
                         conn.rollback()
                     except Exception:
@@ -417,6 +459,12 @@ class BaseSQLConnector(abc.ABC):
                         f"{self._table_ref(name)} in "
                         f"{self._database}@{self._host}: {exc}"
                     ) from exc
+
+                elapsed = time.monotonic() - t0
+                logger.info(
+                    "[%s] wrote %d row(s) in %.2fs", name, df.height, elapsed,
+                    extra={"progress": {"stage": "write", "current": i, "total": total_tables, "label": name}},
+                )
 
                 results_map[name] = WriteResult(
                     dataset=name,
