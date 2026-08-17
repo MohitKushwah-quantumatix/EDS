@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Healthcare Data Model — Simplified ER Diagram</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background: #f5f5f5;
+    color: #2c2c2a;
+  }
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: white;
+    padding: 30px 40px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+  h1 {
+    color: #2c3e50;
+    text-align: center;
+    margin-bottom: 6px;
+  }
+  .subtitle {
+    text-align: center;
+    color: #666;
+    margin-bottom: 24px;
+    font-size: 14px;
+  }
+  .legend {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 10px;
+    margin: 20px 0 30px;
+    padding: 15px 18px;
+    background: #f8f9fa;
+    border-radius: 6px;
+    font-size: 13px;
+  }
+  .legend-item { display: flex; align-items: center; gap: 8px; }
+  .legend-icon { font-size: 16px; }
+  .section-title {
+    color: #2c3e50;
+    margin-top: 40px;
+    margin-bottom: 8px;
+    font-size: 19px;
+    border-bottom: 2px solid #3498db;
+    padding-bottom: 6px;
+  }
+  .section-note {
+    font-size: 13px;
+    color: #666;
+    margin-bottom: 16px;
+  }
+  .mermaid {
+    text-align: center;
+    margin: 20px 0;
+    overflow-x: auto;
+  }
+  .info-box {
+    background: #e3f2fd;
+    border-left: 4px solid #2196f3;
+    padding: 14px 16px;
+    margin: 20px 0;
+    border-radius: 4px;
+    font-size: 13px;
+  }
+  .hipaa-box {
+    background: #fff3e0;
+    border-left: 4px solid #ff9800;
+    padding: 14px 16px;
+    margin: 20px 0;
+    border-radius: 4px;
+    font-size: 13px;
+  }
+  .simplify-box {
+    background: #eafaf1;
+    border-left: 4px solid #27ae60;
+    padding: 14px 16px;
+    margin: 20px 0;
+    border-radius: 4px;
+    font-size: 13px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    font-size: 12.5px;
+  }
+  th, td {
+    border: 1px solid #ddd;
+    padding: 7px 8px;
+    text-align: left;
+    vertical-align: top;
+  }
+  th { background: #f5f5f5; font-weight: 600; }
+  @media print {
+    body { background: white; }
+    .container { box-shadow: none; }
+    .no-print { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Healthcare data model</h1>
+  <div class="subtitle">Simplified entity-relationship diagram — 35 datasets, reorganized into 2 clean views</div>
+
+  <div class="legend">
+    <div class="legend-item"><span class="legend-icon">🔑</span> Primary key (PK)</div>
+    <div class="legend-item"><span class="legend-icon">🔗</span> Foreign key (FK)</div>
+    <div class="legend-item"><span class="legend-icon">⚠️</span> HIPAA PHI (protected health info)</div>
+    <div class="legend-item"><span class="legend-icon">🔒</span> Quasi-identifier</div>
+  </div>
+
+  
+
+  <div class="section-title">1. Foundations</div>
+  <div class="section-note">Geography, organizations, and the patient/provider record itself — nothing clinical yet.</div>
+  <div class="mermaid" id="diagram1">
+erDiagram
+    COUNTRIES ||--o{ STATES : has
+    STATES ||--o{ CITIES : has
+    FACILITIES ||--o{ PATIENTS : registered_at
+    DEPARTMENTS ||--o{ PROVIDERS : employs
+    SPECIALTIES ||--o{ PROVIDERS : certifies
+    PATIENTS ||--o{ PATIENT_ADDRESSES : has
+    PATIENTS ||--o{ PATIENT_INSURANCE : covered_by
+    PATIENTS ||--o{ PATIENT_ALLERGIES : has
+    PATIENTS ||--o{ PATIENT_EMERGENCY_CONTACTS : has
+    PATIENTS ||--o{ IMMUNIZATIONS : receives
+    INSURANCE_PLANS ||--o{ PATIENT_INSURANCE : covers
+
+    PATIENTS {
+        int patient_id PK
+        int primary_facility_id FK
+        string first_name
+        string last_name
+        date date_of_birth
+    }
+    PROVIDERS {
+        int provider_id PK
+        int department_id FK
+        int specialty_id FK
+        string full_name
+    }
+    FACILITIES {
+        int facility_id PK
+    }
+  </div>
+
+  <div class="section-title">2. Clinical hub</div>
+  <div class="section-note">Encounters is the single hub. Everything clinical — visits, orders, results, billing — hangs off one encounter, not off patients and providers separately.</div>
+  <div class="mermaid" id="diagram2">
+erDiagram
+    PATIENTS ||--o{ ENCOUNTERS : attends
+    PROVIDERS ||--o{ ENCOUNTERS : conducts
+    ENCOUNTERS ||--o{ APPOINTMENTS : has
+    ENCOUNTERS ||--o{ VITALS : has
+    ENCOUNTERS ||--o{ DIAGNOSES : has
+    ENCOUNTERS ||--o{ PROCEDURES : has
+    ENCOUNTERS ||--o{ LAB_RESULTS : has
+    ENCOUNTERS ||--o{ RADIOLOGY_REPORTS : has
+    ENCOUNTERS ||--o{ MEDICATIONS_PRESCRIBED : has
+    ENCOUNTERS ||--o{ ADMISSIONS : has
+    ENCOUNTERS ||--o{ DISCHARGE_SUMMARIES : has
+    ENCOUNTERS ||--o{ REFERRALS : has
+    ENCOUNTERS ||--o{ BILLING : has
+    DIAGNOSIS_CODES ||--o{ DIAGNOSES : coded_by
+    PROCEDURE_CODES ||--o{ PROCEDURES : coded_by
+    MEDICATIONS ||--o{ MEDICATIONS_PRESCRIBED : prescribed_as
+    MEDICATIONS ||--o{ MEDICATION_ADMINISTRATION : administered_as
+    BILLING_CODES ||--o{ BILLING : charged_using
+    BILLING ||--o{ CLAIMS : generates
+    INSURANCE_PLANS ||--o{ CLAIMS : processed_by
+
+    ENCOUNTERS {
+        int encounter_id PK
+        int patient_id FK
+        int provider_id FK
+        int department_id FK
+        int facility_id FK
+        date admission_date
+    }
+    BILLING {
+        int billing_id PK
+        int encounter_id FK
+        decimal total_amount
+    }
+  </div>
+
+  <div class="section-title">Dataset reference: master data</div>
+  <table>
+    <tr><th>Dataset</th><th>Primary key</th><th>Foreign keys</th><th>HIPAA-sensitive columns</th></tr>
+    <tr><td>countries</td><td>country_id</td><td>—</td><td>None</td></tr>
+    <tr><td>states</td><td>state_id</td><td>country_id</td><td>None</td></tr>
+    <tr><td>cities</td><td>city_id</td><td>state_id</td><td>None</td></tr>
+    <tr><td>departments</td><td>department_id</td><td>—</td><td>None</td></tr>
+    <tr><td>specialties</td><td>specialty_id</td><td>—</td><td>None</td></tr>
+    <tr><td>insurance_plans</td><td>insurance_plan_id</td><td>—</td><td>None</td></tr>
+    <tr><td>room_types</td><td>room_type_id</td><td>—</td><td>None</td></tr>
+    <tr><td>medications</td><td>medication_id</td><td>—</td><td>None</td></tr>
+    <tr><td>diagnosis_codes</td><td>diagnosis_code_id</td><td>—</td><td>None</td></tr>
+    <tr><td>procedure_codes</td><td>procedure_code_id</td><td>—</td><td>None</td></tr>
+    <tr><td>billing_codes</td><td>billing_code_id</td><td>—</td><td>None</td></tr>
+    <tr><td>facilities</td><td>facility_id</td><td>—</td><td>None</td></tr>
+  </table>
+
+  <div class="section-title">Dataset reference: patients</div>
+  <table>
+    <tr><th>Dataset</th><th>Primary key</th><th>Foreign keys</th><th>HIPAA-sensitive columns</th></tr>
+    <tr>
+      <td>patients</td><td>patient_id</td>
+      <td>primary_facility_id → facilities</td>
+      <td>⚠️ first_name, last_name, date_of_birth, email, phone, registration_date<br>🔒 patient_number</td>
+    </tr>
+    <tr>
+      <td>patient_addresses</td><td>address_id</td>
+      <td>patient_id → patients<br>city_id → cities<br>state_id → states<br>country_id → countries</td>
+      <td>⚠️ line1, line2, postal_code, latitude, longitude<br>🔗 patient_id links to PHI</td>
+    </tr>
+    <tr>
+      <td>patient_insurance</td><td>insurance_id</td>
+      <td>patient_id → patients<br>insurance_plan_id → insurance_plans</td>
+      <td>⚠️ policy_number, group_number, effective_date, expiration_date<br>🔗 patient_id links to PHI</td>
+    </tr>
+    <tr>
+      <td>patient_allergies</td><td>allergy_id</td>
+      <td>patient_id → patients</td>
+      <td>⚠️ allergen, reaction, recorded_at<br>🔗 patient_id links to PHI</td>
+    </tr>
+    <tr>
+      <td>patient_emergency_contacts</td><td>contact_id</td>
+      <td>patient_id → patients</td>
+      <td>⚠️ contact_name, relationship, phone_number, email<br>🔗 patient_id links to PHI</td>
+    </tr>
+    <tr>
+      <td>immunizations</td><td>immunization_id</td>
+      <td>patient_id → patients<br>administered_by → providers</td>
+      <td>⚠️ vaccine_name, administered_at, site<br>🔗 FK columns link to PHI</td>
+    </tr>
+  </table>
+
+  <div class="section-title">Dataset reference: providers</div>
+  <table>
+    <tr><th>Dataset</th><th>Primary key</th><th>Foreign keys</th><th>HIPAA-sensitive columns</th></tr>
+    <tr>
+      <td>providers</td><td>provider_id</td>
+      <td>specialty_id → specialties<br>department_id → departments</td>
+      <td>⚠️ first_name, last_name, license_number<br>🔒 provider_number</td>
+    </tr>
+    <tr>
+      <td>provider_departments</td><td>provider_department_id</td>
+      <td>provider_id → providers<br>department_id → departments</td>
+      <td>🔗 provider_id links to PHI</td>
+    </tr>
+    <tr>
+      <td>provider_specialties</td><td>provider_specialty_id</td>
+      <td>provider_id → providers<br>specialty_id → specialties</td>
+      <td>🔗 provider_id links to PHI</td>
+    </tr>
+  </table>
+
+  <div class="section-title">Dataset reference: encounters</div>
+  <table>
+    <tr><th>Dataset</th><th>Primary key</th><th>Foreign keys</th><th>HIPAA-sensitive columns</th></tr>
+    <tr>
+      <td>encounters</td><td>encounter_id</td>
+      <td>patient_id → patients<br>provider_id → providers<br>department_id → departments<br>facility_id → facilities</td>
+      <td>⚠️ admission_date, discharge_date, room_number, bed_number<br>🔒 encounter_number</td>
+    </tr>
+    <tr>
+      <td>appointments</td><td>appointment_id</td>
+      <td>encounter_id → encounters<br>patient_id → patients<br>provider_id → providers<br>department_id → departments</td>
+      <td>⚠️ scheduled_date, start_time, end_time<br>🔗 FK columns link to PHI</td>
+    </tr>
+    <tr>
+      <td>vitals</td><td>vital_id</td>
+      <td>encounter_id → encounters<br>patient_id → patients</td>
+      <td>⚠️ temperature, heart_rate, blood pressure, respiratory_rate, oxygen_saturation, height, weight, bmi<br>🔗 FK columns link to PHI</td>
+    </tr>
+    <tr>
+      <td>medications_prescribed</td><td>prescription_id</td>
+      <td>encounter_id → encounters<br>patient_id → patients<br>provider_id → providers<br>medication_id → medications</td>
+      <td>⚠️ dosage, frequency, route, prescribed_at<br>🔗 FK columns link to PHI</td>
+    </tr>
+    <tr>
+      <td>diagnoses</td><td>diagnosis_id</td>
+      <td>encounter_id → encounters<br>patient_id → patients<br>provider_id → providers<br>diagnosis_code_id → diagnosis_codes</td>
+      <td>⚠️ onset_date, recorded_at<br>🔗 FK columns link to PHI</td>
+    </tr>
+    <tr>
+      <td>procedures</td><td>procedure_id</td>
+      <td>encounter_id → encounters<br>patient_id → patients<br>provider_id → providers<br>procedure_code_id → procedure_codes</td>
+      <td>⚠️ procedure_description, performed_at<br>🔗 FK columns link to PHI</td>
+    </tr>
+  </table>
+
+  <div class="section-title">Dataset reference: billing</div>
+  <table>
+    <tr><th>Dataset</th><th>Primary key</th><th>Foreign keys</th><th>HIPAA-sensitive columns</th></tr>
+    <tr>
+      <td>billing</td><td>billing_id</td>
+      <td>encounter_id → encounters<br>patient_id → patients<br>provider_id → providers<br>billing_code_id → billing_codes</td>
+      <td>⚠️ charge_amount, discount_amount, tax_amount, total_amount, billing_date<br>🔒 billing_number<br>🔗 FK columns link to PHI</td>
+    </tr>
+    <tr>
+      <td>claims</td><td>claim_id</td>
+      <td>billing_id → billing<br>insurance_plan_id → insurance_plans<br>patient_id → patients</td>
+      <td>⚠️ claim_amount, approved_amount, denied_amount, submitted_date, processed_date<br>🔒 claim_number<br>🔗 FK columns link to PHI</td>
+    </tr>
+  </table>
+
+  <div class="section-title">Dataset reference: additional</div>
+  <table>
+    <tr><th>Dataset</th><th>Primary key</th><th>Foreign keys</th><th>HIPAA-sensitive columns</th></tr>
+    <tr>
+      <td>lab_results</td><td>lab_result_id</td>
+      <td>encounter_id → encounters<br>patient_id → patients</td>
+      <td>⚠️ test_name, result_value, reported_at<br>🔗 FK columns link to PHI</td>
+    </tr>
+    <tr>
+      <td>radiology_reports</td><td>radiology_id</td>
+      <td>encounter_id → encounters<br>patient_id → patients<br>radiologist_id → providers</td>
+      <td>⚠️ modality, body_part, findings, impression, performed_at<br>🔗 FK columns link to PHI</td>
+    </tr>
+    <tr>
+      <td>medication_administration</td><td>administration_id</td>
+      <td>encounter_id → encounters<br>medication_id → medications<br>administered_by → providers</td>
+      <td>⚠️ dose, route, administered_at<br>🔗 FK columns link to PHI</td>
+    </tr>
+    <tr>
+      <td>admissions</td><td>admission_id</td>
+      <td>encounter_id → encounters<br>patient_id → patients<br>attending_physician → providers</td>
+      <td>⚠️ admission_type, admission_source, admitted_at, discharged_at, ward, bed_number<br>🔗 FK columns link to PHI</td>
+    </tr>
+    <tr>
+      <td>discharge_summaries</td><td>discharge_id</td>
+      <td>encounter_id → encounters<br>patient_id → patients<br>follow_up_physician → providers</td>
+      <td>⚠️ discharge_diagnosis, discharge_instructions, follow_up_date<br>🔗 FK columns link to PHI</td>
+    </tr>
+    <tr>
+      <td>referrals</td><td>referral_id</td>
+      <td>patient_id → patients<br>encounter_id → encounters<br>referring_provider → providers<br>referred_to_provider → providers</td>
+      <td>⚠️ referral_reason, referral_date<br>🔗 FK columns link to PHI</td>
+    </tr>
+  </table>
+
+  <div class="hipaa-box">
+    <strong>⚠️ HIPAA PHI summary:</strong><br>
+    This model contains Protected Health Information (PHI) as defined by HIPAA. Sensitive data includes:
+    names, geographic sub-state info (addresses, rooms), dates (DOB, admission, discharge, etc.), contact info
+    (email, phone), medical record numbers, medical conditions/allergies, financial data (charges, claims), and
+    license numbers. Ensure appropriate access controls, encryption, and audit logging are in place.
+  </div>
+
+  <div class="info-box no-print">
+    <strong>📊 Total: 35 datasets</strong> across 6 functional areas: Master Data (12), Patients (6), Providers (3),
+    Encounters (6), Billing (2), Additional (7) — reorganized here into 2 simplified diagrams instead of 1 tangled one.
+  </div>
+</div>
+
+<script>
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'default',
+    er: { useMaxWidth: true }
+  });
+</script>
+</body>
+</html>
