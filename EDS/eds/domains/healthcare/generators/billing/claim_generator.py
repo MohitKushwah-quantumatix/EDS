@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from datetime import datetime
+
 import polars as pl
 
 from eds.core.random_streams import make_rng
@@ -24,28 +26,34 @@ def generate_claims(
             approved_amount = claim_amount if rng.random() < 0.8 else 0.0
             denied_amount = claim_amount - approved_amount
 
-            billing_date = bill_row[11]
-            processed_year = config.reference_date.year
-            try:
-                processed_year = int(str(billing_date)[:4])
-            except (ValueError, TypeError):
-                pass
-            processed_date = f"{processed_year}-{rng.randint(1, 12):02d}-{rng.randint(1, 28):02d}"
+            billing_date = bill_row[10]
+            submitted_date = billing_date
+            proc_year = int(str(billing_date)[:4])
+            proc_month = int(str(billing_date)[5:7])
+            proc_day = int(str(billing_date)[8:10])
+            processed_date = f"{proc_year}-{proc_month:02d}-{min(proc_day + rng.randint(1, 14), 28):02d}"
 
             rows.append({
                 "claim_id": claim_id,
                 "claim_number": f"CLM-{claim_id:06d}",
                 "billing_id": bill_row[0],
                 "insurance_plan_id": rng.choice(insurance_plan_ids),
-                "patient_id": bill_row[2],
+                "patient_id": bill_row[3],
                 "claim_amount": claim_amount,
                 "approved_amount": approved_amount,
                 "denied_amount": denied_amount,
                 "status": rng.choice(claim_statuses),
-                "submitted_date": billing_date,
+                "submitted_date": submitted_date,
                 "processed_date": processed_date,
-                "created_at": config.reference_date.isoformat(),
+                "created_at": datetime.strptime(processed_date, "%Y-%m-%d"),
             })
             claim_id += 1
 
-    return pl.DataFrame(rows)
+    df = pl.DataFrame(rows)
+    if df.height > 0:
+        df = df.with_columns([
+            pl.col("submitted_date").cast(pl.Date()),
+            pl.col("processed_date").str.strptime(pl.Date(), "%Y-%m-%d"),
+            pl.col("created_at").cast(pl.Datetime("us")),
+        ])
+    return df

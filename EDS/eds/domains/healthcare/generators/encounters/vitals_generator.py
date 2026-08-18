@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from datetime import datetime
+
 import polars as pl
 
 from eds.core.random_streams import make_rng
@@ -18,7 +20,7 @@ def generate_vitals(
     vital_id = 1
     for encounter_row in encounters.iter_rows():
         if rng.random() < 0.9:
-            admission_date = encounter_row[7]
+            admission_date = encounter_row[8]
             rows.append({
                 "vital_id": vital_id,
                 "encounter_id": encounter_row[0],
@@ -33,8 +35,14 @@ def generate_vitals(
                 "weight_kg": round(rng.uniform(50.0, 120.0), 1),
                 "bmi": round(rng.uniform(18.0, 35.0), 1),
                 "recorded_at": f"{admission_date} 10:00:00",
-                "created_at": config.reference_date.isoformat(),
+                "created_at": f"{admission_date} 10:00:00",
             })
             vital_id += 1
 
-    return pl.DataFrame(rows)
+    df = pl.DataFrame(rows)
+    if df.height > 0:
+        df = df.with_columns([
+            pl.col("recorded_at").str.strptime(pl.Datetime("us"), "%Y-%m-%d %H:%M:%S"),
+            pl.col("created_at").str.strptime(pl.Datetime("us"), "%Y-%m-%d %H:%M:%S"),
+        ])
+    return df

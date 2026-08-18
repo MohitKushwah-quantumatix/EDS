@@ -25,7 +25,7 @@ def generate_patients(
         facility_id = rng.choice(facility_ids)
         first_name = rng.choice(["Aarav", "Aditya", "Aryan", "Ishaan", "Kavya", "Priya", "Ananya", "Diya", "Riya", "Saanvi"])
         last_name = rng.choice(["Sharma", "Patel", "Singh", "Kumar", "Gupta", "Verma", "Reddy", "Joshi", "Iyer", "Kapoor"])
-        gender = rng.choice(["MALE", "FEMALE", "NON_BINARY", "UNDISCLOSED"])
+        gender = rng.choices(["MALE", "FEMALE", "NON_BINARY", "UNDISCLOSED"], weights=[48, 48, 2, 2], k=1)[0]
         status = rng.choice(["ACTIVE", "ACTIVE", "ACTIVE", "INACTIVE", "TRANSFERRED"])
         insurance_type = rng.choice(["PRIVATE", "PRIVATE", "MEDICARE", "MEDICAID", "SELF_PAY"])
         reg_year = config.reference_date.year - rng.randint(0, config.registration_years)

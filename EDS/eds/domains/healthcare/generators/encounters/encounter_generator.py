@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from datetime import datetime
+
 import polars as pl
 
 from eds.core.random_streams import make_rng
@@ -70,9 +72,16 @@ def generate_encounters(
                 "facility_id": rng.choice(facility_ids),
                 "room_number": f"R{rng.randint(100, 999)}",
                 "bed_number": f"B{rng.randint(1, 10)}",
-                "created_at": config.reference_date.isoformat(),
+                "created_at": datetime.strptime(admission_date, "%Y-%m-%d"),
             })
             encounter_id += 1
 
-    return pl.DataFrame(rows)
+    df = pl.DataFrame(rows)
+    if df.height > 0:
+        df = df.with_columns([
+            pl.col("admission_date").str.strptime(pl.Date(), "%Y-%m-%d"),
+            pl.col("discharge_date").str.strptime(pl.Date(), "%Y-%m-%d"),
+            pl.col("created_at").cast(pl.Datetime("us")),
+        ])
+    return df
 

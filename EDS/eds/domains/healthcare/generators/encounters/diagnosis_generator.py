@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from datetime import datetime
+
 import polars as pl
 
 from eds.core.random_streams import make_rng
@@ -29,11 +31,18 @@ def generate_diagnoses(
                     "provider_id": encounter_row[3],
                     "diagnosis_code_id": rng.choice(diagnosis_code_ids),
                     "diagnosis_type": rng.choice(diagnosis_types),
-                    "onset_date": f"{config.reference_date.year - rng.randint(0, 365)}-01-01",
+                    "onset_date": encounter_row[8],
                     "status": "CONFIRMED",
-                    "recorded_at": f"{encounter_row[7]} 10:00:00",
-                    "created_at": config.reference_date.isoformat(),
+                    "recorded_at": f"{encounter_row[8]} 10:00:00",
+                    "created_at": f"{encounter_row[8]} 10:00:00",
                 })
                 diagnosis_id += 1
 
-    return pl.DataFrame(rows)
+    df = pl.DataFrame(rows)
+    if df.height > 0:
+        df = df.with_columns([
+            pl.col("onset_date").cast(pl.Date()),
+            pl.col("recorded_at").str.strptime(pl.Datetime("us"), "%Y-%m-%d %H:%M:%S"),
+            pl.col("created_at").str.strptime(pl.Datetime("us"), "%Y-%m-%d %H:%M:%S"),
+        ])
+    return df

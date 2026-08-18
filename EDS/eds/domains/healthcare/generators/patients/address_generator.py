@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from datetime import datetime
+
 import polars as pl
 
 from eds.core.random_streams import make_rng
@@ -36,8 +38,13 @@ def generate_addresses(
                 "is_primary": addr_idx == 0,
                 "latitude": rng.uniform(-90.0, 90.0),
                 "longitude": rng.uniform(-180.0, 180.0),
-                "created_at": config.reference_date.isoformat(),
+                "created_at": datetime.strptime(str(patient_row[9]), "%Y-%m-%d"),
             })
             address_id += 1
 
-    return pl.DataFrame(rows)
+    df = pl.DataFrame(rows)
+    if df.height > 0:
+        df = df.with_columns([
+            pl.col("created_at").cast(pl.Datetime("us")),
+        ])
+    return df
