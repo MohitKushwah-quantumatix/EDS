@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from pathlib import Path
 
 import polars as pl
@@ -29,15 +30,22 @@ class HealthcareExecutor:
         config_dir: Path | None = None,
         reader: DatasetReader | None = None,
         writer: DatasetWriter | None = None,
+        stream: bool = False,
     ) -> None:
         self._config = config if config is not None else load_config(config_dir)
         self._reader = reader
         self._writer = writer
+        self._stream = stream
 
     @property
     def config(self) -> SimulationConfig:
         """Return the Healthcare settings this executor generates with."""
         return self._config
+
+    @property
+    def stream(self) -> bool:
+        """Return whether Kafka streaming was requested."""
+        return self._stream
 
     def execute(self, request: StageRequest) -> StageOutput:
         """Run one Healthcare stage for one simulated date."""
@@ -65,6 +73,8 @@ class HealthcareExecutor:
         )
         day = run_stage(stage, config, context, upstream, self._history(reader, stage))
 
+        self._stream_generated(day.generated)
+
         try:
             written = writer.write(day.persisted)
         except AdapterError as exc:
@@ -75,6 +85,27 @@ class HealthcareExecutor:
             ) from exc
 
         return StageOutput(rows_by_dataset={result.dataset: result.rows for result in written})
+
+    def _stream_generated(self, datasets: Mapping[str, pl.DataFrame]) -> None:
+        """Publish generated datasets to Kafka if streaming is enabled.
+
+        Streaming is best-effort: if Kafka is unavailable or the
+        ``kafka-python`` package is missing, a warning is logged and the
+        simulation proceeds normally.
+
+        Args:
+            datasets: The ``day.generated`` mapping from the stage that
+                just ran.
+        """
+        if not self._stream:
+            return
+        try:
+            from eds.infrastructure.kafka.streaming import (  # noqa: PLC0415
+                stream_if_enabled,
+            )
+        except ImportError:
+            return
+        stream_if_enabled(datasets, stream=True)
 
     @staticmethod
     def _history(reader: DatasetReader, stage: str) -> dict[str, pl.DataFrame]:
