@@ -1,0 +1,972 @@
+{
+  "admissions": {
+    "columns": {
+      "admission_id": "int64",
+      "admission_source": "string",
+      "admission_type": "string",
+      "admitted_at": "date",
+      "attending_physician": "int64",
+      "bed_number": "string",
+      "discharged_at": "date",
+      "encounter_id": "int64",
+      "patient_id": "int64",
+      "ward": "string"
+    },
+    "foreign_keys": [
+      {
+        "column": "encounter_id",
+        "nullable": false,
+        "referenced_column": "encounter_id",
+        "references": "encounters"
+      },
+      {
+        "column": "patient_id",
+        "nullable": false,
+        "referenced_column": "patient_id",
+        "references": "patients"
+      },
+      {
+        "column": "attending_physician",
+        "nullable": false,
+        "referenced_column": "provider_id",
+        "references": "providers"
+      }
+    ],
+    "primary_key": "admission_id",
+    "unique_columns": []
+  },
+  "appointments": {
+    "columns": {
+      "appointment_id": "int64",
+      "appointment_type": "string",
+      "created_at": "datetime",
+      "department_id": "int64",
+      "encounter_id": "int64",
+      "end_time": "datetime",
+      "patient_id": "int64",
+      "provider_id": "int64",
+      "scheduled_date": "date",
+      "start_time": "datetime",
+      "status": "string"
+    },
+    "foreign_keys": [
+      {
+        "column": "encounter_id",
+        "nullable": false,
+        "referenced_column": "encounter_id",
+        "references": "encounters"
+      },
+      {
+        "column": "patient_id",
+        "nullable": false,
+        "referenced_column": "patient_id",
+        "references": "patients"
+      },
+      {
+        "column": "provider_id",
+        "nullable": false,
+        "referenced_column": "provider_id",
+        "references": "providers"
+      },
+      {
+        "column": "department_id",
+        "nullable": false,
+        "referenced_column": "department_id",
+        "references": "departments"
+      }
+    ],
+    "primary_key": "appointment_id",
+    "unique_columns": []
+  },
+  "billing": {
+    "columns": {
+      "billing_code_id": "int64",
+      "billing_date": "date",
+      "billing_id": "int64",
+      "billing_number": "string",
+      "charge_amount": "float64",
+      "created_at": "datetime",
+      "discount_amount": "float64",
+      "encounter_id": "int64",
+      "patient_id": "int64",
+      "provider_id": "int64",
+      "status": "string",
+      "tax_amount": "float64",
+      "total_amount": "float64"
+    },
+    "foreign_keys": [
+      {
+        "column": "encounter_id",
+        "nullable": false,
+        "referenced_column": "encounter_id",
+        "references": "encounters"
+      },
+      {
+        "column": "patient_id",
+        "nullable": false,
+        "referenced_column": "patient_id",
+        "references": "patients"
+      },
+      {
+        "column": "provider_id",
+        "nullable": false,
+        "referenced_column": "provider_id",
+        "references": "providers"
+      },
+      {
+        "column": "billing_code_id",
+        "nullable": false,
+        "referenced_column": "billing_code_id",
+        "references": "billing_codes"
+      }
+    ],
+    "primary_key": "billing_id",
+    "unique_columns": [
+      "billing_number"
+    ]
+  },
+  "billing_codes": {
+    "columns": {
+      "billing_code_id": "int64",
+      "charge_amount": "float64",
+      "code": "string",
+      "currency_code": "string",
+      "description": "string"
+    },
+    "foreign_keys": [],
+    "primary_key": "billing_code_id",
+    "unique_columns": [
+      "code"
+    ]
+  },
+  "cities": {
+    "columns": {
+      "city_code": "string",
+      "city_id": "int64",
+      "city_name": "string",
+      "state_id": "int64"
+    },
+    "foreign_keys": [
+      {
+        "column": "state_id",
+        "nullable": false,
+        "referenced_column": "state_id",
+        "references": "states"
+      }
+    ],
+    "primary_key": "city_id",
+    "unique_columns": [
+      "city_code"
+    ]
+  },
+  "claims": {
+    "columns": {
+      "approved_amount": "float64",
+      "billing_id": "int64",
+      "claim_amount": "float64",
+      "claim_id": "int64",
+      "claim_number": "string",
+      "created_at": "datetime",
+      "denied_amount": "float64",
+      "insurance_plan_id": "int64",
+      "patient_id": "int64",
+      "processed_date": "date",
+      "status": "string",
+      "submitted_date": "date"
+    },
+    "foreign_keys": [
+      {
+        "column": "billing_id",
+        "nullable": false,
+        "referenced_column": "billing_id",
+        "references": "billing"
+      },
+      {
+        "column": "insurance_plan_id",
+        "nullable": false,
+        "referenced_column": "insurance_plan_id",
+        "references": "insurance_plans"
+      },
+      {
+        "column": "patient_id",
+        "nullable": false,
+        "referenced_column": "patient_id",
+        "references": "patients"
+      }
+    ],
+    "primary_key": "claim_id",
+    "unique_columns": [
+      "claim_number"
+    ]
+  },
+  "countries": {
+    "columns": {
+      "country_code": "string",
+      "country_id": "int64",
+      "country_name": "string"
+    },
+    "foreign_keys": [],
+    "primary_key": "country_id",
+    "unique_columns": [
+      "country_code"
+    ]
+  },
+  "departments": {
+    "columns": {
+      "department_code": "string",
+      "department_id": "int64",
+      "department_name": "string",
+      "description": "string"
+    },
+    "foreign_keys": [],
+    "primary_key": "department_id",
+    "unique_columns": [
+      "department_code"
+    ]
+  },
+  "diagnoses": {
+    "columns": {
+      "created_at": "datetime",
+      "diagnosis_code_id": "int64",
+      "diagnosis_id": "int64",
+      "diagnosis_type": "string",
+      "encounter_id": "int64",
+      "onset_date": "date",
+      "patient_id": "int64",
+      "provider_id": "int64",
+      "recorded_at": "datetime",
+      "status": "string"
+    },
+    "foreign_keys": [
+      {
+        "column": "encounter_id",
+        "nullable": false,
+        "referenced_column": "encounter_id",
+        "references": "encounters"
+      },
+      {
+        "column": "patient_id",
+        "nullable": false,
+        "referenced_column": "patient_id",
+        "references": "patients"
+      },
+      {
+        "column": "provider_id",
+        "nullable": false,
+        "referenced_column": "provider_id",
+        "references": "providers"
+      },
+      {
+        "column": "diagnosis_code_id",
+        "nullable": false,
+        "referenced_column": "diagnosis_code_id",
+        "references": "diagnosis_codes"
+      }
+    ],
+    "primary_key": "diagnosis_id",
+    "unique_columns": []
+  },
+  "diagnosis_codes": {
+    "columns": {
+      "category": "string",
+      "code": "string",
+      "description": "string",
+      "diagnosis_code_id": "int64"
+    },
+    "foreign_keys": [],
+    "primary_key": "diagnosis_code_id",
+    "unique_columns": [
+      "code"
+    ]
+  },
+  "discharge_summaries": {
+    "columns": {
+      "discharge_diagnosis": "string",
+      "discharge_disposition": "string",
+      "discharge_id": "int64",
+      "discharge_instructions": "string",
+      "encounter_id": "int64",
+      "follow_up_date": "date",
+      "follow_up_physician": "int64",
+      "patient_id": "int64"
+    },
+    "foreign_keys": [
+      {
+        "column": "encounter_id",
+        "nullable": false,
+        "referenced_column": "encounter_id",
+        "references": "encounters"
+      },
+      {
+        "column": "patient_id",
+        "nullable": false,
+        "referenced_column": "patient_id",
+        "references": "patients"
+      },
+      {
+        "column": "follow_up_physician",
+        "nullable": false,
+        "referenced_column": "provider_id",
+        "references": "providers"
+      }
+    ],
+    "primary_key": "discharge_id",
+    "unique_columns": []
+  },
+  "encounters": {
+    "columns": {
+      "admission_date": "date",
+      "admit_source": "string",
+      "bed_number": "string",
+      "created_at": "datetime",
+      "department_id": "int64",
+      "discharge_date": "date",
+      "discharge_disposition": "string",
+      "encounter_id": "int64",
+      "encounter_number": "string",
+      "encounter_type": "string",
+      "facility_id": "int64",
+      "patient_id": "int64",
+      "provider_id": "int64",
+      "room_number": "string",
+      "status": "string"
+    },
+    "foreign_keys": [
+      {
+        "column": "patient_id",
+        "nullable": false,
+        "referenced_column": "patient_id",
+        "references": "patients"
+      },
+      {
+        "column": "provider_id",
+        "nullable": false,
+        "referenced_column": "provider_id",
+        "references": "providers"
+      },
+      {
+        "column": "department_id",
+        "nullable": false,
+        "referenced_column": "department_id",
+        "references": "departments"
+      },
+      {
+        "column": "facility_id",
+        "nullable": false,
+        "referenced_column": "facility_id",
+        "references": "facilities"
+      }
+    ],
+    "primary_key": "encounter_id",
+    "unique_columns": [
+      "encounter_number"
+    ]
+  },
+  "facilities": {
+    "columns": {
+      "facility_code": "string",
+      "facility_id": "int64",
+      "facility_name": "string",
+      "facility_type": "string"
+    },
+    "foreign_keys": [],
+    "primary_key": "facility_id",
+    "unique_columns": [
+      "facility_code"
+    ]
+  },
+  "immunizations": {
+    "columns": {
+      "administered_at": "date",
+      "administered_by": "int64",
+      "dose_number": "int64",
+      "immunization_id": "int64",
+      "lot_number": "string",
+      "patient_id": "int64",
+      "site": "string",
+      "vaccine_name": "string"
+    },
+    "foreign_keys": [
+      {
+        "column": "patient_id",
+        "nullable": false,
+        "referenced_column": "patient_id",
+        "references": "patients"
+      },
+      {
+        "column": "administered_by",
+        "nullable": false,
+        "referenced_column": "provider_id",
+        "references": "providers"
+      }
+    ],
+    "primary_key": "immunization_id",
+    "unique_columns": []
+  },
+  "insurance_plans": {
+    "columns": {
+      "coverage_tier": "string",
+      "currency_code": "string",
+      "insurance_plan_id": "int64",
+      "plan_name": "string",
+      "plan_type": "string",
+      "premium_amount": "float64"
+    },
+    "foreign_keys": [],
+    "primary_key": "insurance_plan_id",
+    "unique_columns": [
+      "plan_name"
+    ]
+  },
+  "lab_results": {
+    "columns": {
+      "encounter_id": "int64",
+      "lab_result_id": "int64",
+      "normal_range": "string",
+      "patient_id": "int64",
+      "reported_at": "date",
+      "result_status": "string",
+      "result_value": "string",
+      "test_name": "string",
+      "unit": "string"
+    },
+    "foreign_keys": [
+      {
+        "column": "encounter_id",
+        "nullable": false,
+        "referenced_column": "encounter_id",
+        "references": "encounters"
+      },
+      {
+        "column": "patient_id",
+        "nullable": false,
+        "referenced_column": "patient_id",
+        "references": "patients"
+      }
+    ],
+    "primary_key": "lab_result_id",
+    "unique_columns": []
+  },
+  "medication_administration": {
+    "columns": {
+      "administered_at": "date",
+      "administered_by": "int64",
+      "administration_id": "int64",
+      "dose": "string",
+      "encounter_id": "int64",
+      "medication_id": "int64",
+      "route": "string"
+    },
+    "foreign_keys": [
+      {
+        "column": "encounter_id",
+        "nullable": false,
+        "referenced_column": "encounter_id",
+        "references": "encounters"
+      },
+      {
+        "column": "medication_id",
+        "nullable": false,
+        "referenced_column": "medication_id",
+        "references": "medications"
+      },
+      {
+        "column": "administered_by",
+        "nullable": false,
+        "referenced_column": "provider_id",
+        "references": "providers"
+      }
+    ],
+    "primary_key": "administration_id",
+    "unique_columns": []
+  },
+  "medications": {
+    "columns": {
+      "form": "string",
+      "medication_code": "string",
+      "medication_id": "int64",
+      "medication_name": "string",
+      "strength": "string",
+      "unit_of_measure": "string"
+    },
+    "foreign_keys": [],
+    "primary_key": "medication_id",
+    "unique_columns": [
+      "medication_code"
+    ]
+  },
+  "medications_prescribed": {
+    "columns": {
+      "created_at": "datetime",
+      "dosage": "string",
+      "duration_days": "int64",
+      "encounter_id": "int64",
+      "frequency": "string",
+      "medication_id": "int64",
+      "patient_id": "int64",
+      "prescribed_at": "datetime",
+      "prescription_id": "int64",
+      "provider_id": "int64",
+      "route": "string",
+      "status": "string"
+    },
+    "foreign_keys": [
+      {
+        "column": "encounter_id",
+        "nullable": false,
+        "referenced_column": "encounter_id",
+        "references": "encounters"
+      },
+      {
+        "column": "patient_id",
+        "nullable": false,
+        "referenced_column": "patient_id",
+        "references": "patients"
+      },
+      {
+        "column": "provider_id",
+        "nullable": false,
+        "referenced_column": "provider_id",
+        "references": "providers"
+      },
+      {
+        "column": "medication_id",
+        "nullable": false,
+        "referenced_column": "medication_id",
+        "references": "medications"
+      }
+    ],
+    "primary_key": "prescription_id",
+    "unique_columns": []
+  },
+  "patient_addresses": {
+    "columns": {
+      "address_id": "int64",
+      "address_type": "string",
+      "city_id": "int64",
+      "country_id": "int64",
+      "created_at": "datetime",
+      "is_primary": "boolean",
+      "latitude": "float64",
+      "line1": "string",
+      "line2": "string",
+      "longitude": "float64",
+      "patient_id": "int64",
+      "postal_code": "string",
+      "state_id": "int64"
+    },
+    "foreign_keys": [
+      {
+        "column": "patient_id",
+        "nullable": false,
+        "referenced_column": "patient_id",
+        "references": "patients"
+      },
+      {
+        "column": "city_id",
+        "nullable": false,
+        "referenced_column": "city_id",
+        "references": "cities"
+      },
+      {
+        "column": "state_id",
+        "nullable": false,
+        "referenced_column": "state_id",
+        "references": "states"
+      },
+      {
+        "column": "country_id",
+        "nullable": false,
+        "referenced_column": "country_id",
+        "references": "countries"
+      }
+    ],
+    "primary_key": "address_id",
+    "unique_columns": []
+  },
+  "patient_allergies": {
+    "columns": {
+      "allergen": "string",
+      "allergy_id": "int64",
+      "created_at": "datetime",
+      "patient_id": "int64",
+      "reaction": "string",
+      "recorded_at": "date",
+      "severity": "string",
+      "status": "string"
+    },
+    "foreign_keys": [
+      {
+        "column": "patient_id",
+        "nullable": false,
+        "referenced_column": "patient_id",
+        "references": "patients"
+      }
+    ],
+    "primary_key": "allergy_id",
+    "unique_columns": []
+  },
+  "patient_emergency_contacts": {
+    "columns": {
+      "contact_id": "int64",
+      "contact_name": "string",
+      "email": "string",
+      "is_primary": "boolean",
+      "patient_id": "int64",
+      "phone_number": "string",
+      "relationship": "string"
+    },
+    "foreign_keys": [
+      {
+        "column": "patient_id",
+        "nullable": false,
+        "referenced_column": "patient_id",
+        "references": "patients"
+      }
+    ],
+    "primary_key": "contact_id",
+    "unique_columns": []
+  },
+  "patient_insurance": {
+    "columns": {
+      "created_at": "datetime",
+      "effective_date": "date",
+      "expiration_date": "date",
+      "group_number": "string",
+      "insurance_id": "int64",
+      "insurance_plan_id": "int64",
+      "is_primary": "boolean",
+      "patient_id": "int64",
+      "policy_number": "string"
+    },
+    "foreign_keys": [
+      {
+        "column": "patient_id",
+        "nullable": false,
+        "referenced_column": "patient_id",
+        "references": "patients"
+      },
+      {
+        "column": "insurance_plan_id",
+        "nullable": false,
+        "referenced_column": "insurance_plan_id",
+        "references": "insurance_plans"
+      }
+    ],
+    "primary_key": "insurance_id",
+    "unique_columns": [
+      "patient_id"
+    ]
+  },
+  "patients": {
+    "columns": {
+      "created_at": "datetime",
+      "date_of_birth": "date",
+      "email": "string",
+      "first_name": "string",
+      "full_name": "string",
+      "gender": "string",
+      "insurance_type": "string",
+      "last_name": "string",
+      "patient_id": "int64",
+      "patient_number": "string",
+      "phone": "string",
+      "primary_facility_id": "int64",
+      "registration_date": "date",
+      "status": "string",
+      "updated_at": "datetime"
+    },
+    "foreign_keys": [],
+    "primary_key": "patient_id",
+    "unique_columns": [
+      "patient_number",
+      "email",
+      "phone"
+    ]
+  },
+  "procedure_codes": {
+    "columns": {
+      "category": "string",
+      "code": "string",
+      "description": "string",
+      "procedure_code_id": "int64"
+    },
+    "foreign_keys": [],
+    "primary_key": "procedure_code_id",
+    "unique_columns": [
+      "code"
+    ]
+  },
+  "procedures": {
+    "columns": {
+      "created_at": "datetime",
+      "encounter_id": "int64",
+      "patient_id": "int64",
+      "performed_at": "datetime",
+      "procedure_code_id": "int64",
+      "procedure_description": "string",
+      "procedure_id": "int64",
+      "provider_id": "int64"
+    },
+    "foreign_keys": [
+      {
+        "column": "encounter_id",
+        "nullable": false,
+        "referenced_column": "encounter_id",
+        "references": "encounters"
+      },
+      {
+        "column": "patient_id",
+        "nullable": false,
+        "referenced_column": "patient_id",
+        "references": "patients"
+      },
+      {
+        "column": "provider_id",
+        "nullable": false,
+        "referenced_column": "provider_id",
+        "references": "providers"
+      },
+      {
+        "column": "procedure_code_id",
+        "nullable": false,
+        "referenced_column": "procedure_code_id",
+        "references": "procedure_codes"
+      }
+    ],
+    "primary_key": "procedure_id",
+    "unique_columns": []
+  },
+  "provider_departments": {
+    "columns": {
+      "created_at": "datetime",
+      "department_id": "int64",
+      "end_date": "date",
+      "is_primary": "boolean",
+      "provider_department_id": "int64",
+      "provider_id": "int64",
+      "role": "string",
+      "start_date": "date"
+    },
+    "foreign_keys": [
+      {
+        "column": "provider_id",
+        "nullable": false,
+        "referenced_column": "provider_id",
+        "references": "providers"
+      },
+      {
+        "column": "department_id",
+        "nullable": false,
+        "referenced_column": "department_id",
+        "references": "departments"
+      }
+    ],
+    "primary_key": "provider_department_id",
+    "unique_columns": []
+  },
+  "provider_specialties": {
+    "columns": {
+      "certification_date": "date",
+      "created_at": "datetime",
+      "provider_id": "int64",
+      "provider_specialty_id": "int64",
+      "specialty_id": "int64"
+    },
+    "foreign_keys": [
+      {
+        "column": "provider_id",
+        "nullable": false,
+        "referenced_column": "provider_id",
+        "references": "providers"
+      },
+      {
+        "column": "specialty_id",
+        "nullable": false,
+        "referenced_column": "specialty_id",
+        "references": "specialties"
+      }
+    ],
+    "primary_key": "provider_specialty_id",
+    "unique_columns": []
+  },
+  "providers": {
+    "columns": {
+      "created_at": "datetime",
+      "department_id": "int64",
+      "first_name": "string",
+      "full_name": "string",
+      "hire_date": "date",
+      "last_name": "string",
+      "license_number": "string",
+      "provider_id": "int64",
+      "provider_number": "string",
+      "provider_type": "string",
+      "specialty_id": "int64",
+      "status": "string",
+      "termination_date": "date"
+    },
+    "foreign_keys": [],
+    "primary_key": "provider_id",
+    "unique_columns": [
+      "provider_number",
+      "license_number"
+    ]
+  },
+  "radiology_reports": {
+    "columns": {
+      "body_part": "string",
+      "encounter_id": "int64",
+      "findings": "string",
+      "impression": "string",
+      "modality": "string",
+      "patient_id": "int64",
+      "performed_at": "date",
+      "radiologist_id": "int64",
+      "radiology_id": "int64"
+    },
+    "foreign_keys": [
+      {
+        "column": "encounter_id",
+        "nullable": false,
+        "referenced_column": "encounter_id",
+        "references": "encounters"
+      },
+      {
+        "column": "patient_id",
+        "nullable": false,
+        "referenced_column": "patient_id",
+        "references": "patients"
+      },
+      {
+        "column": "radiologist_id",
+        "nullable": false,
+        "referenced_column": "provider_id",
+        "references": "providers"
+      }
+    ],
+    "primary_key": "radiology_id",
+    "unique_columns": []
+  },
+  "referrals": {
+    "columns": {
+      "encounter_id": "int64",
+      "patient_id": "int64",
+      "referral_date": "date",
+      "referral_id": "int64",
+      "referral_reason": "string",
+      "referred_to_provider": "int64",
+      "referring_provider": "int64",
+      "status": "string"
+    },
+    "foreign_keys": [
+      {
+        "column": "patient_id",
+        "nullable": false,
+        "referenced_column": "patient_id",
+        "references": "patients"
+      },
+      {
+        "column": "encounter_id",
+        "nullable": false,
+        "referenced_column": "encounter_id",
+        "references": "encounters"
+      },
+      {
+        "column": "referring_provider",
+        "nullable": false,
+        "referenced_column": "provider_id",
+        "references": "providers"
+      },
+      {
+        "column": "referred_to_provider",
+        "nullable": false,
+        "referenced_column": "provider_id",
+        "references": "providers"
+      }
+    ],
+    "primary_key": "referral_id",
+    "unique_columns": []
+  },
+  "room_types": {
+    "columns": {
+      "base_rate": "float64",
+      "currency_code": "string",
+      "room_type_code": "string",
+      "room_type_id": "int64",
+      "room_type_name": "string"
+    },
+    "foreign_keys": [],
+    "primary_key": "room_type_id",
+    "unique_columns": [
+      "room_type_code"
+    ]
+  },
+  "specialties": {
+    "columns": {
+      "description": "string",
+      "specialty_code": "string",
+      "specialty_id": "int64",
+      "specialty_name": "string"
+    },
+    "foreign_keys": [],
+    "primary_key": "specialty_id",
+    "unique_columns": [
+      "specialty_code"
+    ]
+  },
+  "states": {
+    "columns": {
+      "country_id": "int64",
+      "state_code": "string",
+      "state_id": "int64",
+      "state_name": "string"
+    },
+    "foreign_keys": [
+      {
+        "column": "country_id",
+        "nullable": false,
+        "referenced_column": "country_id",
+        "references": "countries"
+      }
+    ],
+    "primary_key": "state_id",
+    "unique_columns": [
+      "state_code"
+    ]
+  },
+  "vitals": {
+    "columns": {
+      "blood_pressure_diastolic": "int64",
+      "blood_pressure_systolic": "int64",
+      "bmi": "float64",
+      "created_at": "datetime",
+      "encounter_id": "int64",
+      "heart_rate": "int64",
+      "height_cm": "float64",
+      "oxygen_saturation": "float64",
+      "patient_id": "int64",
+      "recorded_at": "datetime",
+      "respiratory_rate": "int64",
+      "temperature": "float64",
+      "vital_id": "int64",
+      "weight_kg": "float64"
+    },
+    "foreign_keys": [
+      {
+        "column": "encounter_id",
+        "nullable": false,
+        "referenced_column": "encounter_id",
+        "references": "encounters"
+      },
+      {
+        "column": "patient_id",
+        "nullable": false,
+        "referenced_column": "patient_id",
+        "references": "patients"
+      }
+    ],
+    "primary_key": "vital_id",
+    "unique_columns": []
+  }
+}
