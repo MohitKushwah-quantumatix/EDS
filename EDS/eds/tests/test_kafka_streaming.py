@@ -2,10 +2,8 @@
 
 from __future__ import annotations
 
-import builtins
-import os
+import json
 import sys
-from collections.abc import Mapping
 from unittest.mock import MagicMock, patch
 
 import polars as pl
@@ -35,15 +33,18 @@ class TestKafkaConfig:
         assert config.bootstrap_servers == "localhost:9092"
         assert config.topic_prefix == ""
         assert config.realtime is False
+        assert config.schema_registry_url == "http://localhost:8081"
 
     def test_from_env_with_env_vars(self, monkeypatch: pytest.MonkeyPatch) -> None:
         monkeypatch.setenv("KAFKA_BOOTSTRAP_SERVERS", "broker1:9092,broker2:9092")
         monkeypatch.setenv("EDS_KAFKA_TOPIC_PREFIX", "test.prefix")
         monkeypatch.setenv("EDS_REALTIME", "1")
+        monkeypatch.setenv("EDS_KAFKA_SCHEMA_REGISTRY_URL", "http://schema-registry:8081")
         config = KafkaConfig.from_env()
         assert config.bootstrap_servers == "broker1:9092,broker2:9092"
         assert config.topic_prefix == "test.prefix"
         assert config.realtime is True
+        assert config.schema_registry_url == "http://schema-registry:8081"
 
     def test_is_enabled_false_by_default(self) -> None:
         config = KafkaConfig.from_env()
@@ -54,6 +55,24 @@ class TestKafkaConfig:
         config = KafkaConfig.from_env()
         assert config.is_enabled is True
 
+    def test_has_schema_registry(self) -> None:
+        config = KafkaConfig(
+            bootstrap_servers="localhost:9092",
+            topic_prefix="",
+            realtime=False,
+            schema_registry_url="http://localhost:8081",
+        )
+        assert config.has_schema_registry is True
+
+    def test_has_schema_registry_empty(self) -> None:
+        config = KafkaConfig(
+            bootstrap_servers="localhost:9092",
+            topic_prefix="",
+            realtime=False,
+            schema_registry_url="",
+        )
+        assert config.has_schema_registry is False
+
 
 class TestConsumerConfig:
     """Tests for ConsumerConfig."""
@@ -61,126 +80,76 @@ class TestConsumerConfig:
     def test_from_env_defaults(self) -> None:
         config = ConsumerConfig.from_env()
         assert config.bootstrap_servers == "localhost:9092"
-        assert config.topic_prefix == ""
         assert config.group_id == "eds-consumers"
 
     def test_from_env_with_env_vars(self, monkeypatch: pytest.MonkeyPatch) -> None:
         monkeypatch.setenv("KAFKA_BOOTSTRAP_SERVERS", "broker:9092")
-        monkeypatch.setenv("EDS_KAFKA_TOPIC_PREFIX", "prefix")
         monkeypatch.setenv("EDS_CONSUMER_GROUP_ID", "my-group")
         config = ConsumerConfig.from_env()
         assert config.bootstrap_servers == "broker:9092"
-        assert config.topic_prefix == "prefix"
         assert config.group_id == "my-group"
-
-    def test_topic_for_no_prefix(self) -> None:
-        config = ConsumerConfig(
-            bootstrap_servers="localhost:9092",
-            topic_prefix="",
-            group_id="test",
-        )
-        assert config.topic_for("patients") == "patients"
-
-    def test_topic_for_with_prefix(self) -> None:
-        config = ConsumerConfig(
-            bootstrap_servers="localhost:9092",
-            topic_prefix="my.prefix",
-            group_id="test",
-        )
-        assert config.topic_for("patients") == "my.prefix.patients"
-
-    def test_topics_for_tuple(self) -> None:
-        config = ConsumerConfig(
-            bootstrap_servers="localhost:9092",
-            topic_prefix="p",
-            group_id="test",
-        )
-        assert config.topics_for(("a", "b")) == ["p.a", "p.b"]
-
-    def test_topics_for_dict(self) -> None:
-        config = ConsumerConfig(
-            bootstrap_servers="localhost:9092",
-            topic_prefix="",
-            group_id="test",
-        )
-        assert config.topics_for({"x": 1, "y": 2}) == ["x", "y"]
 
 
 class TestStreamingProducer:
     """Tests for StreamingProducer."""
 
-    def test_lazy_initialization(self) -> None:
-        config = KafkaConfig(
+    def _make_config(self, realtime: bool = True) -> KafkaConfig:
+        return KafkaConfig(
             bootstrap_servers="localhost:9092",
             topic_prefix="",
-            realtime=True,
+            realtime=realtime,
+            schema_registry_url="",
         )
+
+    def test_lazy_initialization(self) -> None:
+        config = self._make_config()
         producer = StreamingProducer(config=config)
         assert producer.is_ready is False
 
     def test_topic_for_no_prefix(self) -> None:
-        config = KafkaConfig(
-            bootstrap_servers="localhost:9092",
-            topic_prefix="",
-            realtime=False,
-        )
+        config = self._make_config(realtime=False)
         producer = StreamingProducer(config=config)
-        assert producer._topic_for("patients") == "patients"
+        assert producer._topic_for("healthcare.patients") == "healthcare.patients"
 
     def test_topic_for_with_prefix(self) -> None:
         config = KafkaConfig(
             bootstrap_servers="localhost:9092",
             topic_prefix="test",
             realtime=False,
+            schema_registry_url="",
         )
         producer = StreamingProducer(config=config)
         assert producer._topic_for("patients") == "test.patients"
 
     def test_send_dataset_skips_empty(self) -> None:
-        config = KafkaConfig(
-            bootstrap_servers="localhost:9092",
-            topic_prefix="",
-            realtime=True,
-        )
+        config = self._make_config()
         producer = StreamingProducer(config=config)
         empty_df = pl.DataFrame(schema={"id": pl.Int64()})
-        producer.send_dataset("empty", empty_df)
+        producer.send_dataset("healthcare.patients", empty_df)
         assert producer.is_ready is False
 
     def test_stream_datasets(self) -> None:
-        config = KafkaConfig(
-            bootstrap_servers="localhost:9092",
-            topic_prefix="",
-            realtime=True,
-        )
+        config = self._make_config()
         producer = StreamingProducer(config=config)
         mock_kafka_producer = MagicMock()
         with patch.object(producer, "_get_producer", return_value=mock_kafka_producer):
             df = pl.DataFrame({"id": [1, 2], "name": ["a", "b"]})
-            producer.stream_datasets({"patients": df})
+            producer.stream_datasets({"healthcare.patients": df})
         assert mock_kafka_producer.send.call_count == 2
         mock_kafka_producer.flush.assert_called_once()
 
     def test_stream_datasets_skips_empty(self) -> None:
-        config = KafkaConfig(
-            bootstrap_servers="localhost:9092",
-            topic_prefix="",
-            realtime=True,
-        )
+        config = self._make_config()
         producer = StreamingProducer(config=config)
         mock_kafka_producer = MagicMock()
         with patch.object(producer, "_get_producer", return_value=mock_kafka_producer):
             df = pl.DataFrame({"id": [1], "name": ["a"]})
             empty_df = pl.DataFrame(schema={"id": pl.Int64()})
-            producer.stream_datasets({"patients": df, "empty": empty_df})
+            producer.stream_datasets({"healthcare.patients": df, "healthcare.empty": empty_df})
         assert mock_kafka_producer.send.call_count == 1
 
     def test_close(self) -> None:
-        config = KafkaConfig(
-            bootstrap_servers="localhost:9092",
-            topic_prefix="",
-            realtime=True,
-        )
+        config = self._make_config()
         producer = StreamingProducer(config=config)
         mock_producer = MagicMock()
         producer._producer = mock_producer
@@ -189,16 +158,12 @@ class TestStreamingProducer:
         mock_producer.close.assert_called_once()
 
     def test_stream_datasets_function(self) -> None:
-        config = KafkaConfig(
-            bootstrap_servers="localhost:9092",
-            topic_prefix="",
-            realtime=True,
-        )
+        config = self._make_config()
         mock_producer = MagicMock()
         with patch('eds.infrastructure.kafka.producer.StreamingProducer', return_value=mock_producer):
             df = pl.DataFrame({"id": [1]})
-            stream_datasets({"x": df}, config=config)
-        mock_producer.stream_datasets.assert_called_once_with({"x": df})
+            stream_datasets({"healthcare.x": df}, config=config)
+        mock_producer.stream_datasets.assert_called_once_with({"healthcare.x": df})
         mock_producer.close.assert_called_once()
 
 
@@ -211,10 +176,7 @@ class TestStreamIfEnabled:
         assert "EDS_REALTIME is not set" not in caplog.text
 
     def test_kafka_import_error(self, monkeypatch: pytest.MonkeyPatch, caplog: pytest.LogCaptureFixture) -> None:
-        import eds.infrastructure.kafka.streaming as streaming_module
-        monkeypatch.delattr(streaming_module, "StreamingProducer", raising=False)
-        monkeypatch.delattr(streaming_module, "KafkaConfig", raising=False)
-
+        import builtins
         original_import = builtins.__import__
         def mock_import(name, *args, **kwargs):
             if name == "eds.infrastructure.kafka.producer" or name.startswith("eds.infrastructure.kafka.producer"):
@@ -245,22 +207,22 @@ class TestConsumers:
 
     def test_encounter_consumer_topics(self) -> None:
         consumer = EncounterConsumer()
-        assert "encounters" in consumer.topics
-        assert "lab_results" in consumer.topics
+        assert "healthcare.encounters" in consumer.topics
+        assert "healthcare.lab_results" in consumer.topics
 
     def test_billing_consumer_topics(self) -> None:
         consumer = BillingConsumer()
-        assert "billing" in consumer.topics
-        assert "claims" in consumer.topics
+        assert "healthcare.billing" in consumer.topics
+        assert "healthcare.claims" in consumer.topics
 
     def test_vitals_consumer_topics(self) -> None:
         consumer = VitalsConsumer()
-        assert "vitals" in consumer.topics
+        assert "healthcare.vitals" in consumer.topics
 
     def test_patient_consumer_topics(self) -> None:
         consumer = PatientConsumer()
-        assert "patients" in consumer.topics
-        assert "immunizations" in consumer.topics
+        assert "healthcare.patients" in consumer.topics
+        assert "healthcare.immunizations" in consumer.topics
 
     def test_get_consumer_valid(self) -> None:
         consumer = get_consumer("encounters")

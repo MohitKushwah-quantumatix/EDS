@@ -89,6 +89,9 @@ class HealthcareExecutor:
     def _stream_generated(self, datasets: Mapping[str, pl.DataFrame]) -> None:
         """Publish generated datasets to Kafka if streaming is enabled.
 
+        Dataset names are prefixed with ``healthcare.`` so that topics are
+        domain-scoped (e.g. ``healthcare.encounters``).
+
         Streaming is best-effort: if Kafka is unavailable or the
         ``kafka-python`` package is missing, a warning is logged and the
         simulation proceeds normally.
@@ -99,13 +102,14 @@ class HealthcareExecutor:
         """
         if not self._stream:
             return
+        prefixed = {f"healthcare.{name}": data for name, data in datasets.items()}
         try:
             from eds.infrastructure.kafka.streaming import (  # noqa: PLC0415
                 stream_if_enabled,
             )
         except ImportError:
             return
-        stream_if_enabled(datasets, stream=True)
+        stream_if_enabled(prefixed, stream=True)
 
     @staticmethod
     def _history(reader: DatasetReader, stage: str) -> dict[str, pl.DataFrame]:

@@ -294,7 +294,8 @@ def healthcare_master_data(
         except ImportError:
             typer.echo("Kafka streaming unavailable: kafka-python not installed.", err=True)
         else:
-            stream_if_enabled(data.datasets, stream=True)
+            prefixed = {f"healthcare.{k}": v for k, v in data.datasets.items()}
+            stream_if_enabled(prefixed, stream=True)
 
     _report(data.datasets, data.seed, config.platform.output_directory)
 
@@ -387,7 +388,7 @@ def healthcare_patients(
         except ImportError:
             typer.echo("Kafka streaming unavailable: kafka-python not installed.", err=True)
         else:
-            stream_if_enabled(datasets, stream=True)
+            stream_if_enabled({f"healthcare.{k}": v for k, v in datasets.items()}, stream=True)
 
     _report(datasets, data.seed, config.platform.output_directory)
 
@@ -462,7 +463,8 @@ def healthcare_providers(
         except ImportError:
             typer.echo("Kafka streaming unavailable: kafka-python not installed.", err=True)
         else:
-            stream_if_enabled(data.datasets, stream=True)
+            prefixed = {f"healthcare.{k}": v for k, v in data.datasets.items()}
+            stream_if_enabled(prefixed, stream=True)
 
     _report(data.datasets, data.seed, config.platform.output_directory)
 
@@ -553,7 +555,7 @@ def healthcare_encounters(
         except ImportError:
             typer.echo("Kafka streaming unavailable: kafka-python not installed.", err=True)
         else:
-            stream_if_enabled(datasets, stream=True)
+            stream_if_enabled({f"healthcare.{k}": v for k, v in datasets.items()}, stream=True)
 
     _report(datasets, data.seed, config.platform.output_directory)
 

@@ -3,6 +3,16 @@
 Each consumer subscribes to a group of Kafka topics that correspond to a
 healthcare domain concept (encounters, billing, vitals, patients).  The
 underlying :class:`~kafka.KafkaConsumer` is created lazily.
+
+Topic naming convention:
+    All healthcare topics are prefixed with ``healthcare.`` so they are
+    domain-scoped (e.g. ``healthcare.encounters``, ``healthcare.claims``).
+
+Consumers:
+    - EncounterConsumer: processes encounter events (admissions, discharges)
+    - BillingConsumer: processes billing/claims for insurance verification
+    - VitalsConsumer: processes vitals for real-time anomaly detection
+    - PatientConsumer: processes patient demographic updates
 """
 
 from __future__ import annotations
@@ -10,7 +20,7 @@ from __future__ import annotations
 import json
 import os
 import sys
-from collections.abc import Iterator, MutableMapping
+from collections.abc import Iterator
 from dataclasses import dataclass
 from typing import Any
 
@@ -23,10 +33,6 @@ __all__ = [
     "run_consumer",
 ]
 
-_DEFAULT_BOOTSTRAP_SERVERS = "localhost:9092"
-_DEFAULT_TOPIC_PREFIX = ""
-_DEFAULT_GROUP_ID = "eds-consumers"
-
 
 @dataclass(frozen=True, slots=True)
 class ConsumerConfig:
@@ -34,59 +40,30 @@ class ConsumerConfig:
 
     Attributes:
         bootstrap_servers: Comma-separated Kafka broker list.
-        topic_prefix: Prefix prepended to dataset names to form topic names.
         group_id: Consumer group identifier.
     """
 
     bootstrap_servers: str
-    topic_prefix: str
     group_id: str
 
     @classmethod
     def from_env(cls) -> ConsumerConfig:
         """Build a config from environment variables.
 
-        ``KAFKA_BOOTSTRAP_SERVERS``, ``EDS_KAFKA_TOPIC_PREFIX`` and
-        ``EDS_CONSUMER_GROUP_ID`` are consulted, with sensible defaults.
+        ``KAFKA_BOOTSTRAP_SERVERS`` and ``EDS_CONSUMER_GROUP_ID`` are
+        consulted, with sensible defaults.
 
         Returns:
             A config with defaults applied for missing values.
         """
         return cls(
             bootstrap_servers=os.environ.get(
-                "KAFKA_BOOTSTRAP_SERVERS", _DEFAULT_BOOTSTRAP_SERVERS
-            ),
-            topic_prefix=os.environ.get(
-                "EDS_KAFKA_TOPIC_PREFIX", _DEFAULT_TOPIC_PREFIX
+                "KAFKA_BOOTSTRAP_SERVERS", "localhost:9092"
             ),
             group_id=os.environ.get(
-                "EDS_CONSUMER_GROUP_ID", _DEFAULT_GROUP_ID
+                "EDS_CONSUMER_GROUP_ID", "eds-consumers"
             ),
         )
-
-    def topic_for(self, dataset_name: str) -> str:
-        """Return the topic name for a dataset.
-
-        Args:
-            dataset_name: The dataset name.
-
-        Returns:
-            The topic name, prefixed if a prefix is configured.
-        """
-        if self.topic_prefix:
-            return f"{self.topic_prefix}.{dataset_name}"
-        return dataset_name
-
-    def topics_for(self, dataset_names: MutableMapping[str, Any] | tuple[str, ...]) -> list[str]:
-        """Return the topic names for a collection of dataset names.
-
-        Args:
-            dataset_names: Iterable of dataset names.
-
-        Returns:
-            List of fully-qualified topic names.
-        """
-        return [self.topic_for(name) for name in dataset_names]
 
 
 class _HealthcareConsumer:
@@ -126,9 +103,8 @@ class _HealthcareConsumer:
         if self._consumer is None:
             from kafka import KafkaConsumer as _KafkaConsumer  # noqa: PLC0415
 
-            topic_names = self._config.topics_for(self.topics)
             self._consumer = _KafkaConsumer(
-                *topic_names,
+                *self.topics,
                 bootstrap_servers=self._config.bootstrap_servers,
                 group_id=self._config.group_id,
                 auto_offset_reset="earliest",
@@ -163,55 +139,85 @@ class _HealthcareConsumer:
 
 
 class EncounterConsumer(_HealthcareConsumer):
-    """Consumes encounter-related datasets from Kafka."""
+    """Consumes encounter-related datasets from Kafka.
+
+    Use cases:
+        - Real-time bed occupancy tracking
+        - Emergency department load balancing
+        - Admission/discharge workflow automation
+
+    Topics: encounters, appointments, medications_prescribed, diagnoses,
+            procedures, lab_results, radiology_reports,
+            medication_administration, admissions, discharge_summaries, referrals
+    """
 
     topics: tuple[str, ...] = (
-        "encounters",
-        "appointments",
-        "medications_prescribed",
-        "diagnoses",
-        "procedures",
-        "lab_results",
-        "radiology_reports",
-        "medication_administration",
-        "admissions",
-        "discharge_summaries",
-        "referrals",
+        "healthcare.encounters",
+        "healthcare.appointments",
+        "healthcare.medications_prescribed",
+        "healthcare.diagnoses",
+        "healthcare.procedures",
+        "healthcare.lab_results",
+        "healthcare.radiology_reports",
+        "healthcare.medication_administration",
+        "healthcare.admissions",
+        "healthcare.discharge_summaries",
+        "healthcare.referrals",
     )
 
 
 class BillingConsumer(_HealthcareConsumer):
-    """Consumes billing-related datasets from Kafka."""
+    """Consumes billing-related datasets from Kafka.
+
+    Use cases:
+        - Real-time insurance verification
+        - Fraud detection on claims
+        - Billing exception alerts
+
+    Topics: billing, claims
+    """
 
     topics: tuple[str, ...] = (
-        "billing",
-        "claims",
-        "billing_codes",
-        "insurance_plans",
+        "healthcare.billing",
+        "healthcare.claims",
     )
 
 
 class VitalsConsumer(_HealthcareConsumer):
-    """Consumes vitals-related datasets from Kafka."""
+    """Consumes vitals-related datasets from Kafka.
+
+    Use cases:
+        - Real-time alert generation for abnormal vitals
+        - ICU/ward monitoring dashboards
+        - Early warning score calculation
+
+    Topics: vitals
+    """
 
     topics: tuple[str, ...] = (
-        "vitals",
-        "medications_prescribed",
-        "diagnoses",
-        "procedures",
+        "healthcare.vitals",
     )
 
 
 class PatientConsumer(_HealthcareConsumer):
-    """Consumes patient-related datasets from Kafka."""
+    """Consumes patient-related datasets from Kafka.
+
+    Use cases:
+        - Real-time patient registry updates
+        - Compliance audit logging
+        - Patient outreach coordination
+
+    Topics: patients, patient_addresses, patient_insurance,
+            patient_allergies, immunizations, patient_emergency_contacts
+    """
 
     topics: tuple[str, ...] = (
-        "patients",
-        "patient_addresses",
-        "patient_insurance",
-        "patient_allergies",
-        "immunizations",
-        "patient_emergency_contacts",
+        "healthcare.patients",
+        "healthcare.patient_addresses",
+        "healthcare.patient_insurance",
+        "healthcare.patient_allergies",
+        "healthcare.immunizations",
+        "healthcare.patient_emergency_contacts",
     )
 
 
