@@ -113,7 +113,7 @@ class StreamingProducer:
         import requests  # noqa: PLC0415
 
         url = f"{self._config.schema_registry_url}/subjects/{topic}-value/versions"
-        response = requests.post(url, json={"schema": json.dumps(schema)}, timeout=10)
+        response = requests.post(url, json={"schema": json.dumps(schema), "schemaType": "JSON"}, timeout=10)
         if response.status_code == 409:
             # Schema already registered
             return str(response.json()["id"])
