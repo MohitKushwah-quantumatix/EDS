@@ -28,6 +28,7 @@ import eds_loader.connectors.local_fs   # noqa: F401
 import eds_loader.connectors.remote_fs  # noqa: F401
 import eds_loader.connectors.postgres   # noqa: F401
 import eds_loader.connectors.mysql      # noqa: F401
+import eds_loader.connectors.mssql      # noqa: F401
 import eds_loader.connectors.mongodb    # noqa: F401
 import eds_loader.connectors.s3         # noqa: F401
 import eds_loader.connectors.azure_blob # noqa: F401

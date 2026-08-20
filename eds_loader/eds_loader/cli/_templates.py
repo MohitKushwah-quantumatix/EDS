@@ -21,7 +21,8 @@ SOURCE_TEMPLATES: dict[str, str] = {
     "local_fs": """\
 source:
   kind: local_fs
-  path: ./output          # required -- directory containing .parquet + schema.json
+  path: ./output          # required -- directory containing dataset files + schema.json
+  # format: parquet       # optional -- parquet (default) | csv | json | ndjson | excel | avro | orc
 """,
 
     "remote_fs": """\
@@ -29,11 +30,12 @@ source:
   kind: remote_fs
   host: sftp.example.com  # required
   username: eds_user       # required
-  remote_path: /data/eds  # required -- remote directory containing .parquet + schema.json
+  remote_path: /data/eds  # required -- remote directory containing dataset files + schema.json
   port: 22                 # optional -- default: 22
   # password_env: SFTP_PASSWORD   # env-var holding the password (preferred)
   # password: ""                  # inline password (not recommended for production)
   # key_filename: ~/.ssh/id_rsa   # path to private key file
+  # format: parquet               # optional -- parquet (default) | csv | json | ndjson | excel | avro | orc
 """,
 
     "s3": """\
@@ -45,6 +47,7 @@ source:
   aws_secret_access_key_env: AWS_SECRET_ACCESS_KEY  # env-var for secret key
   # region: us-east-1             # optional -- default: us-east-1
   # endpoint_url:                 # optional -- for MinIO / LocalStack
+  # format: parquet               # optional -- parquet (default) | csv | json | ndjson | excel | avro | orc
 """,
 
     "azure_blob": """\
@@ -55,6 +58,7 @@ source:
   # prefix: datasets/2024/        # optional -- prefix within the container
   account_key_env: AZURE_STORAGE_KEY  # env-var for storage account key
   # connection_string_env: AZURE_STORAGE_CONN_STR  # alternative: full connection string
+  # format: parquet               # optional -- parquet (default) | csv | json | ndjson | excel | avro | orc
 """,
 
     "gcs": """\
@@ -65,6 +69,7 @@ source:
   # credentials_env: GOOGLE_APPLICATION_CREDENTIALS  # path to service account JSON
   # credentials_file: /path/to/sa.json               # explicit credentials file
   # project: my-gcp-project       # optional -- GCP project ID
+  # format: parquet               # optional -- parquet (default) | csv | json | ndjson | excel | avro | orc
 """,
 }
 
@@ -149,6 +154,21 @@ target:
   # password_env: EDS_MONGO_PASSWORD
   port: 27017               # optional -- default: 27017
   # auth_source: admin            # optional -- authentication database, default: admin
+""",
+
+    "mssql": """\
+target:
+  kind: mssql
+  host: localhost           # required
+  database: eds_db          # required
+  user: eds_loader          # required
+  password_env: EDS_MSSQL_PASSWORD  # env-var holding the password (preferred)
+  # password: ""                    # inline password (not recommended for production)
+  port: 1433                # optional -- default: 1433
+  schema: dbo               # optional -- default: dbo
+  driver: "ODBC Driver 17 for SQL Server"  # optional -- must match an installed ODBC driver
+  # encrypt: true                   # optional -- default: true
+  # trust_server_certificate: false # optional -- set true for self-signed certs (dev only)
 """,
 }
 

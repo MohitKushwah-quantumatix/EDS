@@ -30,11 +30,18 @@ EDS generator
 
 ---
 
+## 1.5 Uninstallation 
+```bash
+pip uninstall eds-loader
+
+```
+
 ## 2. Installation
 
 ### Minimum install (local filesystem only)
 ```bash
 pip install eds-loader
+pip install -e "c:\Users\Mohit Patel\Downloads\EDS\eds_loader[all]"
 ```
 
 ### With a specific connector driver
@@ -83,8 +90,10 @@ Install everything at once:  pip install eds-loader[all]
 
 - `[OK]` — driver is installed, connector is ready.
 - `[--]` — driver missing; the hint shows the fix command.
-- `(source/target)` — can read AND write Parquet datasets.
-- `(target)` — write-only (databases don't expose a Parquet source).
+- `(source/target)` — can read AND write datasets.
+- `(target)` — write-only (databases don't expose a source interface).
+
+> **All connector kinds:** `local_fs`, `remote_fs`, `s3`, `azure_blob`, `gcs` (storage) · `postgres`, `mysql`, `mssql`, `oracle`, `mongodb` (database targets)
 
 ---
 
@@ -136,6 +145,7 @@ Every run is driven by a YAML file with three top-level sections:
 source:                   # where to READ data from
   kind: local_fs
   path: ./output
+  # format: parquet       # optional — parquet (default) | csv | json | ndjson | excel | avro | orc
 
 target:                   # where to WRITE data to
   kind: postgres
@@ -146,7 +156,12 @@ target:                   # where to WRITE data to
 
 tables: []                # [] = load every table in schema.json
 enforce_constraints: true # apply PK / FK / UNIQUE on the target
+schema_required: true     # false = skip schema.json, auto-discover *.parquet files
 ```
+
+> **`schema_required: false`** — Use when your source directory has no `schema.json` (e.g. a raw
+> export from another system). The loader discovers all matching format files automatically and
+> loads them without constraint metadata.
 
 ### Generate a config automatically
 
@@ -158,7 +173,7 @@ eds-loader init --source local_fs --target postgres --output loader.yaml
 
 # All available sources: local_fs, remote_fs, s3, azure_blob, gcs
 # All available targets: local_fs, remote_fs, s3, azure_blob, gcs,
-#                        postgres, mysql, mongodb
+#                        postgres, mysql, mssql, mongodb
 ```
 
 The generated file contains every field with comments explaining each one.
@@ -255,8 +270,25 @@ Works as **source** and **target** (no extra install needed).
 ```yaml
 source:                   # or target:
   kind: local_fs
-  path: ./output          # path to directory with .parquet + schema.json
+  path: ./output          # path to directory with dataset files + schema.json
+  # format: parquet       # optional — parquet (default) | csv | json | ndjson | excel | avro | orc
 ```
+
+**Supported source formats:**
+
+| Format | Extensions | Notes |
+|---|---|---|
+| `parquet` | `.parquet` | Default — always available |
+| `csv` | `.csv` | Plain comma-separated values |
+| `json` | `.json` | JSON array of objects |
+| `ndjson` | `.ndjson`, `.jsonl` | Newline-delimited JSON |
+| `excel` | `.xlsx`, `.xls` | Requires `pip install eds-loader[excel]`; multi-sheet → one dataset per sheet |
+| `avro` | `.avro` | Apache Avro |
+| `orc` | `.orc` | Apache ORC |
+
+> **Excel multi-sheet behaviour:** a workbook named `sales.xlsx` with sheets `Jan` and `Feb`
+> produces datasets named `sales_Jan` and `sales_Feb`. A single-sheet workbook uses the bare
+> stem (`sales`).
 
 **Typical use:** quickest way to test a load locally before pushing to a real target.
 
@@ -298,6 +330,7 @@ source:
   aws_access_key_id: AKIAIOSFODNN7EXAMPLE   # optional
   aws_secret_access_key_env: AWS_SECRET_ACCESS_KEY
   region: us-east-1             # optional, default: us-east-1
+  # format: parquet             # optional — parquet (default) | csv | json | ndjson | excel | avro | orc
   # endpoint_url: http://localhost:9000  # for MinIO / LocalStack
 ```
 
@@ -415,6 +448,49 @@ constraint enforcement. Uses backtick quoting and `FOREIGN_KEY_CHECKS` hooks.
 
 ---
 
+### 9.9 `mssql` — Microsoft SQL Server
+
+**Target only.** Install: `pip install eds-loader[mssql]`
+
+> **ODBC driver required:** An OS-level ODBC driver must be installed separately.
+> Download from Microsoft: [ODBC Driver for SQL Server](https://learn.microsoft.com/sql/connect/odbc/download-odbc-driver-for-sql-server).
+> List installed drivers: `python -c "import pyodbc; print(pyodbc.drivers())"`
+
+```yaml
+target:
+  kind: mssql
+  host: localhost               # required — hostname or IP
+  database: eds_db              # required
+  user: eds_loader              # required — SQL authentication login
+  password_env: EDS_MSSQL_PASSWORD  # preferred
+  # password: ""               # inline (not recommended for production)
+  port: 1433                    # optional, default: 1433
+  schema: dbo                   # optional, default: dbo
+  driver: "ODBC Driver 17 for SQL Server"  # optional — must match an installed driver
+  encrypt: true                 # optional, default: true
+  trust_server_certificate: false  # optional, default: false (set true for dev/self-signed certs)
+  connect_timeout: 10           # optional, default: 10 seconds
+```
+
+**What it does:**
+- Creates tables using T-SQL DDL derived from `schema.json`.
+- Drops all FK constraints in the target schema before `DROP TABLE` (T-SQL
+  does not support per-session FK-check disabling like MySQL).
+- Uses `fast_executemany = True` for bulk inserts (pyodbc row-at-a-time is
+  dramatically slower without this).
+- Promotes `NVARCHAR(MAX)` to `NVARCHAR(255)` on key/index columns (SQL
+  Server cannot use `MAX` columns as PK/UNIQUE/FK keys).
+- Writes data in **FK-dependency order** (parent tables before child tables).
+- Creates PRIMARY KEY, UNIQUE, and FOREIGN KEY constraints when
+  `enforce_constraints: true`.
+
+```bash
+export EDS_MSSQL_PASSWORD="my-mssql-password"
+eds-loader run -c loader.yaml
+```
+
+---
+
 ### 9.8 `mongodb` — MongoDB
 
 **Target only.** Install: `pip install eds-loader[mongodb]`
@@ -428,6 +504,7 @@ target:
   # password_env: EDS_MONGO_PASSWORD  # optional — omit for unauthenticated
   port: 27017                         # optional, default: 27017
   # auth_source: admin                # optional, default: admin
+  # connect_timeout: 10000            # optional, default: 10000 ms (server-selection)
 ```
 
 **What it does:**
@@ -463,6 +540,81 @@ tables:                    # only load these two tables
 
 enforce_constraints: true
 ```
+
+---
+
+### Load Without `schema.json` (`schema_required: false`)
+
+Use this when the source directory has no `schema.json` — for example, a raw
+export from a non-EDS system or an ad-hoc Parquet dump:
+
+```yaml
+source:
+  kind: local_fs
+  path: ./raw_exports
+
+target:
+  kind: mongodb
+  host: localhost
+  database: eds_db
+
+tables: []
+enforce_constraints: false   # no schema.json → no constraint metadata
+schema_required: false       # skip schema.json — auto-discover *.parquet files
+```
+
+With `schema_required: false`:
+- Every `.parquet` file (or other format file) in the source directory is loaded.
+- `schema.json` is never read or required.
+- Constraint enforcement is automatically disabled (no metadata to forward).
+- You can still use `tables: [name1, name2]` to restrict which files are loaded.
+
+---
+
+### Load CSV / Excel / JSON Source Data
+
+Any storage source connector supports a `format:` field. Example — loading
+CSV exports into MongoDB:
+
+```yaml
+source:
+  kind: local_fs
+  path: ./csv_exports
+  format: csv              # read *.csv files instead of *.parquet
+
+target:
+  kind: mongodb
+  host: localhost
+  database: eds_db
+
+schema_required: false     # CSV exports typically have no schema.json
+enforce_constraints: false
+```
+
+Example — loading an Excel workbook from S3:
+
+```yaml
+source:
+  kind: s3
+  bucket: my-reports-bucket
+  prefix: monthly/
+  format: excel
+  aws_secret_access_key_env: AWS_SECRET_ACCESS_KEY
+
+target:
+  kind: postgres
+  host: localhost
+  database: eds_db
+  user: eds_loader
+  password_env: EDS_PG_PASSWORD
+
+schema_required: false
+enforce_constraints: false
+```
+
+> **Excel note:** each sheet becomes a separate dataset. A `sales.xlsx` with
+> sheets `Jan` and `Feb` produces tables `sales_Jan` and `sales_Feb`.
+> Requires `pip install eds-loader[excel]`.
 
 ---
 
@@ -753,6 +905,38 @@ error, check that `schema.json` has correct `foreign_keys` entries.
 ```sql
 CREATE DATABASE eds_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ```
+
+---
+
+### MSSQL: `Cannot connect to MSSQL` / driver error
+**Fix:** Confirm the ODBC driver named in the `driver:` field is installed:
+```bash
+python -c "import pyodbc; print(pyodbc.drivers())"
+```
+Download from Microsoft if missing:
+https://learn.microsoft.com/sql/connect/odbc/download-odbc-driver-for-sql-server
+
+---
+
+### MSSQL: `Cannot open database requested by the login`
+**Fix:** Verify `database` and `host` fields. Also check that the SQL login
+has `CONNECT` permission on the target database.
+
+---
+
+### MSSQL: SSL/TLS handshake errors (local/dev server)
+**Fix:** Add `trust_server_certificate: true` to the config for self-signed certs.
+
+---
+
+### `Load failed: Unknown format`
+You set `format:` to an unsupported value.
+**Fix:** Use one of: `parquet`, `csv`, `json`, `ndjson`, `excel`, `avro`, `orc`.
+
+---
+
+### `Load failed: Excel format requires openpyxl`
+**Fix:** `pip install eds-loader[excel]`
 
 ---
 
@@ -1218,14 +1402,26 @@ eds-loader run -c loader.yaml --dry-run
 # Install extras
 pip install eds-loader[postgres]
 pip install eds-loader[mysql]
+pip install eds-loader[mssql]        # + OS ODBC driver from Microsoft
+pip install eds-loader[oracle]
 pip install eds-loader[mongodb]
 pip install eds-loader[remote_fs]
 pip install eds-loader[s3]
 pip install eds-loader[azure]
 pip install eds-loader[gcs]
+pip install eds-loader[excel]
 pip install eds-loader[all]
 
 # Connector kinds
 # Sources:  local_fs, remote_fs, s3, azure_blob, gcs
-# Targets:  local_fs, remote_fs, s3, azure_blob, gcs, postgres, mysql, mongodb
+# Targets:  local_fs, remote_fs, s3, azure_blob, gcs,
+#           postgres, mysql, mssql, oracle, mongodb
+
+# Source formats (set via format: field)
+# parquet (default) | csv | json | ndjson | excel | avro | orc
+
+# Key config fields
+# schema_required: true    # false = skip schema.json, auto-discover files
+# enforce_constraints: true
+# tables: []               # [] = all tables
 ```

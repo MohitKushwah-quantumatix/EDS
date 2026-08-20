@@ -7,6 +7,8 @@ pip install eds-loader[postgres]   # core + Postgres driver
 eds-loader run --config loader.yaml
 ```
 
+> **Current version:** `0.1.0` · **Python ≥ 3.12** · **Status:** Beta
+
 ---
 
 ## Installation
@@ -16,13 +18,16 @@ eds-loader run --config loader.yaml
 pip install eds-loader
 
 # Add the connector(s) you need:
-pip install eds-loader[postgres]      # PostgreSQL
-pip install eds-loader[mysql]         # MySQL
-pip install eds-loader[mongodb]       # MongoDB
-pip install eds-loader[remote_fs]     # SSH / SFTP
-pip install eds-loader[s3]            # AWS S3
-pip install eds-loader[azure]         # Azure Blob Storage
-pip install eds-loader[gcs]           # Google Cloud Storage
+pip install eds-loader[postgres]      # PostgreSQL (psycopg v3)
+pip install eds-loader[mysql]         # MySQL (pymysql)
+pip install eds-loader[mssql]         # Microsoft SQL Server (pyodbc + ODBC driver)
+pip install eds-loader[oracle]        # Oracle Database (oracledb)
+pip install eds-loader[mongodb]       # MongoDB (pymongo)
+pip install eds-loader[remote_fs]     # SSH / SFTP (paramiko)
+pip install eds-loader[s3]            # AWS S3 (boto3)
+pip install eds-loader[azure]         # Azure Blob Storage (azure-storage-blob)
+pip install eds-loader[gcs]           # Google Cloud Storage (google-cloud-storage)
+pip install eds-loader[excel]         # Excel source format (openpyxl)
 
 # Everything at once:
 pip install eds-loader[all]
@@ -55,7 +60,7 @@ eds-loader run --config loader.yaml
 
 ## Connector Matrix
 
-| Kind | Role | Extra | Driver |
+| Kind | Role | Extra | Driver / Notes |
 |---|---|---|---|
 | `local_fs` | source / target | *(built-in)* | — |
 | `remote_fs` | source / target | `remote_fs` | `paramiko` |
@@ -64,7 +69,12 @@ eds-loader run --config loader.yaml
 | `gcs` | source / target | `gcs` | `google-cloud-storage` |
 | `postgres` | target | `postgres` | `psycopg` v3 |
 | `mysql` | target | `mysql` | `pymysql` |
+| `mssql` | target | `mssql` | `pyodbc` + OS ODBC driver |
+| `oracle` | target | `oracle` | `oracledb` |
 | `mongodb` | target | `mongodb` | `pymongo` |
+
+> **Supported source formats:** `parquet` (default), `csv`, `json`, `ndjson`, `excel`, `avro`, `orc`.
+> Set the `format:` field under any storage source connector to change the format.
 
 ---
 
@@ -146,6 +156,7 @@ Install everything at once:  pip install eds-loader[all]
 source:
   kind: local_fs        # connector kind — see connector matrix above
   path: ./output        # connector-specific fields follow
+  # format: parquet     # optional — parquet (default) | csv | json | ndjson | excel | avro | orc
 
 # ── Target ──────────────────────────────────────────────────────────────────
 target:
@@ -161,6 +172,7 @@ target:
 tables: []              # empty = load every dataset from schema.json
                         # subset: [customers, orders, products]
 enforce_constraints: true  # false = skip PK/FK/UNIQUE enforcement
+schema_required: true   # false = skip schema.json; auto-discover *.parquet files
 ```
 
 ### Credential conventions
@@ -179,8 +191,11 @@ enforce_constraints: true  # false = skip PK/FK/UNIQUE enforcement
 ```yaml
 source:               # or target:
   kind: local_fs
-  path: ./output      # required — directory containing .parquet + schema.json
+  path: ./output      # required — directory containing dataset files + schema.json
+  # format: parquet   # optional — parquet (default) | csv | json | ndjson | excel | avro | orc
 ```
+
+> **Excel multi-sheet files:** each worksheet becomes a separate dataset named `<stem>_<SheetName>`.
 
 ---
 
@@ -271,6 +286,28 @@ target:
 
 ---
 
+### `mssql` (target only)
+
+```yaml
+target:
+  kind: mssql
+  host: localhost
+  database: eds_db
+  user: eds_loader
+  password_env: EDS_MSSQL_PASSWORD
+  port: 1433                              # optional, default: 1433
+  schema: dbo                             # optional, default: dbo
+  driver: "ODBC Driver 17 for SQL Server" # optional — must match an installed ODBC driver
+  encrypt: true                           # optional, default: true
+  trust_server_certificate: false         # optional, default: false (set true for dev/self-signed)
+  connect_timeout: 10                     # optional, default: 10 seconds
+```
+
+> **ODBC driver required:** install separately from Microsoft (e.g. `ODBC Driver 17 for SQL Server`).
+> List installed drivers with: `python -c "import pyodbc; print(pyodbc.drivers())"`
+
+---
+
 ### `mongodb` (target only)
 
 ```yaml
@@ -281,7 +318,8 @@ target:
   username: eds_loader  # optional — omit for unauthenticated
   password_env: EDS_MONGO_PASSWORD
   port: 27017           # optional, default: 27017
-  auth_source: admin    # optional — authentication database
+  auth_source: admin    # optional — authentication database, default: admin
+  connect_timeout: 10000  # optional, default: 10000 ms (server-selection timeout)
 ```
 
 ---
@@ -309,6 +347,7 @@ for table, rows in result.rows_written.items():
 | `target` | `ConnectorConfig` | — | Target connector config |
 | `tables` | `list[str]` | `[]` | Subset of tables to load (empty = all) |
 | `enforce_constraints` | `bool` | `True` | Apply PK/FK/UNIQUE on the target |
+| `schema_required` | `bool` | `True` | When `False`, skip `schema.json` and auto-discover datasets from `*.parquet` files |
 
 ### `LoadResult` fields
 
@@ -343,6 +382,23 @@ ruff check .              # lint
 mypy eds_loader           # type-check
 
 python -m build --wheel   # build distribution wheel
+```
+
+### Running tests by connector area
+
+```bash
+pytest tests/test_loader.py      # core loader
+pytest tests/test_cli.py         # CLI commands
+pytest tests/test_config.py      # config validation
+pytest tests/test_mongodb.py     # MongoDB connector
+pytest tests/test_postgres.py    # PostgreSQL connector
+pytest tests/test_sql_base.py    # shared SQL base (covers mssql behaviour too)
+pytest tests/test_local_fs.py    # local filesystem connector
+pytest tests/test_remote_fs.py   # SSH/SFTP connector
+pytest tests/test_cloud_base.py  # shared cloud base
+pytest tests/test_s3.py          # S3 connector
+pytest tests/test_azure_blob.py  # Azure Blob connector
+pytest tests/test_gcs.py         # GCS connector
 ```
 
 ---

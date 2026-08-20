@@ -122,15 +122,15 @@ class GCSConnector(CloudBaseConnector):
         except Exception as exc:
             raise LoadError(f"Cannot create GCS client: {exc}") from exc
 
-    def _list_parquet_keys(self) -> list[str]:
-        """List all ``*.parquet`` object names in the bucket under the prefix."""
+    def _list_keys_by_extension(self, ext: str) -> list[str]:
+        """List all object names ending with *ext* in the bucket under the prefix."""
         client = self._get_client()
         try:
             bucket = client.bucket(self._bucket_name)
             return [
                 blob.name
                 for blob in client.list_blobs(bucket, prefix=self._prefix)
-                if blob.name.endswith(".parquet")
+                if blob.name.endswith(ext)
             ]
         except Exception as exc:
             raise LoadError(

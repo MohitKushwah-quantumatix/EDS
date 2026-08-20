@@ -24,6 +24,7 @@ from typing import Any
 import polars as pl
 
 from eds_loader._logging import get_logger
+from eds_loader.connectors import _formats
 from eds_loader.connectors.base import WriteResult
 from eds_loader.connectors.registry import ConnectorSpec, register_connector
 from eds_loader.exceptions import LoadError
@@ -62,8 +63,14 @@ class LocalFSConnector:
             in the connector config section.
     """
 
-    def __init__(self, path: str | Path) -> None:
+    def __init__(self, path: str | Path, format: str = "parquet") -> None:  # noqa: A002
         self._path = Path(path)
+        if format not in _formats.FORMATS:
+            known = ", ".join(sorted(_formats.FORMATS))
+            raise LoadError(
+                f"Unknown source format {format!r}. Known formats: {known}"
+            )
+        self._format = format
 
     # ------------------------------------------------------------------
     # Readable interface
@@ -122,31 +129,52 @@ class LocalFSConnector:
                 listed, or if any named dataset file is missing or
                 unreadable.
         """
+        exts = _formats.all_extensions(self._format)
         if names is None:
             try:
-                parquet_files = sorted(self._path.glob("*.parquet"))
+                found: list[Path] = []
+                for ext in exts:
+                    found.extend(self._path.glob(f"*{ext}"))
+                dataset_files = sorted(set(found))
             except OSError as exc:
                 raise LoadError(
                     f"Cannot list directory {self._path}: {exc}"
                 ) from exc
-            names = [f.stem for f in parquet_files]
-            logger.debug("Auto-discovered %d parquet file(s) in %s", len(names), self._path)
+            # Build initial name list from discovered files (stem only, deduped)
+            names = list(dict.fromkeys(f.stem for f in dataset_files))
+            logger.debug(
+                "Auto-discovered %d %s file(s) in %s",
+                len(names), self._format, self._path,
+            )
 
         result: dict[str, pl.DataFrame] = {}
         total = len(names)
         for i, name in enumerate(names, start=1):
-            file_path = self._path / f"{name}.parquet"
-            if not file_path.is_file():
+            # Find the actual file (try all accepted extensions)
+            file_path: Path | None = None
+            for ext in exts:
+                candidate = self._path / f"{name}{ext}"
+                if candidate.is_file():
+                    file_path = candidate
+                    break
+            if file_path is None:
+                checked = ", ".join(f"{name}{e}" for e in exts)
                 raise LoadError(
-                    f"Dataset {name!r} not found at {file_path}.\n"
+                    f"Dataset {name!r} not found in {self._path} "
+                    f"(checked: {checked}).\n"
                     "Check the source path or re-run EDS generation."
                 )
             try:
-                result[name] = pl.read_parquet(file_path)
-                logger.info(
-                    "Read %s: %d row(s) from %s", name, result[name].height, file_path,
-                    extra={"progress": {"stage": "read", "current": i, "total": total, "label": name}},
-                )
+                datasets = _formats.read_path(self._format, file_path)
+                for ds_name, df in datasets.items():
+                    result[ds_name] = df
+                    logger.info(
+                        "Read %s: %d row(s) from %s",
+                        ds_name, df.height, file_path,
+                        extra={"progress": {"stage": "read", "current": i, "total": total, "label": ds_name}},
+                    )
+            except LoadError:
+                raise
             except Exception as exc:
                 raise LoadError(
                     f"Cannot read dataset {name!r} from {file_path}: {exc}"
