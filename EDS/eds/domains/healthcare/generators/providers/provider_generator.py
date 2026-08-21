@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import polars as pl
 
@@ -30,7 +30,9 @@ def generate_providers(
         provider_type = rng.choice(["PHYSICIAN", "NURSE", "SPECIALIST", "TECHNICIAN", "ADMIN", "SURGEON", "ANESTHETIST", "RADIOLOGIST", "LAB_TECHNICIAN", "PHARMACIST", "RESIDENT", "FELLOW", "COORDINATOR", "THERAPIST", "ATTENDING"])
         first_name = rng.choice(first_names)
         last_name = rng.choice(last_names)
-        hire_date = f"{config.reference_date.year - rng.randint(1, 5)}-{rng.randint(1, 12):02d}-{rng.randint(1, 28):02d}"
+        from datetime import timedelta
+        hire_days_back = rng.randint(365, 365 * 5)
+        hire_date = (config.reference_date - timedelta(days=hire_days_back)).isoformat()
         rows.append({
             "provider_id": i,
             "provider_number": f"PROV-{i:06d}",

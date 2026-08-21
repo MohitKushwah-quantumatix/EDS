@@ -1,10 +1,10 @@
 {
-  "created_at": "2026-08-21T11:07:30.359016+00:00",
+  "created_at": "2026-08-21T11:10:32.730166+00:00",
   "domain": "healthcare",
   "manifest_version": 1,
   "name": "My Hospital",
   "platform_contract_version": 1,
   "platform_version": "0.1.0",
-  "project_id": "2c5521d1f0174d56b7e4478e17dd7929",
+  "project_id": "aa6eb0602a3342fea7b44d3075c4031d",
   "seed": 42
 }
