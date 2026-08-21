@@ -78,4 +78,3 @@ import polars as pl
 patients_df = pl.read_parquet("my-hospital/data/patients.parquet")
 print()
 print(f"Total patients generated: {len(patients_df)}")
-print(f"Expected: 40 (founding) + 5 (day 2) + 5 (day 3) = 50")
