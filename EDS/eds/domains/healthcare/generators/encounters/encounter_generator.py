@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import polars as pl
 
@@ -48,14 +48,10 @@ def generate_encounters(
         for _ in range(num_encounters):
             encounter_type = rng.choice(encounter_types)
             status = rng.choice(statuses)
-            admission_year = config.reference_date.year - rng.randint(0, 1)
-            admission_month = rng.randint(1, 12)
-            admission_day = rng.randint(1, 28)
-            admission_date = f"{admission_year}-{admission_month:02d}-{admission_day:02d}"
+            admission_date = (config.reference_date - timedelta(days=rng.randint(0, 3))).isoformat()
             discharge_date = None
             if encounter_type == "INPATIENT":
-                discharge_day = min(admission_day + rng.randint(1, 30), 28)
-                discharge_date = f"{admission_year}-{admission_month:02d}-{discharge_day:02d}"
+                discharge_date = (config.reference_date + timedelta(days=rng.randint(1, 14))).isoformat()
 
             rows.append({
                 "encounter_id": encounter_id,
