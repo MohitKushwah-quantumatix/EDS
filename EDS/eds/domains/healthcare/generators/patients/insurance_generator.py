@@ -23,12 +23,11 @@ def generate_insurance(
         patient_id = patient_row[0]
         plan_id = rng.choice(insurance_plans)
         _reg_date = patient_row[9]
-        _reg_year = _reg_date.year if _reg_date else config.reference_date.year
-        _eff_years_ago = rng.randint(0, 1)
-        _eff_year = _reg_year - _eff_years_ago
-        _exp_year = _eff_year + rng.randint(3, 5)
-        effective_date = f"{_eff_year}-{rng.randint(1, 12):02d}-{rng.randint(1, 28):02d}"
-        expiration_date = f"{_exp_year}-{rng.randint(1, 12):02d}-{rng.randint(1, 28):02d}"
+        _ref_date = _reg_date if _reg_date else config.reference_date
+        _eff_days_back = rng.randint(0, 365)
+        effective_date = (_ref_date - timedelta(days=_eff_days_back)).isoformat()
+        _exp_days_after = rng.randint(365, 1825)
+        expiration_date = (_ref_date + timedelta(days=_exp_days_after)).isoformat()
         rows.append({
             "insurance_id": insurance_id,
             "patient_id": patient_id,

@@ -48,10 +48,10 @@ def generate_encounters(
         for _ in range(num_encounters):
             encounter_type = rng.choice(encounter_types)
             status = rng.choice(statuses)
-            admission_date = (config.reference_date - timedelta(days=rng.randint(0, 3))).isoformat()
+            admission_date = config.reference_date.isoformat()
             discharge_date = None
             if encounter_type == "INPATIENT":
-                discharge_date = (config.reference_date + timedelta(days=rng.randint(1, 14))).isoformat()
+                discharge_date = config.reference_date.isoformat()
 
             rows.append({
                 "encounter_id": encounter_id,

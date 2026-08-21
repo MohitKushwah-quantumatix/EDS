@@ -33,7 +33,7 @@ small = config.model_copy(
         ),
         "patients": config.patients.model_copy(update={"patient_count": 40}),
         "providers": config.providers.model_copy(update={"provider_count": 10}),
-        "evolution": config.evolution.model_copy(update={"new_patients_per_day": 5}),
+        "evolution": config.evolution.model_copy(update={"new_patients_per_day": 5, "active_patient_rate": 0.2, "max_daily_encounters": 3}),
     }
 )
 
@@ -53,8 +53,8 @@ project = create_project(
 # Run 3 simulated days through all 4 stages
 run = create_run(
     project,
-    create_clock(date(2026, 1, 1), end=date(2026, 1, 4)),
-    RunConfiguration(stop_condition=AfterTicks(4)),
+    create_clock(date(2026, 1, 1), end=date(2026, 1, 10)),
+    RunConfiguration(stop_condition=AfterTicks(10)),
     run_id="healthcare-demo",
 )
 

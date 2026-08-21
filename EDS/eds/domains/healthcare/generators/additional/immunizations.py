@@ -46,7 +46,7 @@ def generate_immunizations(
             "patient_id": int(pat["patient_id"]),
             "vaccine_name": str(rng.choice(VACCINES)),
             "dose_number": int(rng.randint(1, 4)),
-            "administered_at": pat["registration_date"],
+            "administered_at": config.patients.reference_date,
             "administered_by": int(rng.choice(provider_ids)),
             "site": str(rng.choice(SITES)),
             "lot_number": str(f"LOT-{int(rng.randint(10000, 99999))}"),

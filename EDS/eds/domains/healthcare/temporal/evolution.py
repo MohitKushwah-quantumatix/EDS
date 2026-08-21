@@ -90,7 +90,8 @@ def evolve_encounters(
     today = context.business_date
     produced: Frames = {}
 
-    existing_patients = history.get("patients")
+    upstream_patients = upstream.get("patients")
+    existing_patients = upstream_patients if upstream_patients is not None else history.get("patients")
     if existing_patients is None or existing_patients.is_empty():
         return produced
 
@@ -110,7 +111,7 @@ def evolve_encounters(
 
     # Build encounter upstream with all required data
     encounter_upstream = dict(upstream)
-    encounter_upstream["patients"] = existing_patients
+    encounter_upstream["patients"] = upstream_patients if upstream_patients is not None else existing_patients
 
     # Filter to only active patients for encounter generation
     encounter_upstream_filtered = dict(encounter_upstream)

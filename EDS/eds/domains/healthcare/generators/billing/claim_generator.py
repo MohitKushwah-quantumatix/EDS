@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import polars as pl
 
@@ -28,10 +28,7 @@ def generate_claims(
 
             billing_date = bill_row[10]
             submitted_date = billing_date
-            proc_year = int(str(billing_date)[:4])
-            proc_month = int(str(billing_date)[5:7])
-            proc_day = int(str(billing_date)[8:10])
-            processed_date = f"{proc_year}-{proc_month:02d}-{min(proc_day + rng.randint(1, 14), 28):02d}"
+            processed_date = billing_date.isoformat()
 
             rows.append({
                 "claim_id": claim_id,

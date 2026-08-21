@@ -117,7 +117,7 @@ def renumber(
                 continue
             if step := offsets.get(key.references, 0):
                 updates.append(pl.col(key.column) + step)
-        shifted[name] = frame.with_columns(updates) if updates else frame
+        shifted[name] = frame.with_columns(updates) if updates and not frame.is_empty() else frame
     return shifted
 
 

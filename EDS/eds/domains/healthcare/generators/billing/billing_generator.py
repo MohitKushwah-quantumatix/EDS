@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import polars as pl
 
@@ -30,11 +30,8 @@ def generate_billing(
             total_amount = round(charge_amount - discount_amount + tax_amount, 2)
 
             admission_date = encounter_row[8]
-            billing_year = int(str(admission_date)[:4])
-            billing_month = int(str(admission_date)[5:7])
-            billing_day = int(str(admission_date)[8:10])
-            billing_delay = rng.randint(1, 14)
-            billing_date = f"{billing_year}-{billing_month:02d}-{min(billing_day + billing_delay, 28):02d}"
+            billing_delay = 0
+            billing_date = (admission_date + timedelta(days=billing_delay)).isoformat()
 
             rows.append({
                 "billing_id": billing_id,

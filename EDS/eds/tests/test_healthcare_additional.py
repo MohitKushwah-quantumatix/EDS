@@ -5,7 +5,7 @@ from __future__ import annotations
 import polars as pl
 import pytest
 
-from eds.config import SimulationConfig
+from eds.domains.healthcare.config import SimulationConfig
 from eds.domains.healthcare.generators.additional.lab_results import generate_lab_results
 from eds.domains.healthcare.generators.additional.radiology_reports import generate_radiology_reports
 from eds.domains.healthcare.generators.additional.medication_administration import generate_medication_administration
