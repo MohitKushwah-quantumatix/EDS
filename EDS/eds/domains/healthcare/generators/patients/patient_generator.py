@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import date
+from datetime import date, timedelta
 import random
 
 import polars as pl
@@ -28,14 +28,10 @@ def generate_patients(
         gender = rng.choices(["MALE", "FEMALE", "NON_BINARY", "UNDISCLOSED"], weights=[48, 48, 2, 2], k=1)[0]
         status = rng.choice(["ACTIVE", "ACTIVE", "ACTIVE", "INACTIVE", "TRANSFERRED"])
         insurance_type = rng.choice(["PRIVATE", "PRIVATE", "MEDICARE", "MEDICAID", "SELF_PAY"])
-        reg_year = config.reference_date.year - rng.randint(0, config.registration_years)
-        reg_month = rng.randint(1, 12)
-        reg_day = rng.randint(1, 28)
-        registration_date = date(reg_year, reg_month, reg_day)
-        dob_year = reg_year - rng.randint(18, 80)
-        dob_month = rng.randint(1, 12)
-        dob_day = rng.randint(1, 28)
-        date_of_birth = date(dob_year, dob_month, dob_day)
+        days_back = rng.randint(0, min(365 * config.registration_years, 365 * 5))
+        registration_date = config.reference_date - timedelta(days=days_back)
+        age_years = rng.randint(18, 80)
+        date_of_birth = registration_date - timedelta(days=age_years * 365)
 
         rows.append({
             "patient_id": i,
