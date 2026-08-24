@@ -28,7 +28,8 @@ def generate_patients(
         gender = rng.choices(["MALE", "FEMALE", "NON_BINARY", "UNDISCLOSED"], weights=[48, 48, 2, 2], k=1)[0]
         status = rng.choice(["ACTIVE", "ACTIVE", "ACTIVE", "INACTIVE", "TRANSFERRED"])
         insurance_type = rng.choice(["PRIVATE", "PRIVATE", "MEDICARE", "MEDICAID", "SELF_PAY"])
-        days_back = rng.randint(0, min(365 * config.registration_years, 365 * 5))
+        max_lookback = min((config.reference_date - date(2026, 1, 1)).days, 150)
+        days_back = rng.randint(0, max_lookback)
         registration_date = config.reference_date - timedelta(days=days_back)
         age_years = rng.randint(18, 80)
         date_of_birth = registration_date - timedelta(days=age_years * 365)

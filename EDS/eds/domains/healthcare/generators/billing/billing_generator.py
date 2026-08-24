@@ -30,8 +30,10 @@ def generate_billing(
             total_amount = round(charge_amount - discount_amount + tax_amount, 2)
 
             admission_date = encounter_row[8]
-            billing_delay = 0
+            billing_delay = rng.randint(0, 2)
             billing_date = (admission_date + timedelta(days=billing_delay)).isoformat()
+            if billing_date > "2026-06-01":
+                billing_date = "2026-06-01"
 
             rows.append({
                 "billing_id": billing_id,

@@ -30,8 +30,9 @@ def generate_providers(
         provider_type = rng.choice(["PHYSICIAN", "NURSE", "SPECIALIST", "TECHNICIAN", "ADMIN", "SURGEON", "ANESTHETIST", "RADIOLOGIST", "LAB_TECHNICIAN", "PHARMACIST", "RESIDENT", "FELLOW", "COORDINATOR", "THERAPIST", "ATTENDING"])
         first_name = rng.choice(first_names)
         last_name = rng.choice(last_names)
-        from datetime import timedelta
-        hire_days_back = rng.randint(365, 365 * 5)
+        from datetime import timedelta, date
+        max_lookback = (config.reference_date - date(2026, 1, 1)).days
+        hire_days_back = rng.randint(0, max_lookback)
         hire_date = (config.reference_date - timedelta(days=hire_days_back)).isoformat()
         rows.append({
             "provider_id": i,

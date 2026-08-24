@@ -38,7 +38,7 @@ def generate_addresses(
                 "is_primary": addr_idx == 0,
                 "latitude": rng.uniform(-90.0, 90.0),
                 "longitude": rng.uniform(-180.0, 180.0),
-                "created_at": datetime.strptime(str(patient_row[9]), "%Y-%m-%d"),
+                "created_at": datetime.strptime(config.reference_date.isoformat(), "%Y-%m-%d"),
             })
             address_id += 1
 

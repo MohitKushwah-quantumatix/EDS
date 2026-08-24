@@ -24,10 +24,14 @@ def generate_insurance(
         plan_id = rng.choice(insurance_plans)
         _reg_date = patient_row[9]
         _ref_date = _reg_date if _reg_date else config.reference_date
-        _eff_days_back = rng.randint(0, 365)
-        effective_date = (_ref_date - timedelta(days=_eff_days_back)).isoformat()
-        _exp_days_after = rng.randint(365, 1825)
-        expiration_date = (_ref_date + timedelta(days=_exp_days_after)).isoformat()
+        _eff_days_back = rng.randint(0, 150)
+        effective_date = (config.reference_date - timedelta(days=_eff_days_back)).isoformat()
+        max_exp = (date(2026, 6, 1) - config.reference_date).days
+        if max_exp > 0:
+            _exp_days_after = rng.randint(1, max_exp)
+        else:
+            _exp_days_after = 0
+        expiration_date = (config.reference_date + timedelta(days=_exp_days_after)).isoformat()
         rows.append({
             "insurance_id": insurance_id,
             "patient_id": patient_id,

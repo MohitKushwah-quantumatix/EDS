@@ -28,7 +28,9 @@ def generate_claims(
 
             billing_date = bill_row[10]
             submitted_date = billing_date
-            processed_date = billing_date.isoformat()
+            processed_date = (billing_date + timedelta(days=rng.randint(0, 3))).isoformat()
+            if processed_date > "2026-06-01":
+                processed_date = "2026-06-01"
 
             rows.append({
                 "claim_id": claim_id,

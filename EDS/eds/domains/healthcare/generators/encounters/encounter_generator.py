@@ -51,7 +51,12 @@ def generate_encounters(
             admission_date = config.reference_date.isoformat()
             discharge_date = None
             if encounter_type == "INPATIENT":
-                discharge_date = config.reference_date.isoformat()
+                discharge_date = (config.reference_date + timedelta(days=rng.randint(1, 5))).isoformat()
+            elif rng.random() < 0.3:
+                discharge_date = (config.reference_date + timedelta(days=rng.randint(1, 3))).isoformat()
+            # Cap discharge date at Jun 1, 2026
+            if discharge_date and discharge_date > "2026-06-01":
+                discharge_date = "2026-06-01"
 
             rows.append({
                 "encounter_id": encounter_id,

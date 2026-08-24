@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 
 import polars as pl
 
@@ -24,7 +24,8 @@ def generate_provider_specialties(
         num_specs = rng.randint(config.min_specialties, config.max_specialties)
         chosen = [specialty_ids[rng.randint(0, len(specialty_ids) - 1)] for _ in range(num_specs)]
         for specialty_id in chosen:
-            cert_date = (config.reference_date - timedelta(days=rng.randint(365, 1095))).isoformat()
+            max_lookback = (config.reference_date - date(2026, 1, 1)).days
+            cert_date = (config.reference_date - timedelta(days=rng.randint(0, max_lookback))).isoformat()
             rows.append({
                 "provider_specialty_id": ps_id,
                 "provider_id": provider_id,

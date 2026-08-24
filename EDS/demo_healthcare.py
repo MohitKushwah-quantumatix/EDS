@@ -53,8 +53,8 @@ project = create_project(
 # Run 3 simulated days through all 4 stages
 run = create_run(
     project,
-    create_clock(date(2026, 1, 1), end=date(2026, 1, 10)),
-    RunConfiguration(stop_condition=AfterTicks(10)),
+    create_clock(date(2026, 1, 1), end=date(2026, 6, 1)),
+    RunConfiguration(stop_condition=AfterTicks(180)),
     run_id="healthcare-demo",
 )
 
