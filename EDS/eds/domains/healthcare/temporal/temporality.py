@@ -35,12 +35,12 @@ DATASET_TEMPORALITY: dict[str, Temporality] = {
     "facilities": Temporality.STATIC,
     # Patient datasets
     "patients": Temporality.SLOWLY_CHANGING,
-    "patient_addresses": Temporality.MUTABLE_SNAPSHOT,
-    "patient_insurance": Temporality.MUTABLE_SNAPSHOT,
-    "patient_allergies": Temporality.MUTABLE_SNAPSHOT,
+    "patient_addresses": Temporality.SLOWLY_CHANGING,
+    "patient_insurance": Temporality.SLOWLY_CHANGING,
+    "patient_allergies": Temporality.SLOWLY_CHANGING,
     # Provider datasets
     "providers": Temporality.SLOWLY_CHANGING,
-    "provider_departments": Temporality.MUTABLE_SNAPSHOT,
+    "provider_departments": Temporality.SLOWLY_CHANGING,
     "provider_specialties": Temporality.SLOWLY_CHANGING,
     # Encounter datasets: append only
     "encounters": Temporality.APPEND_ONLY,

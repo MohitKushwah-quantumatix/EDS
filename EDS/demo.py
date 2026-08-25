@@ -5,7 +5,7 @@ from eds.domains.retail.config import load_config
 from eds.platform.project.project import create_project
 from eds.platform.run.configuration import RunConfiguration
 from eds.platform.run.run import create_run
-from eds.platform.run.stop import AfterTicks
+from eds.platform.run.stop import AfterTicks, EndOfPeriod
 from eds.platform.scheduler.scheduler import execute
 from eds.platform.time.clock import create_clock
 from eds.runners.retail import RetailExecutor
@@ -18,20 +18,25 @@ small = config.model_copy(
         "master_data": config.master_data.model_copy(
             update={
                 "product_count": 30,
-                "brand_count": 3,
-                "supplier_count": 2,
-                "warehouse_count": 2,
+                "brand_count": 10,
+                "supplier_count": 5,
+                "warehouse_count": 5,
                 "warehouses_per_product": 1,
                 "root_categories": 2,
                 "children_per_category": 2,
             }
         ),
+        "returns": config.returns.model_copy(update={"return_rate": 0.5}),
+        "engagement": config.engagement.model_copy(update={"wishlist_view_rate": 0.9}),
     }
 )
 
+# Run EVERY day from Jan 1 to Jun 1, 2026. EndOfPeriod advances the clock until
+# it reaches the end date, so data is generated for the whole range and spreads
+# across it (instead of stopping after a fixed tick count).
 project = create_project(Path("./my-shop"), name="Demo Shop", domain="retail", seed=42)
-clock = create_clock(date(2026, 1, 1), end=date(2026, 1, 3))
-run = create_run(project, clock, RunConfiguration(stop_condition=AfterTicks(3)))
+clock = create_clock(date(2026, 1, 1), end=date(2026, 6, 1))
+run = create_run(project, clock, RunConfiguration(stop_condition=EndOfPeriod()))
 
 report = execute(run, RetailExecutor(config=small))
 

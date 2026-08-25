@@ -78,7 +78,7 @@ ORDERINGS: tuple[EventOrdering, ...] = (
         key="customer_id",
         parent_key="customer_id",
         parent_moment="registration_date",
-        strict=True,
+        strict=False,
     ),
     EventOrdering(
         dataset="orders",

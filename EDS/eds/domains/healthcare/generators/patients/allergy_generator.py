@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 
 import polars as pl
 
@@ -25,7 +25,8 @@ def generate_allergies(
             num_allergies = rng.randint(1, 3)
             for _ in range(num_allergies):
                 _reg_date = patient_row[9]
-                days_back = rng.randint(0, 150) if _reg_date else 0
+                max_lookback = min((config.reference_date - date(2026, 1, 1)).days, 150)
+                days_back = rng.randint(0, max_lookback) if _reg_date else 0
                 recorded_at = (config.reference_date - timedelta(days=days_back)).isoformat()
                 rows.append({
                     "allergy_id": allergy_id,

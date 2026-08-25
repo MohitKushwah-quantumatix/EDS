@@ -422,8 +422,7 @@ def iter_session_batches(
         country_code = locations.country_code_by_id.get(country_id, "")
 
         registration = registration_by_customer[customer_id]
-        # Strictly after registration: the first eligible day is the next one.
-        earliest = registration + timedelta(days=1)
+        earliest = registration
         if earliest > reference:
             continue
 

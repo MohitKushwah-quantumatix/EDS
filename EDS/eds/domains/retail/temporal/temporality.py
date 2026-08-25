@@ -72,9 +72,10 @@ DATASET_TEMPORALITY: Final[Mapping[str, Temporality]] = {
     "brands": Temporality.STATIC,
     "products": Temporality.STATIC,
     # The one master dataset that is not a fixture. Stock is consumed by what
-    # was sold and replenished by the reorder policy, so it is a picture of
-    # now rather than a record of what happened.
-    "inventory": Temporality.MUTABLE_SNAPSHOT,
+    # was sold and replenished by the reorder policy. It is treated as
+    # slowly-changing so daily snapshots accumulate and preserve history across
+    # the run instead of being replaced each tick.
+    "inventory": Temporality.SLOWLY_CHANGING,
     # Customers. A person who registered on the fourth of March registered on
     # the fourth of March for ever, so the customer row and everything created
     # with it is history.

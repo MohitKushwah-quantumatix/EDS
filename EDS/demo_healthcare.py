@@ -9,7 +9,7 @@ from eds.domains.healthcare.config import load_config
 from eds.platform.project.project import create_project
 from eds.platform.run.configuration import RunConfiguration
 from eds.platform.run.run import create_run
-from eds.platform.run.stop import AfterTicks
+from eds.platform.run.stop import AfterTicks, EndOfPeriod
 from eds.platform.scheduler.scheduler import execute
 from eds.platform.time.clock import create_clock
 from eds.runners.healthcare import HealthcareExecutor
@@ -20,15 +20,15 @@ small = config.model_copy(
     update={
         "master_data": config.master_data.model_copy(
             update={
-                "department_count": 3,
-                "specialty_count": 3,
-                "insurance_plan_count": 3,
-                "room_type_count": 3,
+                "department_count": 5,
+                "specialty_count": 5,
+                "insurance_plan_count": 5,
+                "room_type_count": 5,
                 "medication_count": 10,
                 "diagnosis_code_count": 5,
                 "procedure_code_count": 5,
                 "billing_code_count": 5,
-                "facility_count": 2,
+                "facility_count": 7,
             }
         ),
         "patients": config.patients.model_copy(update={"patient_count": 40}),
@@ -50,11 +50,13 @@ project = create_project(
     seed=42,
 )
 
-# Run 3 simulated days through all 4 stages
+# Run EVERY day from Jan 1 to Jun 1, 2026. EndOfPeriod advances the clock until
+# it reaches the end date, so data is generated for the whole range and spreads
+# across it (instead of stopping after a fixed tick count and capping in January).
 run = create_run(
     project,
     create_clock(date(2026, 1, 1), end=date(2026, 6, 1)),
-    RunConfiguration(stop_condition=AfterTicks(180)),
+    RunConfiguration(stop_condition=EndOfPeriod()),
     run_id="healthcare-demo",
 )
 

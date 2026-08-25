@@ -430,7 +430,10 @@ def iter_customer_batches(
             risk_scores.append(_risk_score(rng))
             stages.append(str(lifecycle_stage(status, registered, config.reference_date)))
             created.append(registered_at)
-            updated.append(registered_at + timedelta(days=rng.randrange(0, 400)))
+            updated_at = registered_at + timedelta(days=rng.randrange(0, 400))
+            if updated_at.date() > config.reference_date:
+                updated_at = datetime.combine(config.reference_date, time(23, 59, 59))
+            updated.append(updated_at)
 
         yield build_frame(
             CUSTOMERS,

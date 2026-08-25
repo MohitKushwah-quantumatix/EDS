@@ -308,7 +308,7 @@ class CustomerConfig(BaseModel):
     @property
     def earliest_registration_date(self) -> date:
         """Return the oldest registration date this configuration allows."""
-        return self.reference_date - timedelta(days=365 * self.registration_years)
+        return max(self.reference_date - timedelta(days=365 * self.registration_years), date(2026, 1, 1))
 
 
 class JourneyConfig(BaseModel):

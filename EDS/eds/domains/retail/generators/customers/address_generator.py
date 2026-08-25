@@ -131,7 +131,7 @@ def iter_address_batches(
                 created.append(
                     datetime.combine(
                         config.earliest_registration_date
-                        + timedelta(days=rng.randrange(365 * config.registration_years)),
+                        + timedelta(days=rng.randrange((config.reference_date - config.earliest_registration_date).days + 1)),
                         time(rng.randrange(24), rng.randrange(60)),
                     )
                 )
