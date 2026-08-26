@@ -45,6 +45,8 @@ from typing import Any
 
 import polars as pl
 
+from eds_loader._logging import get_logger
+from eds_loader.connectors import _formats
 from eds_loader.connectors.base import WriteResult
 from eds_loader.connectors.registry import ConnectorSpec, register_connector
 from eds_loader.exceptions import LoadError
@@ -52,6 +54,7 @@ from eds_loader.exceptions import LoadError
 __all__ = ["RemoteFSConnector"]
 
 _SCHEMA_FILE = "schema.json"
+logger = get_logger(__name__)
 
 # Optional dependency — wrapped so the module always imports cleanly.
 try:
@@ -126,6 +129,7 @@ class RemoteFSConnector:
         private_key_passphrase_env: str | None = None,
         known_hosts_file: str | None = None,
         timeout: int = 30,
+        format: str = "parquet",  # noqa: A002
         **_kwargs: Any,  # absorb unknown future config fields gracefully
     ) -> None:
         self._host = host
@@ -138,6 +142,12 @@ class RemoteFSConnector:
         self._private_key_passphrase_env = private_key_passphrase_env
         self._known_hosts_file = known_hosts_file
         self._timeout = int(timeout)
+        if format not in _formats.FORMATS:
+            known = ", ".join(sorted(_formats.FORMATS))
+            raise LoadError(
+                f"Unknown source format {format!r}. Known formats: {known}"
+            )
+        self._format = format
 
         # Populated lazily on first use.
         self._ssh: Any = None
@@ -213,6 +223,10 @@ class RemoteFSConnector:
                     connect_kwargs["password"] = password
 
             client.connect(**connect_kwargs)
+            logger.info(
+                "Connected to SFTP %s@%s:%s", self._username, self._host, self._port,
+                extra={"progress": {"stage": "connect_source", "label": f"{self._host}:{self._port}"}},
+            )
 
         except _paramiko.AuthenticationException as exc:
             raise LoadError(
@@ -302,8 +316,8 @@ class RemoteFSConnector:
                 f"Cannot upload to {remote_file} on {self._host}: {exc}"
             ) from exc
 
-    def _list_parquet_names(self) -> list[str]:
-        """List all ``.parquet`` dataset names in ``remote_path``.
+    def _list_names_by_extension(self, ext: str) -> list[str]:
+        """List all dataset names in ``remote_path`` whose filenames end with *ext*.
 
         Returns:
             Sorted list of dataset name stems (no extension).
@@ -313,6 +327,7 @@ class RemoteFSConnector:
         """
         _, sftp = self._connect()
         remote_dir = str(self._remote_path)
+        logger.debug("Listing remote directory: %s", remote_dir)
         try:
             attrs = sftp.listdir_attr(remote_dir)
         except FileNotFoundError:
@@ -323,11 +338,13 @@ class RemoteFSConnector:
             raise LoadError(
                 f"Cannot list remote directory {remote_dir} on {self._host}: {exc}"
             ) from exc
-        return sorted(
+        names = sorted(
             PurePosixPath(attr.filename).stem
             for attr in attrs
-            if attr.filename.endswith(".parquet")
+            if attr.filename.endswith(ext)
         )
+        logger.debug("Found %d %s file(s) in %s", len(names), ext, remote_dir)
+        return names
 
     def _ensure_remote_dir(self) -> None:
         """Create ``remote_path`` on the server if it does not exist."""
@@ -391,19 +408,44 @@ class RemoteFSConnector:
                 listed or any dataset file is missing or unreadable.
         """
         if names is None:
-            names = self._list_parquet_names()
+            exts = _formats.all_extensions(self._format)
+            discovered: list[str] = []
+            for ext in exts:
+                discovered.extend(self._list_names_by_extension(ext))
+            # Deduplicate while preserving order
+            names = list(dict.fromkeys(discovered))
 
         result: dict[str, pl.DataFrame] = {}
-        for name in names:
-            remote_file = str(self._remote_path / f"{name}.parquet")
-            try:
-                data = self._download_bytes(remote_file)
-            except LoadError:
+        total = len(names)
+        exts = _formats.all_extensions(self._format)
+        for i, name in enumerate(names, start=1):
+            # Try each extension to find the file
+            data: bytes | None = None
+            used_ext = exts[0]
+            for ext in exts:
+                remote_file = str(self._remote_path / f"{name}{ext}")
+                try:
+                    data = self._download_bytes(remote_file)
+                    used_ext = ext
+                    break
+                except LoadError:
+                    continue
+            if data is None:
+                checked = ", ".join(f"{name}{e}" for e in exts)
                 raise LoadError(
-                    f"Dataset {name!r} not found at {remote_file} on {self._host}."
-                ) from None
+                    f"Dataset {name!r} not found on {self._host} "
+                    f"(checked: {checked})."
+                )
             try:
-                result[name] = pl.read_parquet(io.BytesIO(data))
+                for ds_name, df in _formats.read_bytes(self._format, name, data).items():
+                    result[ds_name] = df
+                    logger.info(
+                        "Downloaded %s: %d row(s) from %s",
+                        ds_name, df.height, str(self._remote_path / f"{name}{used_ext}"),
+                        extra={"progress": {"stage": "read", "current": i, "total": total, "label": ds_name}},
+                    )
+            except LoadError:
+                raise
             except Exception as exc:
                 raise LoadError(
                     f"Cannot parse dataset {name!r} downloaded from {self._host}: {exc}"

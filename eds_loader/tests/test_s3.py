@@ -221,7 +221,7 @@ def test_list_parquet_keys_returns_parquet_files() -> None:
         "prefix/orders.parquet",
         "prefix/schema.json",   # ← excluded
     ])
-    keys = conn._list_parquet_keys()
+    keys = conn._list_keys_by_extension(".parquet")
     assert keys == ["prefix/customers.parquet", "prefix/orders.parquet"]
 
 
@@ -234,7 +234,7 @@ def test_list_parquet_keys_paginates_all_pages() -> None:
         {"Contents": [{"Key": "b.parquet"}]},
     ]
     mock_s3.get_paginator.return_value = pag
-    assert conn._list_parquet_keys() == ["a.parquet", "b.parquet"]
+    assert conn._list_keys_by_extension(".parquet") == ["a.parquet", "b.parquet"]
 
 
 def test_list_parquet_keys_empty_page_returns_empty() -> None:
@@ -243,7 +243,7 @@ def test_list_parquet_keys_empty_page_returns_empty() -> None:
     pag = MagicMock()
     pag.paginate.return_value = [{}]   # no "Contents" key
     mock_s3.get_paginator.return_value = pag
-    assert conn._list_parquet_keys() == []
+    assert conn._list_keys_by_extension(".parquet") == []
 
 
 def test_list_parquet_keys_error_raises_load_error() -> None:
@@ -251,7 +251,7 @@ def test_list_parquet_keys_error_raises_load_error() -> None:
     mock_s3 = _inject_client(conn)
     mock_s3.get_paginator.side_effect = Exception("access denied")
     with pytest.raises(LoadError, match="Cannot list s3://bkt"):
-        conn._list_parquet_keys()
+        conn._list_keys_by_extension(".parquet")
 
 
 # ---------------------------------------------------------------------------

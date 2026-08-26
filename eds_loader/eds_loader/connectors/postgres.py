@@ -188,8 +188,27 @@ class PostgresConnector(BaseSQLConnector):
     def _ensure_namespace_sql(self) -> str:
         return f'CREATE SCHEMA IF NOT EXISTS "{self._schema}"'
 
+    def _upsert_sql(self, table_name: str, df: pl.DataFrame, pk_col: str) -> str:
+        """Postgres: INSERT ... ON CONFLICT (pk) DO UPDATE SET ..."""
+        quoted_cols = ", ".join(self._quote(c) for c in df.columns)
+        non_pk = [c for c in df.columns if c != pk_col]
+        placeholders = ", ".join(["%s"] * len(df.columns))
+        if non_pk:
+            update_set = ", ".join(
+                f"{self._quote(c)} = EXCLUDED.{self._quote(c)}" for c in non_pk
+            )
+            conflict_action = f"DO UPDATE SET {update_set}"
+        else:
+            # Only a PK column — nothing to update, just ignore duplicates.
+            conflict_action = "DO NOTHING"
+        return (
+            f"INSERT INTO {self._table_ref(table_name)} ({quoted_cols}) "
+            f"VALUES ({placeholders}) "
+            f"ON CONFLICT ({self._quote(pk_col)}) {conflict_action}"
+        )
+
     # _placeholder, _pre_drop_hook, _post_write_hook — base defaults OK
-    # _topological_sort, write_datasets, etc. — fully inherited
+    # _topological_sort, write_datasets, upsert_datasets — fully inherited
 
 
 # ---------------------------------------------------------------------------

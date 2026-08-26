@@ -47,13 +47,17 @@ When ``schema_metadata`` is non-empty:
 from __future__ import annotations
 
 import os
+import time
 from typing import Any
 
 import polars as pl
 
-from eds_loader.connectors.base import WriteResult
+from eds_loader._logging import get_logger
+from eds_loader.connectors.base import UpsertResult, WriteResult
 from eds_loader.connectors.registry import ConnectorSpec, register_connector
 from eds_loader.exceptions import LoadError
+
+logger = get_logger(__name__)
 
 __all__ = ["MongoDBConnector"]
 
@@ -262,42 +266,273 @@ class MongoDBConnector:
                 or index creation error.
         """
         db = self._db()
+        logger.info(
+            "Connected to MongoDB %s:%s/%s", self._host, self._port, self._database,
+            extra={"progress": {"stage": "connect_target", "label": f"{self._host}:{self._port}"}},
+        )
         enforce = bool(schema_metadata)
         results: list[WriteResult] = []
+        total = len(datasets)
 
-        for name, df in datasets.items():
+        for i, (name, df) in enumerate(datasets.items(), start=1):
             schema_entry = schema_metadata.get(name, {})
             location = (
                 f"mongodb://{self._host}:{self._port}"
                 f"/{self._database}/{name}"
             )
+            t0 = time.monotonic()
             try:
                 collection = db[name]
 
                 # Full replace — drop existing collection first.
+                logger.debug("[%s] dropping existing collection", name)
                 collection.drop()
 
                 # Bulk insert using Polars' native Python-dict serialiser.
-                # df.to_dicts() converts Polars types → Python native types;
-                # pymongo handles Python → BSON mapping automatically.
+                # df.to_dicts() converts Polars types -> Python native types;
+                # pymongo handles Python -> BSON mapping automatically.
+                #
+                # Exception: Polars `Date` columns become `datetime.date`,
+                # which BSON cannot encode (only `datetime.datetime` is
+                # supported). Cast any Date columns to Datetime (midnight)
+                # first so they serialise cleanly.
                 if df.height > 0:
+                    date_cols = [
+                        c for c, dt in df.schema.items() if dt == pl.Date
+                    ]
+                    if date_cols:
+                        logger.debug(
+                            "[%s] casting Date -> Datetime for column(s): %s",
+                            name, ", ".join(date_cols),
+                        )
+                        df = df.with_columns(
+                            [pl.col(c).cast(pl.Datetime) for c in date_cols]
+                        )
+                    logger.debug("[%s] inserting %d document(s)", name, df.height)
                     collection.insert_many(df.to_dicts())
 
                 # Create indexes derived from schema.json.
                 if enforce:
+                    logger.debug("[%s] creating indexes from schema metadata", name)
                     self._create_indexes(collection, schema_entry)
 
             except LoadError:
                 raise
             except Exception as exc:
+                logger.error("[%s] write failed: %s", name, exc)
                 raise LoadError(
                     f"Failed to write dataset {name!r} to collection "
                     f"{name!r} in {self._database}@{self._host}: {exc}"
                 ) from exc
 
+            elapsed = time.monotonic() - t0
+            logger.info(
+                "[%s] wrote %d document(s) in %.2fs", name, df.height, elapsed,
+                extra={"progress": {"stage": "write", "current": i, "total": total, "label": name}},
+            )
+
             results.append(
                 WriteResult(dataset=name, location=location, rows=df.height)
             )
+
+        return results
+
+    # ------------------------------------------------------------------
+    # Upsertable interface — incremental / delta load
+    # ------------------------------------------------------------------
+
+    def upsert_datasets(
+        self,
+        datasets: dict[str, pl.DataFrame],
+        schema_metadata: dict[str, Any],
+    ) -> list[UpsertResult]:
+        """Upsert datasets into MongoDB using ``replace_one(upsert=True)``.
+
+        For each collection:
+
+        - If a ``primary_key`` is present in *schema_metadata*, each document
+          is upserted with ``replace_one({pk: value}, doc, upsert=True)``.
+          ``upserted_id is not None`` → new insert; ``None`` → update.
+        - If no primary key is available the collection is **fully replaced**
+          (drop + insert_many) with a warning, matching the SQL fallback.
+
+        Args:
+            datasets: Dataset name → Polars DataFrame.
+            schema_metadata: Parsed ``schema.json``.
+
+        Returns:
+            One :class:`~eds_loader.connectors.base.UpsertResult` per dataset.
+
+        Raises:
+            ~eds_loader.exceptions.LoadError: Connection or write failure.
+        """
+        db = self._db()
+        logger.info(
+            "Connected to MongoDB %s:%s/%s for upsert",
+            self._host, self._port, self._database,
+            extra={"progress": {"stage": "connect_target",
+                                "label": f"{self._host}:{self._port}"}},
+        )
+        enforce = bool(schema_metadata)
+        results: list[UpsertResult] = []
+        total = len(datasets)
+
+        for i, (name, df) in enumerate(datasets.items(), start=1):
+            schema_entry = schema_metadata.get(name, {})
+            pk_field: str | None = schema_entry.get("primary_key") if enforce else None
+            location = (
+                f"mongodb://{self._host}:{self._port}"
+                f"/{self._database}/{name}"
+            )
+            t0 = time.monotonic()
+            collection = db[name]
+
+            try:
+                if not pk_field:
+                    # No PK — full replace with a warning.
+                    logger.warning(
+                        "[%s] No primary key in schema — falling back to full replace", name
+                    )
+                    collection.drop()
+                    docs: list[dict] = []
+                    if df.height > 0:
+                        date_cols = [c for c, dt in df.schema.items() if dt == pl.Date]
+                        if date_cols:
+                            df = df.with_columns(
+                                [pl.col(c).cast(pl.Datetime) for c in date_cols]
+                            )
+                        docs = df.to_dicts()
+                        collection.insert_many(docs)
+                    if enforce:
+                        self._create_indexes(collection, schema_entry)
+                    elapsed = time.monotonic() - t0
+                    logger.info(
+                        "[%s] full-replace wrote %d document(s) in %.2fs",
+                        name, len(docs), elapsed,
+                        extra={"progress": {"stage": "write", "current": i,
+                                            "total": total, "label": name}},
+                    )
+                    results.append(UpsertResult(
+                        dataset=name, location=location,
+                        rows_inserted=len(docs), rows_updated=0,
+                    ))
+                    continue
+
+                # PK available — upsert each document.
+                rows_inserted = 0
+                rows_updated = 0
+                if df.height > 0:
+                    date_cols = [c for c, dt in df.schema.items() if dt == pl.Date]
+                    if date_cols:
+                        df = df.with_columns(
+                            [pl.col(c).cast(pl.Datetime) for c in date_cols]
+                        )
+                    for doc in df.to_dicts():
+                        res = collection.replace_one(
+                            filter={pk_field: doc[pk_field]},
+                            replacement=doc,
+                            upsert=True,
+                        )
+                        if res.upserted_id is not None:
+                            rows_inserted += 1
+                        else:
+                            rows_updated += 1
+
+                # Ensure indexes exist (idempotent).
+                if enforce:
+                    self._create_indexes(collection, schema_entry)
+
+            except (LoadError, UpsertResult.__class__):
+                raise
+            except Exception as exc:
+                logger.error("[%s] upsert failed: %s", name, exc)
+                raise LoadError(
+                    f"Failed to upsert dataset {name!r} into collection "
+                    f"{name!r} in {self._database}@{self._host}: {exc}"
+                ) from exc
+
+            elapsed = time.monotonic() - t0
+            logger.info(
+                "[%s] upserted %d doc(s) (%d inserted, %d updated) in %.2fs",
+                name, df.height, rows_inserted, rows_updated, elapsed,
+                extra={"progress": {"stage": "write", "current": i,
+                                    "total": total, "label": name}},
+            )
+            results.append(UpsertResult(
+                dataset=name, location=location,
+                rows_inserted=rows_inserted, rows_updated=rows_updated,
+            ))
+
+        return results
+
+    # ------------------------------------------------------------------
+    # Appendable interface — append-only / growing-history load
+    # ------------------------------------------------------------------
+
+    def append_datasets(
+        self,
+        datasets: dict[str, pl.DataFrame],
+        schema_metadata: dict[str, Any],
+    ) -> list["AppendResult"]:
+        """Append documents to MongoDB collections without dropping existing data.
+
+        For each collection:
+
+        1. ``insert_many`` all documents unconditionally — no drop, no duplicates check.
+        2. Ensure indexes from schema.json exist (idempotent).
+
+        The collection grows with every run.
+
+        Args:
+            datasets:        Dataset name → Polars DataFrame of new documents.
+            schema_metadata: Parsed ``schema.json`` for index creation.
+
+        Returns:
+            One :class:`~eds_loader.connectors.base.AppendResult` per dataset.
+
+        Raises:
+            ~eds_loader.exceptions.LoadError: On connection or insert failure.
+        """
+        from eds_loader.connectors.base import AppendResult
+
+        if not _PYMONGO_AVAILABLE:
+            raise LoadError(
+                "pymongo is not installed. Run: pip install eds-loader[mongodb]"
+            )
+
+        db = self._connect()
+        enforce = bool(schema_metadata)
+        results: list[AppendResult] = []
+        total = len(datasets)
+
+        for i, (name, df) in enumerate(datasets.items(), start=1):
+            schema_entry = schema_metadata.get(name, {})
+            location = f"mongodb://{self._host}:{self._port}/{self._database}/{name}"
+            t0 = time.monotonic()
+
+            try:
+                collection = db[name]
+                if df.height > 0:
+                    docs = _sanitise_docs(df.to_dicts())
+                    collection.insert_many(docs, ordered=False)
+                if enforce:
+                    self._create_indexes(collection, schema_entry)
+            except Exception as exc:
+                logger.error("[%s] append failed: %s", name, exc)
+                raise LoadError(
+                    f"Failed to append dataset {name!r} into collection "
+                    f"{name!r} in {self._database}@{self._host}: {exc}"
+                ) from exc
+
+            elapsed = time.monotonic() - t0
+            logger.info(
+                "[%s] appended %d doc(s) in %.2fs", name, df.height, elapsed,
+                extra={"progress": {"stage": "write", "current": i,
+                                    "total": total, "label": name}},
+            )
+            results.append(AppendResult(
+                dataset=name, location=location, rows_appended=df.height,
+            ))
 
         return results
 

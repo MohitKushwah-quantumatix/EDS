@@ -132,8 +132,8 @@ class S3Connector(CloudBaseConnector):
         except Exception as exc:
             raise LoadError(f"Cannot create S3 client: {exc}") from exc
 
-    def _list_parquet_keys(self) -> list[str]:
-        """List all ``*.parquet`` keys in the bucket under the prefix."""
+    def _list_keys_by_extension(self, ext: str) -> list[str]:
+        """List all keys ending with *ext* in the bucket under the prefix."""
         client = self._get_client()
         try:
             paginator = client.get_paginator("list_objects_v2")
@@ -142,7 +142,7 @@ class S3Connector(CloudBaseConnector):
                 Bucket=self._bucket, Prefix=self._prefix
             ):
                 for obj in page.get("Contents", []):
-                    if obj["Key"].endswith(".parquet"):
+                    if obj["Key"].endswith(ext):
                         keys.append(obj["Key"])
             return keys
         except Exception as exc:

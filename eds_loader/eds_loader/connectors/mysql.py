@@ -182,6 +182,14 @@ class MySQLConnector(BaseSQLConnector):
     def _sql_type_map(self) -> dict[str, str]:
         return _MYSQL_TYPE_MAP
 
+    def _indexable_string_type(self, sql_type: str) -> str | None:
+        # MySQL error 1170: "BLOB/TEXT column used in key specification
+        # without a key length". Any PK/UNIQUE/FK column that resolved to
+        # TEXT must be bounded instead.
+        if sql_type == "TEXT":
+            return "VARCHAR(255)"
+        return None
+
     def _drop_table_sql(self, name: str) -> str:
         # MySQL does not support DROP TABLE … CASCADE.
         # FK checks are disabled via _pre_drop_hook instead.
@@ -201,8 +209,26 @@ class MySQLConnector(BaseSQLConnector):
         """Re-enable FK enforcement after all tables are written."""
         cursor.execute("SET FOREIGN_KEY_CHECKS = 1")
 
+    def _upsert_sql(self, table_name: str, df: pl.DataFrame, pk_col: str) -> str:
+        """MySQL: INSERT ... ON DUPLICATE KEY UPDATE ..."""
+        quoted_cols = ", ".join(self._quote(c) for c in df.columns)
+        non_pk = [c for c in df.columns if c != pk_col]
+        placeholders = ", ".join(["%s"] * len(df.columns))
+        if non_pk:
+            update_set = ", ".join(
+                f"{self._quote(c)} = VALUES({self._quote(c)})" for c in non_pk
+            )
+            on_dup = f"ON DUPLICATE KEY UPDATE {update_set}"
+        else:
+            # Only a PK column — treat duplicate as no-op.
+            on_dup = f"ON DUPLICATE KEY UPDATE {self._quote(pk_col)} = {self._quote(pk_col)}"
+        return (
+            f"INSERT INTO {self._table_ref(table_name)} ({quoted_cols}) "
+            f"VALUES ({placeholders}) {on_dup}"
+        )
+
     # _placeholder → "%s" (base default — correct for pymysql)
-    # _topological_sort, write_datasets, etc. — fully inherited
+    # _topological_sort, write_datasets, upsert_datasets — fully inherited
 
 
 # ---------------------------------------------------------------------------

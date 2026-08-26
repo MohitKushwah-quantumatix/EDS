@@ -1,0 +1,10 @@
+{
+  "created_at": "2026-08-25T06:33:40.430865+00:00",
+  "domain": "retail",
+  "manifest_version": 1,
+  "name": "EDS Date-Range Run",
+  "platform_contract_version": 1,
+  "platform_version": "0.1.0",
+  "project_id": "b51ff9140d6541cdae9502d601b23853",
+  "seed": 42
+}

@@ -34,6 +34,7 @@ from typing import Any
 
 import polars as pl
 
+from eds_loader.connectors import _formats
 from eds_loader.connectors.base import WriteResult
 from eds_loader.exceptions import LoadError
 
@@ -54,10 +55,16 @@ class CloudBaseConnector(abc.ABC):
             Normalised to end with ``"/"`` when non-empty.
     """
 
-    def __init__(self, prefix: str = "", **_kwargs: Any) -> None:
+    def __init__(self, prefix: str = "", format: str = "parquet", **_kwargs: Any) -> None:  # noqa: A002
         # Normalise prefix: always ends with "/" when non-empty
         self._prefix: str = (prefix.rstrip("/") + "/") if prefix else ""
         self._cloud_client: Any = None  # lazily created by _get_client()
+        if format not in _formats.FORMATS:
+            known = ", ".join(sorted(_formats.FORMATS))
+            raise LoadError(
+                f"Unknown source format {format!r}. Known formats: {known}"
+            )
+        self._format = format
 
     # ------------------------------------------------------------------
     # Abstract — every cloud dialect must override
@@ -71,8 +78,8 @@ class CloudBaseConnector(abc.ABC):
         """
 
     @abc.abstractmethod
-    def _list_parquet_keys(self) -> list[str]:
-        """Return all ``*.parquet`` object keys under the prefix.
+    def _list_keys_by_extension(self, ext: str) -> list[str]:
+        """Return all object keys whose filename ends with *ext* under the prefix.
 
         Keys are full paths relative to the bucket root (e.g.
         ``"prefix/customers.parquet"``).
@@ -122,14 +129,13 @@ class CloudBaseConnector(abc.ABC):
         return self._cloud_client
 
     @staticmethod
-    def _name_from_key(key: str) -> str:
+    def _name_from_key(key: str, ext: str) -> str:
         """Extract the dataset name from a full object key.
 
-        ``"prefix/customers.parquet"`` → ``"customers"``
-        ``"customers.parquet"``        → ``"customers"``
+        ``"prefix/customers.parquet"`` with ext ``".parquet"`` -> ``"customers"``
         """
         filename = key.rsplit("/", 1)[-1]
-        return filename.removesuffix(".parquet")
+        return filename[: -len(ext)] if ext and filename.endswith(ext) else filename
 
     # ------------------------------------------------------------------
     # Readable interface
@@ -172,28 +178,34 @@ class CloudBaseConnector(abc.ABC):
         Raises:
             ~eds_loader.exceptions.LoadError: On list or download failure.
         """
-        try:
-            keys = self._list_parquet_keys()
-        except LoadError:
-            raise
-        except Exception as exc:
-            raise LoadError(f"Cannot list Parquet files: {exc}") from exc
+        exts = _formats.all_extensions(self._format)
+        all_keys: list[str] = []
+        for ext in exts:
+            try:
+                all_keys.extend(self._list_keys_by_extension(ext))
+            except LoadError:
+                raise
+            except Exception as exc:
+                raise LoadError(f"Cannot list dataset files: {exc}") from exc
 
         name_filter: set[str] | None = set(names) if names else None
 
         datasets: dict[str, pl.DataFrame] = {}
-        for key in keys:
-            name = self._name_from_key(key)
-            if name_filter is not None and name not in name_filter:
+        for key in all_keys:
+            # Pick the matching extension for this key
+            matched_ext = next((e for e in exts if key.endswith(e)), exts[0])
+            stem = self._name_from_key(key, matched_ext)
+            if name_filter is not None and stem not in name_filter:
                 continue
             try:
                 data = self._read_bytes(key)
-                datasets[name] = pl.read_parquet(io.BytesIO(data))
+                for ds_name, df in _formats.read_bytes(self._format, stem, data).items():
+                    datasets[ds_name] = df
             except LoadError:
                 raise
             except Exception as exc:
                 raise LoadError(
-                    f"Cannot read dataset {name!r} from {key!r}: {exc}"
+                    f"Cannot read dataset {stem!r} from {key!r}: {exc}"
                 ) from exc
 
         return datasets

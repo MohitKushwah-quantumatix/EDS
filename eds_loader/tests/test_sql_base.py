@@ -69,6 +69,10 @@ class _TestConnector(BaseSQLConnector):
     def _build_location(self, name: str) -> str:
         return f"test://testhost:9999/testdb/{name}"
 
+    def _upsert_sql(self, table_name: str, df: Any, pk_col: str) -> str:
+        # Minimal stub so the test connector can be instantiated.
+        return f"UPSERT INTO [testdb].[{table_name}] ON {pk_col}"
+
 
 def _make_mock_conn() -> MagicMock:
     """Return a mock connection where each cursor() call gets its own cursor."""
