@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from datetime import date, datetime, timedelta
+
 import polars as pl
 
 from eds.core.random_streams import make_rng
@@ -22,6 +24,10 @@ def generate_allergies(
         if rng.random() < 0.3:
             num_allergies = rng.randint(1, 3)
             for _ in range(num_allergies):
+                _reg_date = patient_row[9]
+                max_lookback = min((config.reference_date - date(2026, 1, 1)).days, 150)
+                days_back = rng.randint(0, max_lookback) if _reg_date else 0
+                recorded_at = (config.reference_date - timedelta(days=days_back)).isoformat()
                 rows.append({
                     "allergy_id": allergy_id,
                     "patient_id": patient_id,
@@ -29,10 +35,26 @@ def generate_allergies(
                     "severity": rng.choice(["MILD", "MODERATE", "SEVERE"]),
                     "reaction": rng.choice(["RASH", "SWELLING", "ANAPHYLAXIS", "NAUSEA", "VOMITING", "DIARRHEA", "HIVES", "ITCHING", "WHEEZING", "COUGH", "FEVER", "HEADACHE", "DIZZINESS", "SHORTNESS_OF_BREATH", "CHEST_PAIN"]),
                     "status": "ACTIVE",
-                    "recorded_at": f"{config.reference_date.year - rng.randint(0, 365)}-01-01",
-                    "created_at": config.reference_date.isoformat(),
+                    "recorded_at": recorded_at,
+                    "created_at": datetime.strptime(recorded_at, "%Y-%m-%d"),
                 })
                 allergy_id += 1
 
-    return pl.DataFrame(rows)
+    if not rows:
+        return pl.DataFrame(schema={
+            'allergy_id': pl.Int64(),
+            'patient_id': pl.Int64(),
+            'allergen': pl.String(),
+            'severity': pl.String(),
+            'reaction': pl.String(),
+            'status': pl.String(),
+            'recorded_at': pl.Date(),
+            'created_at': pl.Datetime("us"),
+        })
 
+    df = pl.DataFrame(rows)
+    df = df.with_columns([
+        pl.col('recorded_at').str.strptime(pl.Date(), '%Y-%m-%d'),
+        pl.col('created_at').cast(pl.Datetime("us")),
+    ])
+    return df

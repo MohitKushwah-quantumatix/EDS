@@ -86,12 +86,20 @@ def advance_day(
     if stage not in STAGE_DATASETS:
         raise KeyError(f"Healthcare runs no stage named {stage!r}; it runs {HEALTHCARE_STAGE_NAMES}")
 
+    settings = config.model_copy(
+        update={
+            "patients": config.patients.model_copy(update={"reference_date": context.business_date}),
+            "providers": config.providers.model_copy(update={"reference_date": context.business_date}),
+            "encounters": config.encounters.model_copy(update={"reference_date": context.business_date}),
+            "billing": config.billing.model_copy(update={"reference_date": context.business_date}),
+        }
+    )
     if _founding(stage, history):
-        generated = _found(stage, config, upstream)
-        return DayOfBusiness(generated, generated, config, is_founding=True)
+        generated = _found(stage, settings, upstream)
+        return DayOfBusiness(generated, generated, settings, is_founding=True)
 
-    generated = _evolve(stage, config, context, upstream, history)
-    return DayOfBusiness(generated, merge_history(history, generated), config, is_founding=False)
+    generated = _evolve(stage, settings, context, upstream, history)
+    return DayOfBusiness(generated, merge_history(history, generated), settings, is_founding=False)
 
 
 def _founding(stage: str, history: Mapping[str, pl.DataFrame]) -> bool:

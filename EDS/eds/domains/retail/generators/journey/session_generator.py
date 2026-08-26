@@ -206,7 +206,7 @@ class SessionLocations:
         if countries.is_empty():
             raise ValueError("cannot generate sessions: the countries dataset is empty")
 
-        primary = addresses.filter(pl.col("is_primary"))
+        primary = addresses.filter(pl.col("is_primary").cast(pl.Boolean))
         if primary.is_empty():
             raise ValueError("cannot generate sessions: no customer has a primary address")
 
@@ -422,8 +422,7 @@ def iter_session_batches(
         country_code = locations.country_code_by_id.get(country_id, "")
 
         registration = registration_by_customer[customer_id]
-        # Strictly after registration: the first eligible day is the next one.
-        earliest = registration + timedelta(days=1)
+        earliest = registration
         if earliest > reference:
             continue
 

@@ -98,7 +98,7 @@ ROOM_TYPES = (
     "ICU",
     "GENERAL",
     "PRIVATE",
-    "SEMI_PRIVATE",
+    "semi-private",
     "EMERGENCY",
     "DELUXE",
     "SUITE",
@@ -215,6 +215,10 @@ MEDICATIONS = (
 
 DIAGNOSIS_CODES = (
     {"code": "A00", "description": "Cholera", "category": "INFECTIOUS"},
+    {"code": "C00", "description": "Malignant neoplasm of lip", "category": "NEOPLASMS"},
+    {"code": "D50", "description": "Iron deficiency anemia", "category": "BLOOD"},
+    {"code": "E00", "description": "Congenital iodine-deficiency syndrome", "category": "ENDOCRINE"},
+    {"code": "F01", "description": "Vascular dementia", "category": "MENTAL"},
     {"code": "A01", "description": "Typhoid and paratyphoid fevers", "category": "INFECTIOUS"},
     {"code": "A02", "description": "Other salmonella infections", "category": "INFECTIOUS"},
     {"code": "A03", "description": "Shigellosis", "category": "INFECTIOUS"},
@@ -229,7 +233,6 @@ DIAGNOSIS_CODES = (
     {"code": "B02", "description": "Zoster", "category": "INFECTIOUS"},
     {"code": "B03", "description": "Smallpox", "category": "INFECTIOUS"},
     {"code": "B04", "description": "Monkeypox", "category": "INFECTIOUS"},
-    {"code": "C00", "description": "Malignant neoplasm of lip", "category": "NEOPLASMS"},
     {"code": "C01", "description": "Malignant neoplasm of base of tongue", "category": "NEOPLASMS"},
     {"code": "C02", "description": "Malignant neoplasm of other parts of tongue", "category": "NEOPLASMS"},
     {"code": "C03", "description": "Malignant neoplasm of gum", "category": "NEOPLASMS"},
@@ -239,7 +242,6 @@ DIAGNOSIS_CODES = (
     {"code": "C07", "description": "Malignant neoplasm of parotid gland", "category": "NEOPLASMS"},
     {"code": "C08", "description": "Malignant neoplasm of other major salivary glands", "category": "NEOPLASMS"},
     {"code": "C09", "description": "Malignant neoplasm of tonsil", "category": "NEOPLASMS"},
-    {"code": "D50", "description": "Iron deficiency anemia", "category": "BLOOD"},
     {"code": "D51", "description": "Vitamin B12 deficiency anemia", "category": "BLOOD"},
     {"code": "D52", "description": "Folate deficiency anemia", "category": "BLOOD"},
     {"code": "D53", "description": "Other nutritional anemias", "category": "BLOOD"},
@@ -482,7 +484,11 @@ DIAGNOSIS_CODES = (
 
 
 PROCEDURE_CODES = (
+    {"code": "70010", "description": "Radiologic examination, skull", "category": "DIAGNOSTIC"},
+    {"code": "80000", "description": "Pathology and laboratory", "category": "LABORATORY"},
     {"code": "99201", "description": "Office visit new patient level 1", "category": "EVALUATION"},
+    {"code": "99281", "description": "Emergency department visit level 1", "category": "EMERGENCY"},
+    {"code": "10060", "description": "Incision and drainage of abscess", "category": "SURGERY"},
     {"code": "99202", "description": "Office visit new patient level 2", "category": "EVALUATION"},
     {"code": "99203", "description": "Office visit new patient level 3", "category": "EVALUATION"},
     {"code": "99204", "description": "Office visit new patient level 4", "category": "EVALUATION"},
@@ -500,7 +506,6 @@ PROCEDURE_CODES = (
     {"code": "99233", "description": "Subsequent hospital care level 3", "category": "EVALUATION"},
     {"code": "99238", "description": "Hospital discharge day management", "category": "EVALUATION"},
     {"code": "99239", "description": "Hospital discharge day management extended", "category": "EVALUATION"},
-    {"code": "99281", "description": "Emergency department visit level 1", "category": "EMERGENCY"},
     {"code": "99282", "description": "Emergency department visit level 2", "category": "EMERGENCY"},
     {"code": "99283", "description": "Emergency department visit level 3", "category": "EMERGENCY"},
     {"code": "99284", "description": "Emergency department visit level 4", "category": "EMERGENCY"},
@@ -535,7 +540,6 @@ PROCEDURE_CODES = (
     {"code": "99348", "description": "Home visit established patient level 2", "category": "EVALUATION"},
     {"code": "99349", "description": "Home visit established patient level 3", "category": "EVALUATION"},
     {"code": "99350", "description": "Home visit established patient level 4", "category": "EVALUATION"},
-    {"code": "10060", "description": "Incision and drainage of abscess", "category": "SURGERY"},
     {"code": "10061", "description": "Incision and drainage of complex abscess", "category": "SURGERY"},
     {"code": "10120", "description": "Removal of foreign body from subcutaneous tissue", "category": "SURGERY"},
     {"code": "10140", "description": "Incision and drainage of hematoma", "category": "SURGERY"},

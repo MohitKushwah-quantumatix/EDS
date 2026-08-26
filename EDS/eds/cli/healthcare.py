@@ -16,6 +16,7 @@ import typer
 
 from eds.adapters.parquet.reader import DatasetNotFoundError, read_datasets
 from eds.adapters.parquet.writer import ExportError, write_datasets
+from eds.core.schema_export import SCHEMA_EXPORT_FILE, export_schema_json
 from eds.core.validation.issues import ValidationError
 from eds.domains.healthcare.config import (
     BillingConfig,
@@ -59,6 +60,7 @@ from eds.domains.healthcare.generators.additional.radiology_reports import (
     generate_radiology_reports,
 )
 from eds.domains.healthcare.generators.additional.referrals import generate_referrals
+from eds.runners.healthcare.dataset_registry import HEALTHCARE_DATASET_SCHEMAS
 from eds.domains.healthcare.validation.billing_validation import validate_billing_data
 from eds.domains.healthcare.validation.encounter_validation import validate_encounter_data
 from eds.domains.healthcare.validation.master_data import validate_master_data
@@ -181,6 +183,17 @@ def _report(datasets: Mapping[str, pl.DataFrame], seed: int, destination: Path) 
     typer.echo(f"Total: {sum(counts.values()):,} rows across {len(counts)} datasets")
 
 
+def _export_schema(datasets: Mapping[str, pl.DataFrame], output_directory: Path) -> None:
+    """Update schema.json with declarations for whatever was just written.
+
+    Merges into any schema.json already present (from an earlier stage's
+    run), so the four ``eds healthcare`` commands build up one complete file
+    between them regardless of the order they're run in.
+    """
+    known = {name: HEALTHCARE_DATASET_SCHEMAS[name] for name in datasets if name in HEALTHCARE_DATASET_SCHEMAS}
+    export_schema_json(known, output_directory / SCHEMA_EXPORT_FILE)
+
+
 @healthcare_app.command("master-data")
 def healthcare_master_data(
     seed: Annotated[
@@ -225,6 +238,9 @@ def healthcare_master_data(
     dry_run: Annotated[
         bool, typer.Option("--dry-run", help="Generate and validate without writing files.")
     ] = False,
+    stream: Annotated[
+        bool, typer.Option("--stream", help="Stream generated data to Kafka if EDS_REALTIME=1.")
+    ] = False,
 ) -> None:
     """Generate healthcare master datasets and write them as Parquet."""
     try:
@@ -267,9 +283,19 @@ def healthcare_master_data(
 
     try:
         write_datasets(data.datasets, config.platform.output_directory)
+        _export_schema(data.datasets, config.platform.output_directory)
     except ExportError as exc:
         typer.echo(f"Export failed: {exc}", err=True)
         raise typer.Exit(code=_EXIT_EXPORT_ERROR) from exc
+
+    if stream:
+        try:
+            from eds.infrastructure.kafka.streaming import stream_if_enabled
+        except ImportError:
+            typer.echo("Kafka streaming unavailable: kafka-python not installed.", err=True)
+        else:
+            prefixed = {f"healthcare.{k}": v for k, v in data.datasets.items()}
+            stream_if_enabled(prefixed, stream=True)
 
     _report(data.datasets, data.seed, config.platform.output_directory)
 
@@ -293,6 +319,9 @@ def healthcare_patients(
     ] = True,
     dry_run: Annotated[
         bool, typer.Option("--dry-run", help="Generate and validate without writing files.")
+    ] = False,
+    stream: Annotated[
+        bool, typer.Option("--stream", help="Stream generated data to Kafka if EDS_REALTIME=1.")
     ] = False,
 ) -> None:
     """Generate healthcare patient datasets and write them as Parquet."""
@@ -348,9 +377,18 @@ def healthcare_patients(
 
     try:
         write_datasets(datasets, config.platform.output_directory)
+        _export_schema(datasets, config.platform.output_directory)
     except ExportError as exc:
         typer.echo(f"Export failed: {exc}", err=True)
         raise typer.Exit(code=_EXIT_EXPORT_ERROR) from exc
+
+    if stream:
+        try:
+            from eds.infrastructure.kafka.streaming import stream_if_enabled
+        except ImportError:
+            typer.echo("Kafka streaming unavailable: kafka-python not installed.", err=True)
+        else:
+            stream_if_enabled({f"healthcare.{k}": v for k, v in datasets.items()}, stream=True)
 
     _report(datasets, data.seed, config.platform.output_directory)
 
@@ -374,6 +412,9 @@ def healthcare_providers(
     ] = True,
     dry_run: Annotated[
         bool, typer.Option("--dry-run", help="Generate and validate without writing files.")
+    ] = False,
+    stream: Annotated[
+        bool, typer.Option("--stream", help="Stream generated data to Kafka if EDS_REALTIME=1.")
     ] = False,
 ) -> None:
     """Generate healthcare provider datasets and write them as Parquet."""
@@ -411,9 +452,19 @@ def healthcare_providers(
 
     try:
         write_datasets(data.datasets, config.platform.output_directory)
+        _export_schema(data.datasets, config.platform.output_directory)
     except ExportError as exc:
         typer.echo(f"Export failed: {exc}", err=True)
         raise typer.Exit(code=_EXIT_EXPORT_ERROR) from exc
+
+    if stream:
+        try:
+            from eds.infrastructure.kafka.streaming import stream_if_enabled
+        except ImportError:
+            typer.echo("Kafka streaming unavailable: kafka-python not installed.", err=True)
+        else:
+            prefixed = {f"healthcare.{k}": v for k, v in data.datasets.items()}
+            stream_if_enabled(prefixed, stream=True)
 
     _report(data.datasets, data.seed, config.platform.output_directory)
 
@@ -434,6 +485,9 @@ def healthcare_encounters(
     ] = True,
     dry_run: Annotated[
         bool, typer.Option("--dry-run", help="Generate and validate without writing files.")
+    ] = False,
+    stream: Annotated[
+        bool, typer.Option("--stream", help="Stream generated data to Kafka if EDS_REALTIME=1.")
     ] = False,
 ) -> None:
     """Generate healthcare encounter and billing datasets and write them as Parquet."""
@@ -490,9 +544,18 @@ def healthcare_encounters(
 
     try:
         write_datasets(datasets, config.platform.output_directory)
+        _export_schema(datasets, config.platform.output_directory)
     except ExportError as exc:
         typer.echo(f"Export failed: {exc}", err=True)
         raise typer.Exit(code=_EXIT_EXPORT_ERROR) from exc
+
+    if stream:
+        try:
+            from eds.infrastructure.kafka.streaming import stream_if_enabled
+        except ImportError:
+            typer.echo("Kafka streaming unavailable: kafka-python not installed.", err=True)
+        else:
+            stream_if_enabled({f"healthcare.{k}": v for k, v in datasets.items()}, stream=True)
 
     _report(datasets, data.seed, config.platform.output_directory)
 

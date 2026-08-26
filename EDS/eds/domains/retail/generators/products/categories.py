@@ -190,7 +190,7 @@ def leaf_category_roots(categories: pl.DataFrame) -> dict[int, str]:
     Returns:
         A mapping of leaf ``category_id`` to root category name.
     """
-    leaves = categories.filter(pl.col("is_leaf"))
+    leaves = categories.filter(pl.col("is_leaf").cast(pl.Boolean))
     ids: list[int] = leaves["category_id"].to_list()
     paths: list[str] = leaves["category_path"].to_list()
     return {

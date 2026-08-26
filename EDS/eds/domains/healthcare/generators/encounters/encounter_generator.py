@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from datetime import datetime, timedelta
+
 import polars as pl
 
 from eds.core.random_streams import make_rng
@@ -46,14 +48,15 @@ def generate_encounters(
         for _ in range(num_encounters):
             encounter_type = rng.choice(encounter_types)
             status = rng.choice(statuses)
-            admission_year = config.reference_date.year - rng.randint(0, 1)
-            admission_month = rng.randint(1, 12)
-            admission_day = rng.randint(1, 28)
-            admission_date = f"{admission_year}-{admission_month:02d}-{admission_day:02d}"
+            admission_date = config.reference_date.isoformat()
             discharge_date = None
             if encounter_type == "INPATIENT":
-                discharge_day = min(admission_day + rng.randint(1, 30), 28)
-                discharge_date = f"{admission_year}-{admission_month:02d}-{discharge_day:02d}"
+                discharge_date = (config.reference_date + timedelta(days=rng.randint(1, 5))).isoformat()
+            elif rng.random() < 0.3:
+                discharge_date = (config.reference_date + timedelta(days=rng.randint(1, 3))).isoformat()
+            # Cap discharge date at Jun 1, 2026
+            if discharge_date and discharge_date > "2026-06-01":
+                discharge_date = "2026-06-01"
 
             rows.append({
                 "encounter_id": encounter_id,
@@ -70,9 +73,16 @@ def generate_encounters(
                 "facility_id": rng.choice(facility_ids),
                 "room_number": f"R{rng.randint(100, 999)}",
                 "bed_number": f"B{rng.randint(1, 10)}",
-                "created_at": config.reference_date.isoformat(),
+                "created_at": datetime.strptime(admission_date, "%Y-%m-%d"),
             })
             encounter_id += 1
 
-    return pl.DataFrame(rows)
+    df = pl.DataFrame(rows)
+    if df.height > 0:
+        df = df.with_columns([
+            pl.col("admission_date").str.strptime(pl.Date(), "%Y-%m-%d"),
+            pl.col("discharge_date").str.strptime(pl.Date(), "%Y-%m-%d"),
+            pl.col("created_at").cast(pl.Datetime("us")),
+        ])
+    return df
 

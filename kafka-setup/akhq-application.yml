@@ -1,0 +1,14 @@
+﻿akhq:
+  connections:
+    kafka:
+      properties:
+        bootstrap:
+          servers: kafka:9093
+      schema-registry:
+        url: http://schema-registry:8081
+app:
+  path: "/data"
+micronaut:
+  server:
+    cors:
+      enabled: true

@@ -133,3 +133,41 @@ Test file :
 pytest eds/tests/test_healthcare_master_data.py eds/tests/test_healthcare_patient.py eds/tests/test_healthcare_provider.py eds/tests/test_healthcare_encounter.py eds/tests/test_healthcare_billing.py eds/tests/test_healthcare_runner.py eds/tests/test_healthcare_temporal.py -v
 
 
+
+
+H2 requires Java + extra dependencies. Since sqlite3 is already built into Python, I recommend SQLite in-memory instead — same concept, zero extra installs.
+
+Proposed Architecture
+my-shop/
+  └── 2026-01-05/                    ← ONLY visible folder (today's data)
+
+SQLite in-memory (during run):
+  └── simulation.db (RAM only)
+      ├── customers
+      ├── orders
+      ├── sessions
+      └── ... (all history)
+
+JSON backup (.internal/, hidden):
+  └── .internal/backup/
+      ├── day1.json
+      ├── day2.json
+      └── ...
+How it works:
+
+Day 1: Create SQLite in-memory DB → write day 1 data → extract daily folder → save JSON backup
+Day 2: Read day 1 from SQLite → generate day 2 → write to SQLite → extract daily folder → delete day 1 folder → save JSON backup
+Day 3: Read days 1+2 from SQLite → generate day 3 → write to SQLite → extract daily folder → delete day 2 folder → save JSON backup
+
+Failure recovery:
+
+If SQLite is lost (system crash/restart), load from latest JSON backup
+Rebuild SQLite from JSON → continue from where we left off
+
+Why SQLite over H2
+                                SQLite	                                          H2
+Dependencies	        Zero (built into Python)	                Java + JayDeBeApi + H2 JAR
+Setup	                None	                                    Install Java, download JAR, configure JDBC
+Performance	            Excellent for TBs (with proper tuning)	    Good
+In-memory mode	        :memory:	                                jdbc:h2:mem:
+JSON backup	            Easy (pandas/Polars)	                    More complex

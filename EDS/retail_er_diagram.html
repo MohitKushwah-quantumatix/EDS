@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Retail Data Model — Simplified ER Diagram</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background: #f5f5f5;
+    color: #2c2c2a;
+  }
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: white;
+    padding: 30px 40px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+  h1 { color: #2c3e50; text-align: center; margin-bottom: 6px; }
+  .subtitle { text-align: center; color: #666; margin-bottom: 24px; font-size: 14px; }
+  .legend {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 10px;
+    margin: 20px 0 30px;
+    padding: 15px 18px;
+    background: #f8f9fa;
+    border-radius: 6px;
+    font-size: 13px;
+  }
+  .legend-item { display: flex; align-items: center; gap: 8px; }
+  .legend-icon { font-size: 16px; }
+  .section-title {
+    color: #2c3e50;
+    margin-top: 40px;
+    margin-bottom: 8px;
+    font-size: 19px;
+    border-bottom: 2px solid #3498db;
+    padding-bottom: 6px;
+  }
+  .section-note { font-size: 13px; color: #666; margin-bottom: 16px; }
+  .mermaid { text-align: center; margin: 20px 0; overflow-x: auto; }
+  .info-box {
+    background: #e3f2fd; border-left: 4px solid #2196f3;
+    padding: 14px 16px; margin: 20px 0; border-radius: 4px; font-size: 13px;
+  }
+  .pii-box {
+    background: #fff3e0; border-left: 4px solid #ff9800;
+    padding: 14px 16px; margin: 20px 0; border-radius: 4px; font-size: 13px;
+  }
+  .simplify-box {
+    background: #eafaf1; border-left: 4px solid #27ae60;
+    padding: 14px 16px; margin: 20px 0; border-radius: 4px; font-size: 13px;
+  }
+  table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12.5px; }
+  th, td { border: 1px solid #ddd; padding: 7px 8px; text-align: left; vertical-align: top; }
+  th { background: #f5f5f5; font-weight: 600; }
+  @media print {
+    body { background: white; }
+    .container { box-shadow: none; }
+    .no-print { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Retail data model</h1>
+  <div class="subtitle">Simplified entity-relationship diagram — 34 datasets, reorganized into 4 clean views</div>
+
+  <div class="legend">
+    <div class="legend-item"><span class="legend-icon">🔑</span> Primary key (PK)</div>
+    <div class="legend-item"><span class="legend-icon">🔗</span> Foreign key (FK)</div>
+    <div class="legend-item"><span class="legend-icon">⚠️</span> PII / PCI sensitive</div>
+    <div class="legend-item"><span class="legend-icon">🔒</span> Quasi-identifier</div>
+  </div>
+
+
+
+  <div class="section-title">1. Foundations &amp; catalog</div>
+  <div class="section-note">Geography, suppliers, warehouses, and the product catalog — the data that exists before any customer shows up.</div>
+  <div class="mermaid" id="diagram1">
+erDiagram
+    COUNTRIES ||--o{ STATES : has
+    STATES ||--o{ CITIES : has
+    COUNTRIES ||--o{ SUPPLIERS : located_in
+    COUNTRIES ||--o{ WAREHOUSES : located_in
+    SUPPLIERS ||--o{ PRODUCTS : supplies
+    SUPPLIERS ||--o{ INVENTORY : stocks
+    WAREHOUSES ||--o{ INVENTORY : holds
+    CATEGORIES ||--o{ CATEGORIES : parent_of
+    CATEGORIES ||--o{ PRODUCTS : contains
+    BRANDS ||--o{ PRODUCTS : brands
+    TAX_CODES ||--o{ PRODUCTS : taxed_by
+
+    PRODUCTS {
+        int product_id PK
+        int category_id FK
+        int brand_id FK
+        int supplier_id FK
+        int tax_code_id FK
+    }
+    INVENTORY {
+        int inventory_id PK
+        int product_id FK
+        int warehouse_id FK
+    }
+  </div>
+
+  <div class="section-title">2. Customer &amp; browsing journey</div>
+  <div class="section-note">A customer signs up, starts a session, and browses categories, searches, and products before adding anything to a cart.</div>
+  <div class="mermaid" id="diagram2">
+erDiagram
+    CUSTOMERS ||--o{ CUSTOMER_ADDRESSES : has
+    CUSTOMERS ||--o{ CUSTOMER_PREFERENCES : has
+    CUSTOMERS ||--o{ CUSTOMER_LOYALTY : has
+    CUSTOMERS ||--o{ CUSTOMER_PERSONAS : has
+    CUSTOMERS ||--o{ SESSIONS : starts
+    SESSIONS ||--o{ CATEGORY_VIEWS : has
+    SESSIONS ||--o{ SEARCH_HISTORY : has
+    SESSIONS ||--o{ PRODUCT_VIEWS : has
+    CATEGORY_VIEWS ||--o{ SEARCH_HISTORY : leads_to
+    PRODUCT_VIEWS ||--o{ WISHLISTS : leads_to
+    CATEGORIES ||--o{ CATEGORY_VIEWS : viewed_in
+    PRODUCTS ||--o{ PRODUCT_VIEWS : viewed_as
+    PRODUCTS ||--o{ WISHLISTS : wishlisted_as
+
+    CUSTOMERS {
+        int customer_id PK
+        string first_name
+        string last_name
+        string email
+    }
+    SESSIONS {
+        int session_id PK
+        int customer_id FK
+        string ip_address
+    }
+  </div>
+
+  <div class="section-title">3. Cart to order</div>
+  <div class="section-note">Browsing turns into a cart, a cart becomes a checkout, and a checkout becomes an order.</div>
+  <div class="mermaid" id="diagram3">
+erDiagram
+    SESSIONS ||--o{ SHOPPING_CARTS : has
+    CUSTOMERS ||--o{ SHOPPING_CARTS : owns
+    SHOPPING_CARTS ||--o{ CART_ITEMS : has
+    PRODUCTS ||--o{ CART_ITEMS : added_as
+    SHOPPING_CARTS ||--o{ CHECKOUT : becomes
+    CUSTOMER_ADDRESSES ||--o{ CHECKOUT : ships_to
+    CHECKOUT ||--o{ ORDERS : becomes
+    ORDERS ||--o{ ORDER_LINES : has
+    PRODUCTS ||--o{ ORDER_LINES : ordered_as
+    ORDERS ||--o{ ORDER_STATUS_HISTORY : has
+
+    ORDERS {
+        int order_id PK
+        int checkout_id FK
+        int customer_id FK
+        decimal total_amount
+    }
+    ORDER_LINES {
+        int order_line_id PK
+        int order_id FK
+        int product_id FK
+    }
+  </div>
+
+  <div class="section-title">4. Payment, shipment, returns &amp; reviews</div>
+  <div class="section-note">Everything that happens after an order is placed — paying for it, shipping it, and possibly returning it or reviewing it.</div>
+  <div class="mermaid" id="diagram4">
+erDiagram
+    ORDERS ||--o{ PAYMENTS : has
+    PAYMENT_METHODS ||--o{ PAYMENTS : paid_with
+    PAYMENTS ||--o{ PAYMENT_STATUS_HISTORY : has
+    ORDERS ||--o{ SHIPMENTS : has
+    SHIPPING_METHODS ||--o{ SHIPMENTS : shipped_via
+    SHIPMENTS ||--o{ SHIPMENT_ITEMS : has
+    ORDER_LINES ||--o{ SHIPMENT_ITEMS : shipped_as
+    SHIPMENTS ||--o{ SHIPMENT_STATUS_HISTORY : has
+    SHIPMENTS ||--o{ RETURNS : has
+    RETURN_REASONS ||--o{ RETURNS : categorises
+    RETURNS ||--o{ RETURN_ITEMS : has
+    SHIPMENT_ITEMS ||--o{ RETURN_ITEMS : returned_as
+    RETURNS ||--o{ RETURN_STATUS_HISTORY : has
+    SHIPMENTS ||--o{ REVIEWS : has
+    PRODUCTS ||--o{ REVIEWS : reviewed_as
+
+    PAYMENTS {
+        int payment_id PK
+        int order_id FK
+        decimal payment_amount
+    }
+    SHIPMENTS {
+        int shipment_id PK
+        int order_id FK
+        int payment_id FK
+    }
+    RETURNS {
+        int return_id PK
+        int shipment_id FK
+        int return_reason FK
+    }
+  </div>
+
+  <div class="section-title">Dataset reference: master data</div>
+  <table>
+    <tr><th>Dataset</th><th>Primary key</th><th>Foreign keys</th><th>Sensitive columns</th></tr>
+    <tr><td>countries</td><td>country_id</td><td>—</td><td>None</td></tr>
+    <tr><td>states</td><td>state_id</td><td>country_id</td><td>None</td></tr>
+    <tr><td>cities</td><td>city_id</td><td>state_id, country_id</td><td>None</td></tr>
+    <tr><td>payment_methods</td><td>payment_method_id</td><td>—</td><td>None</td></tr>
+    <tr><td>shipping_methods</td><td>shipping_method_id</td><td>—</td><td>None</td></tr>
+    <tr><td>tax_codes</td><td>tax_code_id</td><td>country_id</td><td>None</td></tr>
+    <tr><td>coupon_types</td><td>coupon_type_id</td><td>—</td><td>None</td></tr>
+    <tr><td>return_reasons</td><td>return_reason_id</td><td>—</td><td>None</td></tr>
+    <tr><td>suppliers</td><td>supplier_id</td><td>country_id, city_id</td><td>⚠️ contact_email, contact_phone</td></tr>
+    <tr><td>warehouses</td><td>warehouse_id</td><td>city_id, state_id, country_id</td><td>None</td></tr>
+    <tr><td>categories</td><td>category_id</td><td>parent_category_id → categories</td><td>None</td></tr>
+    <tr><td>brands</td><td>brand_id</td><td>country_id</td><td>None</td></tr>
+    <tr><td>products</td><td>product_id</td><td>category_id, brand_id, supplier_id, tax_code_id</td><td>None</td></tr>
+    <tr><td>inventory</td><td>inventory_id</td><td>product_id, warehouse_id</td><td>None</td></tr>
+  </table>
+
+  <div class="section-title">Dataset reference: customer</div>
+  <table>
+    <tr><th>Dataset</th><th>Primary key</th><th>Foreign keys</th><th>Sensitive columns</th></tr>
+    <tr>
+      <td>customers</td><td>customer_id</td><td>—</td>
+      <td>⚠️ first_name, last_name, date_of_birth, email, phone, registration_date<br>🔒 customer_number</td>
+    </tr>
+    <tr>
+      <td>customer_addresses</td><td>address_id</td>
+      <td>customer_id → customers<br>city_id → cities<br>state_id → states<br>country_id → countries</td>
+      <td>⚠️ line1, line2, postal_code, latitude, longitude<br>🔗 customer_id links to PII</td>
+    </tr>
+    <tr><td>customer_preferences</td><td>preference_id</td><td>customer_id → customers</td><td>None</td></tr>
+    <tr><td>customer_loyalty</td><td>loyalty_id</td><td>customer_id → customers</td><td>None</td></tr>
+  </table>
+
+  <div class="section-title">Dataset reference: journey &amp; browsing</div>
+  <table>
+    <tr><th>Dataset</th><th>Primary key</th><th>Foreign keys</th><th>Sensitive columns</th></tr>
+    <tr><td>customer_personas</td><td>persona_id</td><td>customer_id → customers</td><td>None</td></tr>
+    <tr>
+      <td>sessions</td><td>session_id</td>
+      <td>customer_id → customers<br>country_id, state_id, city_id</td>
+      <td>⚠️ ip_address, start_time, end_time, landing_page, exit_page<br>🔗 customer_id links to PII</td>
+    </tr>
+    <tr>
+      <td>category_views</td><td>category_view_id</td>
+      <td>session_id → sessions<br>customer_id → customers<br>category_id → categories</td>
+      <td>⚠️ timestamp<br>🔗 FK columns link to PII</td>
+    </tr>
+    <tr>
+      <td>search_history</td><td>search_id</td>
+      <td>session_id → sessions<br>customer_id → customers<br>category_view_id → category_views<br>category_id → categories</td>
+      <td>⚠️ search_text, timestamp<br>🔗 FK columns link to PII</td>
+    </tr>
+  </table>
+
+  <div class="section-title">Dataset reference: engagement &amp; commerce</div>
+  <table>
+    <tr><th>Dataset</th><th>Primary key</th><th>Foreign keys</th><th>Sensitive columns</th></tr>
+    <tr>
+      <td>product_views</td><td>product_view_id</td>
+      <td>session_id, customer_id, category_view_id, search_id, category_id, product_id</td>
+      <td>⚠️ timestamp, view_duration_seconds<br>🔗 FK columns link to PII</td>
+    </tr>
+    <tr>
+      <td>wishlists</td><td>wishlist_id</td>
+      <td>customer_id → customers<br>product_view_id → product_views<br>product_id → products</td>
+      <td>🔗 FK columns link to PII</td>
+    </tr>
+    <tr>
+      <td>shopping_carts</td><td>cart_id</td>
+      <td>customer_id → customers<br>session_id → sessions</td>
+      <td>🔗 customer_id, session_id link to PII</td>
+    </tr>
+    <tr>
+      <td>cart_items</td><td>cart_item_id</td>
+      <td>cart_id, customer_id, product_id, product_view_id, wishlist_id</td>
+      <td>🔗 FK columns link to PII</td>
+    </tr>
+  </table>
+
+  <div class="section-title">Dataset reference: checkout &amp; orders</div>
+  <table>
+    <tr><th>Dataset</th><th>Primary key</th><th>Foreign keys</th><th>Sensitive columns</th></tr>
+    <tr>
+      <td>checkout</td><td>checkout_id</td>
+      <td>cart_id, customer_id, session_id, shipping_address_id, billing_address_id</td>
+      <td>⚠️ subtotal, shipping_cost, tax_amount, discount_amount, total_amount, payment_method, shipping_method<br>🔗 FK columns link to PII</td>
+    </tr>
+    <tr>
+      <td>orders</td><td>order_id</td>
+      <td>checkout_id, cart_id, customer_id, session_id, shipping_address_id, billing_address_id</td>
+      <td>⚠️ subtotal, shipping_cost, tax_amount, discount_amount, total_amount, order_date<br>🔒 order_number<br>🔗 FK columns link to PII</td>
+    </tr>
+    <tr><td>order_lines</td><td>order_line_id</td><td>order_id → orders<br>product_id → products</td><td>⚠️ unit_price, line_total<br>🔗 order_id links to PII</td></tr>
+    <tr><td>order_status_history</td><td>history_id</td><td>order_id → orders</td><td>⚠️ status_timestamp<br>🔗 order_id links to PII</td></tr>
+  </table>
+
+  <div class="section-title">Dataset reference: payments</div>
+  <table>
+    <tr><th>Dataset</th><th>Primary key</th><th>Foreign keys</th><th>Sensitive columns</th></tr>
+    <tr>
+      <td>payments</td><td>payment_id</td><td>order_id → orders<br>customer_id → customers</td>
+      <td>⚠️ payment_amount, currency, authorized_at, captured_at, payment_method, payment_provider<br>🔒 payment_reference<br>🔗 FK columns link to PII</td>
+    </tr>
+    <tr><td>payment_status_history</td><td>history_id</td><td>payment_id → payments</td><td>⚠️ status_timestamp<br>🔗 payment_id links to PII</td></tr>
+  </table>
+
+  <div class="section-title">Dataset reference: shipments</div>
+  <table>
+    <tr><th>Dataset</th><th>Primary key</th><th>Foreign keys</th><th>Sensitive columns</th></tr>
+    <tr>
+      <td>shipments</td><td>shipment_id</td><td>order_id, payment_id, customer_id</td>
+      <td>⚠️ shipped_at, estimated_delivery_at, delivered_at, carrier, shipping_method, tracking_number<br>🔒 shipment_number, tracking_number<br>🔗 FK columns link to PII</td>
+    </tr>
+    <tr><td>shipment_items</td><td>shipment_item_id</td><td>shipment_id, order_line_id, product_id</td><td>🔗 FK columns link to PII</td></tr>
+    <tr><td>shipment_status_history</td><td>history_id</td><td>shipment_id → shipments</td><td>⚠️ status_timestamp<br>🔗 shipment_id links to PII</td></tr>
+  </table>
+
+  <div class="section-title">Dataset reference: returns &amp; reviews</div>
+  <table>
+    <tr><th>Dataset</th><th>Primary key</th><th>Foreign keys</th><th>Sensitive columns</th></tr>
+    <tr>
+      <td>returns</td><td>return_id</td><td>shipment_id, customer_id, return_reason</td>
+      <td>⚠️ requested_at, approved_at, received_at, completed_at, return_reason, refund_type, current_status<br>🔒 return_number<br>🔗 FK columns link to PII</td>
+    </tr>
+    <tr><td>return_items</td><td>return_item_id</td><td>return_id, shipment_item_id, order_line_id, product_id</td><td>🔗 FK columns link to PII</td></tr>
+    <tr><td>return_status_history</td><td>history_id</td><td>return_id → returns</td><td>⚠️ status_timestamp<br>🔗 return_id links to PII</td></tr>
+    <tr>
+      <td>reviews</td><td>review_id</td><td>shipment_item_id, shipment_id, order_id, product_id, customer_id</td>
+      <td>⚠️ review_title, review_text<br>🔒 review_number<br>🔗 FK columns link to PII</td>
+    </tr>
+  </table>
+
+  <div class="pii-box">
+    <strong>⚠️ PII / PCI summary:</strong><br>
+    This model contains Personally Identifiable Information (PII) and payment-related data. Sensitive data
+    includes: names, addresses, contact info (email, phone, IP address), dates of birth, browsing behavior,
+    order and payment amounts, and payment references. Ensure appropriate access controls, encryption, and
+    audit logging are in place — especially around the payments and shipments datasets.
+  </div>
+
+  <div class="info-box no-print">
+    <strong>📊 Total: 34 datasets</strong> across 12 functional areas: Master Data (14), Customer (4), Journey (2),
+    Browsing (2), Engagement (2), Commerce (2), Checkout (1), Orders (3), Payments (2), Shipments (3), Returns (3),
+    Reviews (1) — reorganized here into 4 simplified diagrams following the customer funnel instead of 1 tangled one.
+  </div>
+</div>
+
+<script>
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'default',
+    er: { useMaxWidth: true }
+  });
+</script>
+</body>
+</html>

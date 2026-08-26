@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from datetime import datetime
+
 import polars as pl
 
 from eds.core.random_streams import make_rng
@@ -28,10 +30,17 @@ def generate_provider_departments(
                 "department_id": dept_id,
                 "role": ["HEAD", "SENIOR", "JUNIOR"][idx % 3],
                 "is_primary": idx == 0,
-                "start_date": provider_row[10],
+                "start_date": config.reference_date,
                 "end_date": None,
-                "created_at": config.reference_date.isoformat(),
+                "created_at": datetime.strptime(config.reference_date.isoformat(), "%Y-%m-%d"),
             })
             pd_id += 1
 
-    return pl.DataFrame(rows)
+    df = pl.DataFrame(rows)
+    if df.height > 0:
+        df = df.with_columns([
+            pl.col("start_date").cast(pl.Date()),
+            pl.col("end_date").cast(pl.Date()),
+            pl.col("created_at").cast(pl.Datetime("us")),
+        ])
+    return df

@@ -107,7 +107,7 @@ def _reason_codes(return_reasons: pl.DataFrame) -> list[str]:
         ValueError: If no active reason is available, which would leave the
             generator with nothing to attribute a return to.
     """
-    active = return_reasons.filter(pl.col("is_active"))["reason_code"].to_list()
+    active = return_reasons.filter(pl.col("is_active").cast(pl.Boolean))["reason_code"].to_list()
     if not active:
         raise ValueError(
             "return_reasons.parquet contains no active reason. F009 reads the "

@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from datetime import datetime, timedelta
+
 import polars as pl
 
 from eds.core.random_streams import make_rng
@@ -28,6 +30,10 @@ def generate_providers(
         provider_type = rng.choice(["PHYSICIAN", "NURSE", "SPECIALIST", "TECHNICIAN", "ADMIN", "SURGEON", "ANESTHETIST", "RADIOLOGIST", "LAB_TECHNICIAN", "PHARMACIST", "RESIDENT", "FELLOW", "COORDINATOR", "THERAPIST", "ATTENDING"])
         first_name = rng.choice(first_names)
         last_name = rng.choice(last_names)
+        from datetime import timedelta, date
+        max_lookback = (config.reference_date - date(2026, 1, 1)).days
+        hire_days_back = rng.randint(0, max_lookback)
+        hire_date = (config.reference_date - timedelta(days=hire_days_back)).isoformat()
         rows.append({
             "provider_id": i,
             "provider_number": f"PROV-{i:06d}",
@@ -39,10 +45,17 @@ def generate_providers(
             "department_id": department_id,
             "license_number": f"LIC-{rng.randint(100000, 999999)}",
             "status": "ACTIVE",
-            "hire_date": f"{config.reference_date.year - rng.randint(1, 5)}-01-01",
+            "hire_date": hire_date,
             "termination_date": None,
-            "created_at": config.reference_date.isoformat(),
+            "created_at": datetime.strptime(hire_date, "%Y-%m-%d"),
         })
 
-    return pl.DataFrame(rows)
+    df = pl.DataFrame(rows)
+    if df.height > 0:
+        df = df.with_columns([
+            pl.col("hire_date").str.strptime(pl.Date(), "%Y-%m-%d"),
+            pl.col("termination_date").cast(pl.Date()),
+            pl.col("created_at").cast(pl.Datetime("us")),
+        ])
+    return df
 

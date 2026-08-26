@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from datetime import datetime, timedelta, date
+
 import polars as pl
 
 from eds.core.random_streams import make_rng
@@ -22,13 +24,21 @@ def generate_provider_specialties(
         num_specs = rng.randint(config.min_specialties, config.max_specialties)
         chosen = [specialty_ids[rng.randint(0, len(specialty_ids) - 1)] for _ in range(num_specs)]
         for specialty_id in chosen:
+            max_lookback = (config.reference_date - date(2026, 1, 1)).days
+            cert_date = (config.reference_date - timedelta(days=rng.randint(0, max_lookback))).isoformat()
             rows.append({
                 "provider_specialty_id": ps_id,
                 "provider_id": provider_id,
                 "specialty_id": specialty_id,
-                "certification_date": f"{config.reference_date.year - rng.randint(1, 3)}-01-01",
-                "created_at": config.reference_date.isoformat(),
+                "certification_date": cert_date,
+                "created_at": datetime.strptime(cert_date, "%Y-%m-%d"),
             })
             ps_id += 1
 
-    return pl.DataFrame(rows)
+    df = pl.DataFrame(rows)
+    if df.height > 0:
+        df = df.with_columns([
+            pl.col("certification_date").str.strptime(pl.Date(), "%Y-%m-%d"),
+            pl.col("created_at").cast(pl.Datetime("us")),
+        ])
+    return df

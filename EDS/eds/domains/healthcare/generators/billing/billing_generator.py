@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from datetime import datetime, timedelta
+
 import polars as pl
 
 from eds.core.random_streams import make_rng
@@ -27,13 +29,11 @@ def generate_billing(
             tax_amount = round((charge_amount - discount_amount) * 0.05, 2)
             total_amount = round(charge_amount - discount_amount + tax_amount, 2)
 
-            admission_date = encounter_row[7]
-            billing_year = config.reference_date.year
-            try:
-                billing_year = int(str(admission_date)[:4])
-            except (ValueError, TypeError):
-                pass
-            billing_date = f"{billing_year}-{rng.randint(1, 12):02d}-{rng.randint(1, 28):02d}"
+            admission_date = encounter_row[8]
+            billing_delay = rng.randint(0, 2)
+            billing_date = (admission_date + timedelta(days=billing_delay)).isoformat()
+            if billing_date > "2026-06-01":
+                billing_date = "2026-06-01"
 
             rows.append({
                 "billing_id": billing_id,
@@ -48,8 +48,14 @@ def generate_billing(
                 "total_amount": total_amount,
                 "billing_date": billing_date,
                 "status": rng.choice(["PENDING", "APPROVED", "PAID"]),
-                "created_at": config.reference_date.isoformat(),
+                "created_at": datetime.strptime(billing_date, "%Y-%m-%d"),
             })
             billing_id += 1
 
-    return pl.DataFrame(rows)
+    df = pl.DataFrame(rows)
+    if df.height > 0:
+        df = df.with_columns([
+            pl.col("billing_date").str.strptime(pl.Date(), "%Y-%m-%d"),
+            pl.col("created_at").cast(pl.Datetime("us")),
+        ])
+    return df

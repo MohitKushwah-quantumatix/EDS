@@ -235,7 +235,7 @@ class SimulationRun:
             ]
 
         issues: list[RunIssue] = []
-        if state.current_date is not None and state.current_date != self.clock.current_date:
+        if state.current_date is not None and self.clock.current_date < state.current_date:
             issues.append(
                 RunIssue(
                     subject="clock",
@@ -243,7 +243,7 @@ class SimulationRun:
                     detail=(
                         f"the clock is at {self.clock.current_date.isoformat()} but the "
                         f"project reached {state.current_date.isoformat()}; the clock was "
-                        "probably built for a different period"
+                        "probably built for an earlier period"
                     ),
                 )
             )

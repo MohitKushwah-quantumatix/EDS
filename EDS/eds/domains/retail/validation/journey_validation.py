@@ -253,8 +253,8 @@ def validate_session_timeline(
         joined,
         "sessions",
         "session_before_registration",
-        pl.col("start_time").dt.date() <= pl.col("registration_date"),
-        "start_time is after registration_date",
+        pl.col("start_time").dt.date() < pl.col("registration_date"),
+        "start_time is before registration_date",
     )
 
     earliest = reference_date - timedelta(days=session_years * _DAYS_PER_YEAR)
