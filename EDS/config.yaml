@@ -1,0 +1,7 @@
+domain: retail
+project_dir: my-shop
+seed: 42
+
+start_date: 2026-01-01
+end_date: 2026-01-03
+cron_interval_minutes: 2

@@ -20,6 +20,7 @@ from datetime import timedelta
 from typing import Final
 
 import polars as pl
+import random
 
 from eds.config import OrderConfig
 from eds.core.frames import empty_frame
@@ -77,12 +78,13 @@ def _successful(checkouts: pl.DataFrame) -> pl.DataFrame:
     )
 
 
-def iter_order_batches(config: OrderConfig, checkouts: pl.DataFrame) -> Iterator[pl.DataFrame]:
+def iter_order_batches(config: OrderConfig, checkouts: pl.DataFrame, seed: int = 0) -> Iterator[pl.DataFrame]:
     """Yield orders in batches, one per successful checkout.
 
     Args:
         config: Order configuration.
         checkouts: The F005 checkout dataset.
+        seed: Run seed used to make the purchase-delay sample reproducible.
 
     Yields:
         Frames matching the orders schema, with ``current_status`` set to
@@ -94,9 +96,17 @@ def iter_order_batches(config: OrderConfig, checkouts: pl.DataFrame) -> Iterator
         return
 
     lead = timedelta(seconds=config.order_lead_seconds)
+    delay_range = config.max_order_delay_days - config.min_order_delay_days + 1
+    rng = random.Random(seed)
+    delays = [rng.randint(config.min_order_delay_days, config.max_order_delay_days) for _ in range(len(eligible))]
+    delay_series = pl.Series("order_delay_days", delays, dtype=pl.Int64)
     built = (
         eligible.with_columns(
+            pl.Series("order_delay_days", delay_series),
             (pl.col("completed_at") + lead).alias("created_at"),
+        )
+        .with_columns(
+            (pl.col("created_at") + pl.duration(days=pl.col("order_delay_days"))).alias("created_at"),
         )
         .with_columns(
             pl.col("created_at").dt.date().alias("order_date"),
@@ -129,18 +139,19 @@ def iter_order_batches(config: OrderConfig, checkouts: pl.DataFrame) -> Iterator
         yield built.slice(offset, config.batch_size)
 
 
-def generate_orders(config: OrderConfig, checkouts: pl.DataFrame) -> pl.DataFrame:
+def generate_orders(config: OrderConfig, checkouts: pl.DataFrame, seed: int = 0) -> pl.DataFrame:
     """Generate the complete orders dataset.
 
     Args:
         config: Order configuration.
         checkouts: The F005 checkout dataset.
+        seed: Run seed used to make the purchase-delay sample reproducible.
 
     Returns:
         One row per successful checkout, keyed by sequential ``order_id``,
         with ``current_status`` set to ``CREATED``.
     """
-    batches = list(iter_order_batches(config, checkouts))
+    batches = list(iter_order_batches(config, checkouts, seed))
     return pl.concat(batches, how="vertical") if batches else empty_frame(ORDERS)
 
 

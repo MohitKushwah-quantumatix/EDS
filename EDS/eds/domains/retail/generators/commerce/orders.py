@@ -116,7 +116,7 @@ def generate_order_data(
     seed = resolve_seed(config.platform.seed)
     settings = config.orders
 
-    orders = generate_orders(settings, upstream["checkout"])
+    orders = generate_orders(settings, upstream["checkout"], seed)
     history = generate_order_status_history(settings, orders, seed)
     orders = apply_current_status(orders, history)
     lines = generate_order_lines(settings, orders, upstream["cart_items"])

@@ -55,7 +55,7 @@ project = create_project(
 # across it (instead of stopping after a fixed tick count and capping in January).
 run = create_run(
     project,
-    create_clock(date(2026, 1, 1), end=date(2026, 6, 1)),
+    create_clock(date(2026, 1, 1), end=date(2026, 3, 1)),
     RunConfiguration(stop_condition=EndOfPeriod()),
     run_id="healthcare-demo",
 )

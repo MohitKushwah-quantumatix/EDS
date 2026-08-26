@@ -549,7 +549,7 @@ def _active_today(
             pl.Series("_active", chosen, dtype=pl.Boolean),
             pl.Series("_today", sessions, dtype=pl.Int64),
         )
-        .filter(pl.col("_active"))
+        .filter(pl.col("_active").cast(pl.Boolean))
         .with_columns(pl.col("_today").alias("session_frequency"))
         .select(*CUSTOMER_PERSONAS.columns)
     )

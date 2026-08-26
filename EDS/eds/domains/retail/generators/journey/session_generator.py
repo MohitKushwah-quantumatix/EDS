@@ -206,7 +206,7 @@ class SessionLocations:
         if countries.is_empty():
             raise ValueError("cannot generate sessions: the countries dataset is empty")
 
-        primary = addresses.filter(pl.col("is_primary"))
+        primary = addresses.filter(pl.col("is_primary").cast(pl.Boolean))
         if primary.is_empty():
             raise ValueError("cannot generate sessions: no customer has a primary address")
 

@@ -511,6 +511,10 @@ class OrderConfig(BaseModel):
     Attributes:
         order_lead_seconds: Delay between a checkout completing and its order
             being created.
+        min_order_delay_days: Shortest delay, in whole days, before an order is
+            created after checkout completes. Use 0 for same-day purchase.
+        max_order_delay_days: Longest delay, in whole days, before an order is
+            created after checkout completes.
         confirmed_rate: Share of orders that reach ``CONFIRMED``.
         processing_rate: Share of orders that reach ``PROCESSING``. An order
             only reaches it after being confirmed, so this cannot exceed
@@ -526,6 +530,8 @@ class OrderConfig(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 
     order_lead_seconds: int = Field(default=1, ge=1)
+    min_order_delay_days: int = Field(default=0, ge=0)
+    max_order_delay_days: int = Field(default=5, ge=0)
     confirmed_rate: float = Field(default=0.95, ge=0.0, le=1.0)
     processing_rate: float = Field(default=0.90, ge=0.0, le=1.0)
     min_confirm_minutes: int = Field(default=1, ge=1)
@@ -553,6 +559,11 @@ class OrderConfig(BaseModel):
             raise ValueError(
                 f"min_processing_minutes ({self.min_processing_minutes}) cannot exceed "
                 f"max_processing_minutes ({self.max_processing_minutes})"
+            )
+        if self.min_order_delay_days > self.max_order_delay_days:
+            raise ValueError(
+                f"min_order_delay_days ({self.min_order_delay_days}) cannot exceed "
+                f"max_order_delay_days ({self.max_order_delay_days})"
             )
         return self
 
