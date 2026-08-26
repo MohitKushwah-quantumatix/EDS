@@ -92,7 +92,8 @@ def load_checkpoint(project_dir: Path) -> date | None:
 def save_checkpoint(project_dir: Path, completed_day: date) -> None:
     import json
     path = _checkpoint_path(project_dir)
-    path.write_text(json.dumps({"last_completed_day": completed_day.isoformat()}))
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump({"last_completed_day": completed_day.isoformat()}, f)
 
 
 def _backup_path(project_dir: Path) -> Path:
@@ -120,7 +121,8 @@ def save_backup(project_dir: Path, adapter: SQLiteAdapter, domain: str, complete
         backup["tables"][name] = df.write_json()
 
     backup_path.parent.mkdir(parents=True, exist_ok=True)
-    backup_path.write_text(json.dumps(backup, indent=2, default=str))
+    with open(backup_path, "w", encoding="utf-8") as f:
+        json.dump(backup, f, default=str)
 
 
 def load_backup(project_dir: Path, adapter: SQLiteAdapter) -> date | None:
@@ -270,13 +272,15 @@ def _export_daily_data(adapter: SQLiteAdapter, project_dir: Path, domain: str, t
     schema = {}
 
     for name, df in all_data.items():
-        if df.is_empty():
-            continue
-
         if name.startswith("_"):
             continue
 
         schema[name] = {col: str(dtype) for col, dtype in df.schema.items()}
+
+        if df.is_empty():
+            dest = output_dir / f"{name}.parquet"
+            df.write_parquet(dest, compression="snappy")
+            continue
 
         if name in master_tables:
             dest = output_dir / f"{name}.parquet"
@@ -295,14 +299,12 @@ def _export_daily_data(adapter: SQLiteAdapter, project_dir: Path, domain: str, t
         else:
             filtered = df.filter(pl.col(date_col).cast(pl.String) == target_date.isoformat())
 
-        if filtered.is_empty():
-            continue
-
         dest = output_dir / f"{name}.parquet"
         filtered.write_parquet(dest, compression="snappy")
 
     schema_path = project_dir / "schema.json"
-    schema_path.write_text(json.dumps(schema, indent=2, default=str))
+    with open(schema_path, "w", encoding="utf-8") as f:
+        json.dump(schema, f, indent=2, default=str)
 
     return output_dir
 
@@ -316,7 +318,8 @@ def _cleanup_previous_day(project_dir: Path, current_date: date) -> None:
 
 def _mark_loaded(project_dir: Path, target_date: date) -> None:
     marker = project_dir / "output" / LOADED_MARKER
-    marker.write_text("loaded")
+    with open(marker, "w", encoding="utf-8") as f:
+        f.write("loaded")
 
 
 def run_retail_day(project_dir: Path, target_date: date, seed: int = 42, config_overrides: dict | None = None) -> None:
