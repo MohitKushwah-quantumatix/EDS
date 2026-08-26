@@ -204,7 +204,7 @@ def test_list_parquet_keys_returns_only_parquet_blobs() -> None:
     ]
     mock_client.get_container_client.return_value = cc
 
-    keys = conn._list_parquet_keys()
+    keys = conn._list_keys_by_extension(".parquet")
     assert keys == ["data/customers.parquet", "data/orders.parquet"]
     cc.list_blobs.assert_called_once_with(name_starts_with=conn._prefix)
 
@@ -215,7 +215,7 @@ def test_list_parquet_keys_uses_correct_container() -> None:
     cc = MagicMock()
     cc.list_blobs.return_value = []
     mock_client.get_container_client.return_value = cc
-    conn._list_parquet_keys()
+    conn._list_keys_by_extension(".parquet")
     mock_client.get_container_client.assert_called_once_with("eds-data")
 
 
@@ -224,7 +224,7 @@ def test_list_parquet_keys_error_raises_load_error() -> None:
     mock_client = _inject_client(conn)
     mock_client.get_container_client.side_effect = Exception("network error")
     with pytest.raises(LoadError, match="Cannot list blobs in azure://acc/ctr"):
-        conn._list_parquet_keys()
+        conn._list_keys_by_extension(".parquet")
 
 
 # ---------------------------------------------------------------------------

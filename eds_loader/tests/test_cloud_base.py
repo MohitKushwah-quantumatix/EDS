@@ -50,9 +50,9 @@ class _TestCloud(CloudBaseConnector):
     def _connect(self) -> Any:
         return self._connect_mock()
 
-    def _list_parquet_keys(self) -> list[str]:
+    def _list_keys_by_extension(self, ext: str) -> list[str]:
         self._list_calls.append(None)
-        return self._parquet_keys
+        return [k for k in self._parquet_keys if k.endswith(ext)]
 
     def _read_bytes(self, key: str) -> bytes:
         self._read_calls.append(key)
@@ -126,15 +126,15 @@ def test_key_with_nested_prefix() -> None:
 # ---------------------------------------------------------------------------
 
 def test_name_from_key_with_prefix() -> None:
-    assert CloudBaseConnector._name_from_key("prefix/customers.parquet") == "customers"
+    assert CloudBaseConnector._name_from_key("prefix/customers.parquet", ".parquet") == "customers"
 
 
 def test_name_from_key_no_prefix() -> None:
-    assert CloudBaseConnector._name_from_key("orders.parquet") == "orders"
+    assert CloudBaseConnector._name_from_key("orders.parquet", ".parquet") == "orders"
 
 
 def test_name_from_key_deep_prefix() -> None:
-    assert CloudBaseConnector._name_from_key("a/b/c/products.parquet") == "products"
+    assert CloudBaseConnector._name_from_key("a/b/c/products.parquet", ".parquet") == "products"
 
 
 # ---------------------------------------------------------------------------
@@ -232,7 +232,7 @@ def test_read_datasets_empty_prefix_returns_empty_dict() -> None:
 
 def test_read_datasets_list_error_raises_load_error() -> None:
     class _BrokenList(_TestCloud):
-        def _list_parquet_keys(self) -> list[str]:
+        def _list_keys_by_extension(self, ext: str) -> list[str]:
             raise RuntimeError("network error")
 
     tc = _BrokenList()

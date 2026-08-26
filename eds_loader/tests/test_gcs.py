@@ -203,7 +203,7 @@ def test_list_parquet_keys_returns_parquet_blobs_only() -> None:
         _make_blob("data/schema.json"),   # excluded
         _make_blob("data/orders.parquet"),
     ]
-    keys = conn._list_parquet_keys()
+    keys = conn._list_keys_by_extension(".parquet")
     assert keys == ["data/customers.parquet", "data/orders.parquet"]
     mock_client.list_blobs.assert_called_once_with(
         bucket_obj, prefix=conn._prefix
@@ -214,7 +214,7 @@ def test_list_parquet_keys_uses_correct_bucket() -> None:
     conn = _make_conn(bucket="my-bucket")
     mock_client = _inject_client(conn)
     mock_client.list_blobs.return_value = []
-    conn._list_parquet_keys()
+    conn._list_keys_by_extension(".parquet")
     mock_client.bucket.assert_called_once_with("my-bucket")
 
 
@@ -223,7 +223,7 @@ def test_list_parquet_keys_error_raises_load_error() -> None:
     mock_client = _inject_client(conn)
     mock_client.bucket.side_effect = Exception("permission denied")
     with pytest.raises(LoadError, match="Cannot list gs://bkt"):
-        conn._list_parquet_keys()
+        conn._list_keys_by_extension(".parquet")
 
 
 # ---------------------------------------------------------------------------

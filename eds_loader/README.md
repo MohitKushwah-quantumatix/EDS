@@ -7,7 +7,7 @@ pip install eds-loader[postgres]   # core + Postgres driver
 eds-loader run --config loader.yaml
 ```
 
-> **Current version:** `0.1.0` · **Python ≥ 3.12** · **Status:** Beta
+> **Current version:** `0.4.0` · **Python ≥ 3.12** · **Status:** Beta
 
 ---
 
@@ -18,16 +18,18 @@ eds-loader run --config loader.yaml
 pip install eds-loader
 
 # Add the connector(s) you need:
-pip install eds-loader[postgres]      # PostgreSQL (psycopg v3)
-pip install eds-loader[mysql]         # MySQL (pymysql)
-pip install eds-loader[mssql]         # Microsoft SQL Server (pyodbc + ODBC driver)
-pip install eds-loader[oracle]        # Oracle Database (oracledb)
-pip install eds-loader[mongodb]       # MongoDB (pymongo)
-pip install eds-loader[remote_fs]     # SSH / SFTP (paramiko)
-pip install eds-loader[s3]            # AWS S3 (boto3)
-pip install eds-loader[azure]         # Azure Blob Storage (azure-storage-blob)
-pip install eds-loader[gcs]           # Google Cloud Storage (google-cloud-storage)
-pip install eds-loader[excel]         # Excel source format (openpyxl)
+pip install eds-loader[postgres]         # PostgreSQL (psycopg v3)
+pip install eds-loader[mysql]            # MySQL (pymysql)
+pip install eds-loader[mssql]            # Microsoft SQL Server (pyodbc + ODBC driver)
+pip install eds-loader[oracle]           # Oracle Database (oracledb)
+pip install eds-loader[mongodb]          # MongoDB (pymongo)
+pip install eds-loader[bigquery]         # Google BigQuery (google-cloud-bigquery)
+pip install eds-loader[elasticsearch]    # Elasticsearch / OpenSearch (elasticsearch)
+pip install eds-loader[remote_fs]        # SSH / SFTP (paramiko)
+pip install eds-loader[s3]               # AWS S3 (boto3)
+pip install eds-loader[azure_blob]       # Azure Blob Storage (azure-storage-blob)
+pip install eds-loader[gcs]              # Google Cloud Storage (google-cloud-storage)
+pip install eds-loader[excel]            # Excel source format (fastexcel)
 
 # Everything at once:
 pip install eds-loader[all]
@@ -46,14 +48,22 @@ Requires **Python ≥ 3.12**.
 # 1. See which connectors are installed:
 eds-loader connectors
 
-# 2. Generate a documented starter config:
-eds-loader init --source s3 --target postgres --output loader.yaml
+# 2. Generate a fully documented starter config:
+eds-loader init --source local_fs --target postgres --output loader.yaml
 
 # 3. Fill in the required fields, then validate:
 eds-loader validate --config loader.yaml
 
-# 4. Run the load:
+# 4. Check what would change (incremental mode):
+eds-loader diff --config loader.yaml
+
+# 5. Run the load:
 eds-loader run --config loader.yaml
+
+# 6. Monitor — status, history, reset:
+eds-loader status  --config loader.yaml
+eds-loader history --config loader.yaml
+eds-loader reset   --config loader.yaml   # force full reload on next run
 ```
 
 ---
@@ -65,13 +75,15 @@ eds-loader run --config loader.yaml
 | `local_fs` | source / target | *(built-in)* | — |
 | `remote_fs` | source / target | `remote_fs` | `paramiko` |
 | `s3` | source / target | `s3` | `boto3` |
-| `azure_blob` | source / target | `azure` | `azure-storage-blob` |
+| `azure_blob` | source / target | `azure_blob` | `azure-storage-blob` |
 | `gcs` | source / target | `gcs` | `google-cloud-storage` |
 | `postgres` | target | `postgres` | `psycopg` v3 |
 | `mysql` | target | `mysql` | `pymysql` |
 | `mssql` | target | `mssql` | `pyodbc` + OS ODBC driver |
 | `oracle` | target | `oracle` | `oracledb` |
 | `mongodb` | target | `mongodb` | `pymongo` |
+| `bigquery` | target | `bigquery` | `google-cloud-bigquery` |
+| `elasticsearch` | target | `elasticsearch` | `elasticsearch` v8+ / OpenSearch 2.x |
 
 > **Supported source formats:** `parquet` (default), `csv`, `json`, `ndjson`, `excel`, `avro`, `orc`.
 > Set the `format:` field under any storage source connector to change the format.
@@ -97,6 +109,47 @@ Reads datasets from the source and writes them to the target.
 
 ---
 
+### `eds-loader status`
+
+```
+eds-loader status --config <file>
+```
+
+Prints a full health summary: config settings, source connectivity check, and a per-dataset state table from the last incremental run.
+
+---
+
+### `eds-loader reset`
+
+```
+eds-loader reset --config <file> [--force]
+```
+
+Deletes the incremental state file so the next run does a full load of all datasets. Prompts for confirmation unless `--force` is passed.
+
+---
+
+### `eds-loader history`
+
+```
+eds-loader history --config <file> [--limit N]
+```
+
+Shows a tabular run history from the JSONL log file. Default: last 20 runs.
+Enable the log with `run_log_file: auto` in `loader.yaml`.
+
+---
+
+### `eds-loader diff`
+
+```
+eds-loader diff --config <file>
+```
+
+Reads source datasets, computes their hashes, and compares them against the stored state — showing `UNCHANGED`, `CHANGED`, or `NEW` per dataset without writing anything.
+
+---
+
 ### `eds-loader validate`
 
 ```
@@ -116,7 +169,7 @@ Validates the config file without running a full load:
 eds-loader init [--source <kind>] [--target <kind>] [--output loader.yaml] [--force]
 ```
 
-Generates a documented starter YAML config. Every field is present and annotated with a comment explaining its purpose.
+Generates a fully documented starter `loader.yaml`. Every field is present — required ones uncommented, optional ones commented with explanation. Includes all v0.4 sections: performance, observability, data quality, schema drift, notifications.
 
 | Flag | Default | Description |
 |---|---|---|
@@ -124,6 +177,10 @@ Generates a documented starter YAML config. Every field is present and annotated
 | `--target`, `-t` | `postgres` | Target connector kind |
 | `--output`, `-o` | `loader.yaml` | Path to write the config |
 | `--force`, `-f` | *(off)* | Overwrite existing file |
+
+**All supported target kinds for `--target`:**
+`local_fs`, `remote_fs`, `s3`, `azure_blob`, `gcs`,
+`postgres`, `mysql`, `mssql`, `oracle`, `mongodb`, `bigquery`, `elasticsearch`
 
 ---
 
@@ -134,15 +191,21 @@ Lists all registered connectors with install status and pip hints:
 ```
 DATABASE
   [OK] mongodb        (target       )
+  [OK] mssql          (target       )
   [OK] mysql          (target       )
+  [OK] oracle         (target       )
   [OK] postgres       (target       )
 
 STORAGE
-  [--] azure_blob     (source/target)  ->  pip install eds-loader[azure]
-  [--] gcs            (source/target)  ->  pip install eds-loader[gcs]
+  [OK] azure_blob     (source/target)
+  [OK] gcs            (source/target)
   [OK] local_fs       (source/target)
   [OK] remote_fs      (source/target)
   [OK] s3             (source/target)
+
+OTHER
+  [--] bigquery       (target       )  ->  pip install eds-loader[bigquery]
+  [--] elasticsearch  (target       )  ->  pip install eds-loader[elasticsearch]
 
 Install everything at once:  pip install eds-loader[all]
 ```
@@ -155,24 +218,58 @@ Install everything at once:  pip install eds-loader[all]
 # ── Source ──────────────────────────────────────────────────────────────────
 source:
   kind: local_fs        # connector kind — see connector matrix above
-  path: ./output        # connector-specific fields follow
-  # format: parquet     # optional — parquet (default) | csv | json | ndjson | excel | avro | orc
+  path: ${DATA_ROOT}/output   # ${ENV_VAR} interpolation supported
+  # format: parquet     # optional — parquet | csv | json | ndjson | excel | avro | orc
 
 # ── Target ──────────────────────────────────────────────────────────────────
 target:
   kind: postgres
-  host: localhost
+  host: ${DB_HOST}       # ENV-VAR interpolation works anywhere in this file
   database: eds_db
   user: eds_loader
   password_env: EDS_PG_PASSWORD   # reads os.environ["EDS_PG_PASSWORD"]
-  port: 5432            # optional
-  schema: public        # optional
+  port: 5432
+  schema: public
 
-# ── Loader options ───────────────────────────────────────────────────────────
-tables: []              # empty = load every dataset from schema.json
-                        # subset: [customers, orders, products]
-enforce_constraints: true  # false = skip PK/FK/UNIQUE enforcement
-schema_required: true   # false = skip schema.json; auto-discover *.parquet files
+# ── Dataset selection ────────────────────────────────────────────────────────
+tables: []              # empty = all datasets; or: [customers, orders]
+enforce_constraints: true
+schema_required: true   # false = skip schema.json, auto-discover *.parquet
+
+# ── Core behaviour ───────────────────────────────────────────────────────────
+load_mode: full         # full | incremental
+
+# ── Incremental options (incremental mode only) ──────────────────────────────
+# state_file: .loader_state.json
+# delete_mode: keep     # keep | soft | hard
+
+# ── Reliability ──────────────────────────────────────────────────────────────
+retry_count: 0
+retry_delay: 60
+
+# ── Performance ──────────────────────────────────────────────────────────────
+parallelism: 1          # concurrent dataset writes
+# batch_size: 100000    # write in N-row chunks
+
+# ── Observability ────────────────────────────────────────────────────────────
+# metrics_file: auto    # write run_metrics.json after every run
+# run_log_file: auto    # append to .eds_loader_runs.jsonl (enables: eds-loader history)
+
+# ── Data quality ─────────────────────────────────────────────────────────────
+# on_validation_error: warn   # warn | fail | quarantine
+# rejected_dir: rejected
+
+# ── Schema drift ─────────────────────────────────────────────────────────────
+# schema_drift: warn    # warn | fail | ignore
+
+# ── Notifications ────────────────────────────────────────────────────────────
+# notifications:
+#   on_failure:
+#     - kind: slack
+#       webhook_url_env: SLACK_WEBHOOK_URL
+#   on_success:
+#     - kind: webhook
+#       url: https://monitoring.company.com/api/runs
 ```
 
 ### Credential conventions
@@ -181,6 +278,7 @@ schema_required: true   # false = skip schema.json; auto-discover *.parquet file
 |---|---|---|
 | Inline | `password: "secret"` | Convenient locally; **never commit** |
 | Env-var | `password_env: MY_PASS` | Reads `os.environ["MY_PASS"]` at runtime; safe to commit |
+| YAML interpolation | `host: ${DB_HOST}` | Resolved from environment before YAML parsing |
 
 ---
 
@@ -308,6 +406,25 @@ target:
 
 ---
 
+### `oracle` (target only)
+
+```yaml
+target:
+  kind: oracle
+  host: oracle.example.com  # required
+  database: ORCLPDB1        # required — service name or SID
+  user: eds_loader          # required
+  password_env: EDS_ORACLE_PASSWORD
+  port: 1521                # optional, default: 1521
+  schema: EDS_DATA          # optional — defaults to username (uppercase)
+  mode: thin                # optional — thin (default) | thick (requires Oracle Client)
+```
+
+> **Upsert:** Oracle MERGE INTO USING DUAL.
+> **Install:** `pip install eds-loader[oracle]`
+
+---
+
 ### `mongodb` (target only)
 
 ```yaml
@@ -319,8 +436,46 @@ target:
   password_env: EDS_MONGO_PASSWORD
   port: 27017           # optional, default: 27017
   auth_source: admin    # optional — authentication database, default: admin
-  connect_timeout: 10000  # optional, default: 10000 ms (server-selection timeout)
+  connect_timeout: 10000  # optional, default: 10000 ms
 ```
+
+---
+
+### `bigquery` (target only)
+
+```yaml
+target:
+  kind: bigquery
+  project: my-gcp-project   # required — GCP project ID
+  dataset: eds_data          # required — BigQuery dataset name
+  credentials_file: /path/to/service-account.json  # optional — omit for ADC
+  location: US               # optional — dataset location, default: US
+  create_dataset: true       # optional — create if missing, default: true
+```
+
+> **Full load:** `WRITE_TRUNCATE`; **Incremental:** BigQuery `MERGE` DML via staging table.
+> **Install:** `pip install eds-loader[bigquery]`
+
+---
+
+### `elasticsearch` (target only)
+
+```yaml
+target:
+  kind: elasticsearch
+  host: http://localhost:9200   # required — ES / OpenSearch URL
+  index_prefix: eds_            # optional — prepended to every index, default: eds_
+  username: elastic             # optional
+  password_env: ES_PASSWORD     # optional
+  verify_certs: true            # optional, default: true
+  timeout: 30                   # optional — request timeout seconds, default: 30
+  shards: 1                     # optional — primary shards per index, default: 1
+  replicas: 0                   # optional — replicas per index, default: 0
+```
+
+> **Full load:** delete index + bulk index. **Incremental:** bulk upsert with `_id = pk_value`.
+> Compatible with Elasticsearch 8.x and OpenSearch 2.x.
+> **Install:** `pip install eds-loader[elasticsearch]`
 
 ---
 
@@ -332,29 +487,54 @@ from eds_loader import load
 from eds_loader.config import LoaderConfig
 
 config = LoaderConfig.from_yaml(Path("loader.yaml"))
-result = load(config)
+result = load(config, config_path=Path("loader.yaml"))
 
 print(f"Done: {result.total_rows:,} rows across {len(result.tables_written)} tables")
 for table, rows in result.rows_written.items():
     print(f"  {table}: {rows:,} rows")
+
+# Incremental mode — per-dataset upsert counts:
+if result.load_mode == "incremental":
+    for table in result.tables_written:
+        ins = result.rows_inserted.get(table, 0)
+        upd = result.rows_updated.get(table, 0)
+        print(f"  {table}: {ins:,} inserted, {upd:,} updated")
+    print(f"  Skipped: {result.tables_skipped}")
 ```
 
 ### `LoaderConfig` fields
 
 | Field | Type | Default | Description |
 |---|---|---|---|
-| `source` | `ConnectorConfig` | — | Source connector config |
-| `target` | `ConnectorConfig` | — | Target connector config |
-| `tables` | `list[str]` | `[]` | Subset of tables to load (empty = all) |
-| `enforce_constraints` | `bool` | `True` | Apply PK/FK/UNIQUE on the target |
-| `schema_required` | `bool` | `True` | When `False`, skip `schema.json` and auto-discover datasets from `*.parquet` files |
+| `source` | `ConnectorConfig` | — | Source connector |
+| `target` | `ConnectorConfig` | — | Target connector |
+| `tables` | `list[str]` | `[]` | Subset to load (empty = all) |
+| `enforce_constraints` | `bool` | `True` | Apply PK/FK/UNIQUE on target |
+| `schema_required` | `bool` | `True` | `False` = auto-discover `*.parquet` |
+| `load_mode` | `"full"\|"incremental"` | `"full"` | Load strategy |
+| `state_file` | `str\|None` | auto | State JSON path (incremental) |
+| `retry_count` | `int` | `0` | Extra retry attempts |
+| `retry_delay` | `int` | `60` | Seconds between retries |
+| `parallelism` | `int` | `1` | Concurrent dataset writes |
+| `batch_size` | `int\|None` | `None` | Row chunk size (unlimited) |
+| `metrics_file` | `str\|None` | `None` | JSON run metrics output path |
+| `run_log_file` | `str\|None` | `None` | JSONL run history path |
+| `on_validation_error` | `"warn"\|"fail"\|"quarantine"` | `"warn"` | Row validation policy |
+| `rejected_dir` | `str` | `"rejected"` | Dir for quarantined rows |
+| `schema_drift` | `"warn"\|"fail"\|"ignore"` | `"warn"` | Schema drift policy |
+| `delete_mode` | `"keep"\|"soft"\|"hard"` | `"keep"` | Incremental delete handling |
+| `notifications` | `dict` | `{}` | Notification channels by trigger |
 
 ### `LoadResult` fields
 
 | Field | Type | Description |
 |---|---|---|
-| `tables_written` | `list[str]` | Dataset names written, in write order |
-| `rows_written` | `dict[str, int]` | Dataset name → row count |
+| `tables_written` | `list[str]` | Dataset names written |
+| `rows_written` | `dict[str, int]` | Dataset → row count |
+| `rows_inserted` | `dict[str, int]` | Incremental: inserted rows per dataset |
+| `rows_updated` | `dict[str, int]` | Incremental: updated rows per dataset |
+| `tables_skipped` | `list[str]` | Incremental: unchanged, skipped datasets |
+| `load_mode` | `str` | `"full"` or `"incremental"` |
 | `total_rows` | `int` (property) | Sum of all `rows_written` values |
 | `write_results` | `list[WriteResult]` | Per-table result objects with `location` |
 

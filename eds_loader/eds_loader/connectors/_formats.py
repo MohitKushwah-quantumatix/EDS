@@ -12,7 +12,7 @@ Supported formats
 | csv      | .csv                  | read_csv          | —                |
 | json     | .json                 | read_json         | —                |
 | ndjson   | .ndjson / .jsonl      | read_ndjson       | —                |
-| excel    | .xlsx / .xls          | read_excel        | openpyxl         |
+| excel    | .xlsx / .xls          | read_excel        | fastexcel        |
 | avro     | .avro                 | read_avro         | —                |
 | orc      | .orc                  | read_orc          | —                |
 +----------+-----------------------+-------------------+------------------+
@@ -36,10 +36,10 @@ from eds_loader.exceptions import LoadError
 
 __all__ = [
     "FORMATS",
-    "primary_extension",
     "all_extensions",
-    "read_path",
+    "primary_extension",
     "read_bytes",
+    "read_path",
 ]
 
 # ---------------------------------------------------------------------------
@@ -85,10 +85,10 @@ def all_extensions(fmt: str) -> list[str]:
 
 def _check_excel_dep() -> None:
     try:
-        import openpyxl  # noqa: F401
+        import fastexcel  # noqa: F401
     except ImportError as exc:
         raise LoadError(
-            "Excel format requires openpyxl. "
+            "Excel format requires fastexcel (Polars' default Excel engine). "
             "Install it with: pip install eds-loader[excel]"
         ) from exc
 
@@ -142,7 +142,12 @@ def read_path(fmt: str, path: Path) -> dict[str, pl.DataFrame]:
             return {stem: pl.read_orc(path)}
         # excel
         _check_excel_dep()
-        sheets: Any = pl.read_excel(path, sheet_name=None)
+        # sheet_id=0 reads ALL sheets and always returns {sheet_name: df},
+        # even for single-sheet workbooks. `sheet_name=None` looks like the
+        # "read everything" option but is NOT — on current Polars
+        # (calamine engine) it silently returns only the *first* sheet as a
+        # bare DataFrame, silently dropping every other sheet's data.
+        sheets: Any = pl.read_excel(path, sheet_id=0)
         return _sheets_to_datasets(stem, sheets)
     except LoadError:
         raise
@@ -183,7 +188,7 @@ def read_bytes(fmt: str, stem: str, data: bytes) -> dict[str, pl.DataFrame]:
             return {stem: pl.read_orc(buf)}
         # excel
         _check_excel_dep()
-        sheets: Any = pl.read_excel(io.BytesIO(data), sheet_name=None)
+        sheets: Any = pl.read_excel(io.BytesIO(data), sheet_id=0)
         return _sheets_to_datasets(stem, sheets)
     except LoadError:
         raise

@@ -53,7 +53,7 @@ from typing import Any
 import polars as pl
 
 from eds_loader._logging import get_logger
-from eds_loader.connectors.base import WriteResult
+from eds_loader.connectors.base import UpsertResult, WriteResult
 from eds_loader.connectors.registry import ConnectorSpec, register_connector
 from eds_loader.exceptions import LoadError
 
@@ -334,6 +334,134 @@ class MongoDBConnector:
             results.append(
                 WriteResult(dataset=name, location=location, rows=df.height)
             )
+
+        return results
+
+    # ------------------------------------------------------------------
+    # Upsertable interface — incremental / delta load
+    # ------------------------------------------------------------------
+
+    def upsert_datasets(
+        self,
+        datasets: dict[str, pl.DataFrame],
+        schema_metadata: dict[str, Any],
+    ) -> list[UpsertResult]:
+        """Upsert datasets into MongoDB using ``replace_one(upsert=True)``.
+
+        For each collection:
+
+        - If a ``primary_key`` is present in *schema_metadata*, each document
+          is upserted with ``replace_one({pk: value}, doc, upsert=True)``.
+          ``upserted_id is not None`` → new insert; ``None`` → update.
+        - If no primary key is available the collection is **fully replaced**
+          (drop + insert_many) with a warning, matching the SQL fallback.
+
+        Args:
+            datasets: Dataset name → Polars DataFrame.
+            schema_metadata: Parsed ``schema.json``.
+
+        Returns:
+            One :class:`~eds_loader.connectors.base.UpsertResult` per dataset.
+
+        Raises:
+            ~eds_loader.exceptions.LoadError: Connection or write failure.
+        """
+        db = self._db()
+        logger.info(
+            "Connected to MongoDB %s:%s/%s for upsert",
+            self._host, self._port, self._database,
+            extra={"progress": {"stage": "connect_target",
+                                "label": f"{self._host}:{self._port}"}},
+        )
+        enforce = bool(schema_metadata)
+        results: list[UpsertResult] = []
+        total = len(datasets)
+
+        for i, (name, df) in enumerate(datasets.items(), start=1):
+            schema_entry = schema_metadata.get(name, {})
+            pk_field: str | None = schema_entry.get("primary_key") if enforce else None
+            location = (
+                f"mongodb://{self._host}:{self._port}"
+                f"/{self._database}/{name}"
+            )
+            t0 = time.monotonic()
+            collection = db[name]
+
+            try:
+                if not pk_field:
+                    # No PK — full replace with a warning.
+                    logger.warning(
+                        "[%s] No primary key in schema — falling back to full replace", name
+                    )
+                    collection.drop()
+                    docs: list[dict] = []
+                    if df.height > 0:
+                        date_cols = [c for c, dt in df.schema.items() if dt == pl.Date]
+                        if date_cols:
+                            df = df.with_columns(
+                                [pl.col(c).cast(pl.Datetime) for c in date_cols]
+                            )
+                        docs = df.to_dicts()
+                        collection.insert_many(docs)
+                    if enforce:
+                        self._create_indexes(collection, schema_entry)
+                    elapsed = time.monotonic() - t0
+                    logger.info(
+                        "[%s] full-replace wrote %d document(s) in %.2fs",
+                        name, len(docs), elapsed,
+                        extra={"progress": {"stage": "write", "current": i,
+                                            "total": total, "label": name}},
+                    )
+                    results.append(UpsertResult(
+                        dataset=name, location=location,
+                        rows_inserted=len(docs), rows_updated=0,
+                    ))
+                    continue
+
+                # PK available — upsert each document.
+                rows_inserted = 0
+                rows_updated = 0
+                if df.height > 0:
+                    date_cols = [c for c, dt in df.schema.items() if dt == pl.Date]
+                    if date_cols:
+                        df = df.with_columns(
+                            [pl.col(c).cast(pl.Datetime) for c in date_cols]
+                        )
+                    for doc in df.to_dicts():
+                        res = collection.replace_one(
+                            filter={pk_field: doc[pk_field]},
+                            replacement=doc,
+                            upsert=True,
+                        )
+                        if res.upserted_id is not None:
+                            rows_inserted += 1
+                        else:
+                            rows_updated += 1
+
+                # Ensure indexes exist (idempotent).
+                if enforce:
+                    self._create_indexes(collection, schema_entry)
+
+            except (LoadError, UpsertResult.__class__):
+                raise
+            except Exception as exc:
+                logger.error("[%s] upsert failed: %s", name, exc)
+                raise LoadError(
+                    f"Failed to upsert dataset {name!r} into collection "
+                    f"{name!r} in {self._database}@{self._host}: {exc}"
+                ) from exc
+
+            elapsed = time.monotonic() - t0
+            logger.info(
+                "[%s] upserted %d doc(s) (%d inserted, %d updated) in %.2fs",
+                name, df.height, rows_inserted, rows_updated, elapsed,
+                extra={"progress": {"stage": "write", "current": i,
+                                    "total": total, "label": name}},
+            )
+            results.append(UpsertResult(
+                dataset=name, location=location,
+                rows_inserted=rows_inserted, rows_updated=rows_updated,
+            ))
 
         return results
 

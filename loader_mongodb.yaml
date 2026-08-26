@@ -20,6 +20,6 @@ target:
 # Optional loader settings
 tables: []                  # empty = load every dataset in schema.json
                             # or specify a subset: [customers, orders]
-enforce_constraints: false   # set to false to skip PK/FK/UNIQUE enforcement
+enforce_constraints: false  # set to false to skip PK/FK/UNIQUE enforcement
 schema_required: false      # set to false if there is no schema.json at the source
                             # (datasets will be auto-discovered from *.parquet files)

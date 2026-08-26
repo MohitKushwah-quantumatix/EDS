@@ -209,8 +209,26 @@ class MySQLConnector(BaseSQLConnector):
         """Re-enable FK enforcement after all tables are written."""
         cursor.execute("SET FOREIGN_KEY_CHECKS = 1")
 
+    def _upsert_sql(self, table_name: str, df: pl.DataFrame, pk_col: str) -> str:
+        """MySQL: INSERT ... ON DUPLICATE KEY UPDATE ..."""
+        quoted_cols = ", ".join(self._quote(c) for c in df.columns)
+        non_pk = [c for c in df.columns if c != pk_col]
+        placeholders = ", ".join(["%s"] * len(df.columns))
+        if non_pk:
+            update_set = ", ".join(
+                f"{self._quote(c)} = VALUES({self._quote(c)})" for c in non_pk
+            )
+            on_dup = f"ON DUPLICATE KEY UPDATE {update_set}"
+        else:
+            # Only a PK column — treat duplicate as no-op.
+            on_dup = f"ON DUPLICATE KEY UPDATE {self._quote(pk_col)} = {self._quote(pk_col)}"
+        return (
+            f"INSERT INTO {self._table_ref(table_name)} ({quoted_cols}) "
+            f"VALUES ({placeholders}) {on_dup}"
+        )
+
     # _placeholder → "%s" (base default — correct for pymysql)
-    # _topological_sort, write_datasets, etc. — fully inherited
+    # _topological_sort, write_datasets, upsert_datasets — fully inherited
 
 
 # ---------------------------------------------------------------------------

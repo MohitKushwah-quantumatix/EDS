@@ -23,7 +23,7 @@ from typing import Any
 import polars as pl
 
 from eds_loader._logging import get_logger
-from eds_loader.connectors.base import WriteResult
+from eds_loader.connectors.base import UpsertResult, WriteResult
 from eds_loader.exceptions import ConfigError, LoadError
 
 logger = get_logger(__name__)
@@ -120,6 +120,41 @@ class BaseSQLConnector(abc.ABC):
         """Return the location URL string for a :class:`~eds_loader.connectors.base.WriteResult`.
 
         Example: ``'postgres://host:5432/mydb/public.customers'``
+        """
+
+    @abc.abstractmethod
+    def _upsert_sql(self, table_name: str, df: pl.DataFrame, pk_col: str) -> str:
+        """Return dialect-specific UPSERT SQL for bulk ``executemany``.
+
+        The SQL must accept exactly ``len(df.columns)`` positional parameters
+        (one per column, in ``df.columns`` order) and perform an INSERT when
+        the primary key is new or an UPDATE of non-PK columns when it exists.
+
+        Postgres::
+
+            INSERT INTO "s"."t" (c1, c2, ...) VALUES (%s, %s, ...)
+            ON CONFLICT (pk) DO UPDATE SET c2 = EXCLUDED.c2, ...
+
+        MySQL::
+
+            INSERT INTO `db`.`t` (c1, c2, ...) VALUES (%s, %s, ...)
+            ON DUPLICATE KEY UPDATE c2 = VALUES(c2), ...
+
+        MSSQL::
+
+            MERGE [s].[t] AS target
+            USING (VALUES (?,?,...)) AS source (c1, c2, ...)
+            ON target.pk = source.pk
+            WHEN MATCHED THEN UPDATE SET target.c2 = source.c2, ...
+            WHEN NOT MATCHED THEN INSERT (c1, c2, ...) VALUES (source.c1, ...);
+
+        Args:
+            table_name: Unquoted target table name.
+            df: DataFrame whose columns define the SQL.
+            pk_col: Name of the primary key column.
+
+        Returns:
+            A parameterised SQL string ready for ``cursor.executemany``.
         """
 
     # ------------------------------------------------------------------
@@ -488,3 +523,198 @@ class BaseSQLConnector(abc.ABC):
             raise write_error
 
         return [results_map[n] for n in names]
+
+    # ------------------------------------------------------------------
+    # Upsertable interface — incremental / delta load
+    # ------------------------------------------------------------------
+
+    def _count_rows(self, conn: Any, table_name: str) -> int:
+        """Return the current row count of *table_name* (best-effort).
+
+        Returns ``0`` if the table does not exist or the query fails.
+        """
+        try:
+            with conn.cursor() as cur:
+                cur.execute(f"SELECT COUNT(*) FROM {self._table_ref(table_name)}")
+                row = cur.fetchone()
+                return int(row[0]) if row else 0
+        except Exception:
+            return 0
+
+    def _create_if_not_exists_sql(self, name: str, df: pl.DataFrame,
+                                  schema_entry: dict, enforce: bool) -> str:
+        """Return a CREATE TABLE IF NOT EXISTS statement for *name*.
+
+        Default implementation uses standard SQL ``CREATE TABLE IF NOT EXISTS``.
+        MSSQL overrides this because T-SQL lacks that syntax.
+        """
+        col_defs = self._build_column_defs(df, schema_entry, enforce)
+        return (
+            f"CREATE TABLE IF NOT EXISTS {self._table_ref(name)} (\n"
+            f"    {col_defs}\n"
+            f")"
+        )
+
+    def _bulk_upsert(
+        self,
+        cursor: Any,
+        table_name: str,
+        df: pl.DataFrame,
+        upsert_sql: str,
+    ) -> None:
+        """Execute *upsert_sql* for every row in *df* via ``executemany``.
+
+        Subclasses can override to set driver-specific flags before the call
+        (e.g. ``cursor.fast_executemany = True`` for pyodbc).
+        """
+        if df.height == 0:
+            return
+        cursor.executemany(upsert_sql, df.rows())
+
+    def upsert_datasets(
+        self,
+        datasets: dict[str, pl.DataFrame],
+        schema_metadata: dict[str, Any],
+    ) -> list[UpsertResult]:
+        """Upsert datasets using dialect-specific INSERT … ON CONFLICT / MERGE.
+
+        For each dataset:
+
+        1. ``CREATE TABLE IF NOT EXISTS`` — preserves existing data.
+        2. Count rows before the upsert.
+        3. Execute :meth:`_upsert_sql` via ``executemany`` → ``COMMIT``.
+        4. Count rows after to derive ``rows_inserted``;
+           ``rows_updated = total_upserted - rows_inserted``.
+
+        Datasets without a ``primary_key`` in *schema_metadata* fall back to
+        a full replace for that dataset (with a logged warning).
+
+        Args:
+            datasets: Dataset name → Polars DataFrame.
+            schema_metadata: Parsed ``schema.json``.  Non-empty enables
+                constraint-derived DDL and PK-based upsert.
+
+        Returns:
+            One :class:`~eds_loader.connectors.base.UpsertResult` per
+            dataset in original *datasets* iteration order.
+
+        Raises:
+            ~eds_loader.exceptions.LoadError: Connection, DDL, or upsert error.
+        """
+        conn = self._connect()
+        logger.info(
+            "Connected to %s@%s:%s/%s for upsert",
+            self._user, self._host, self._port, self._database,
+            extra={"progress": {"stage": "connect_target",
+                                "label": f"{self._host}:{self._port}"}},
+        )
+
+        # Ensure the target namespace (schema/database) exists.
+        ns_sql = self._ensure_namespace_sql()
+        if ns_sql:
+            try:
+                with conn.cursor() as cur:
+                    cur.execute(ns_sql)
+                conn.commit()
+            except Exception as exc:
+                raise LoadError(
+                    f"Cannot ensure namespace in "
+                    f"{self._database}@{self._host}: {exc}"
+                ) from exc
+
+        enforce = bool(schema_metadata)
+        results: list[UpsertResult] = []
+        total = len(datasets)
+
+        for i, (name, df) in enumerate(datasets.items(), start=1):
+            schema_entry = schema_metadata.get(name, {})
+            pk_col: str | None = schema_entry.get("primary_key") if enforce else None
+            t0 = time.monotonic()
+
+            if not pk_col:
+                # No primary key — fall back to full replace for this dataset.
+                logger.warning(
+                    "[%s] No primary key in schema — falling back to full replace", name
+                )
+                try:
+                    with conn.cursor() as cur:
+                        cur.execute(self._drop_table_sql(name))
+                        col_defs = self._build_column_defs(df, schema_entry, enforce)
+                        create_sql = (
+                            f"CREATE TABLE {self._table_ref(name)} (\n"
+                            f"    {col_defs}\n)"
+                        )
+                        cur.execute(create_sql)
+                        self._bulk_insert(cur, name, df)
+                    conn.commit()
+                except Exception as exc:
+                    try:
+                        conn.rollback()
+                    except Exception:
+                        pass
+                    raise LoadError(
+                        f"Failed to full-replace dataset {name!r}: {exc}"
+                    ) from exc
+                elapsed = time.monotonic() - t0
+                logger.info(
+                    "[%s] full-replace wrote %d row(s) in %.2fs",
+                    name, df.height, elapsed,
+                    extra={"progress": {"stage": "write", "current": i,
+                                        "total": total, "label": name}},
+                )
+                results.append(UpsertResult(
+                    dataset=name,
+                    location=self._build_location(name),
+                    rows_inserted=df.height,
+                    rows_updated=0,
+                ))
+                continue
+
+            # Ensure the table exists without dropping it.
+            try:
+                with conn.cursor() as cur:
+                    create_if_sql = self._create_if_not_exists_sql(
+                        name, df, schema_entry, enforce
+                    )
+                    cur.execute(create_if_sql)
+                conn.commit()
+            except Exception as exc:
+                raise LoadError(
+                    f"Cannot ensure table {self._table_ref(name)} exists: {exc}"
+                ) from exc
+
+            rows_before = self._count_rows(conn, name)
+
+            upsert_sql = self._upsert_sql(name, df, pk_col)
+            try:
+                with conn.cursor() as cur:
+                    self._bulk_upsert(cur, name, df, upsert_sql)
+                conn.commit()
+            except Exception as exc:
+                try:
+                    conn.rollback()
+                except Exception:
+                    pass
+                raise LoadError(
+                    f"Failed to upsert dataset {name!r} into "
+                    f"{self._table_ref(name)}: {exc}"
+                ) from exc
+
+            rows_after = self._count_rows(conn, name)
+            rows_inserted = max(0, rows_after - rows_before)
+            rows_updated = max(0, df.height - rows_inserted)
+            elapsed = time.monotonic() - t0
+            logger.info(
+                "[%s] upserted %d row(s) (%d inserted, %d updated) in %.2fs",
+                name, df.height, rows_inserted, rows_updated, elapsed,
+                extra={"progress": {"stage": "write", "current": i,
+                                    "total": total, "label": name}},
+            )
+            results.append(UpsertResult(
+                dataset=name,
+                location=self._build_location(name),
+                rows_inserted=rows_inserted,
+                rows_updated=rows_updated,
+            ))
+
+        return results

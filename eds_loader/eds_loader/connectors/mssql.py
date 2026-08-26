@@ -284,6 +284,59 @@ class MSSQLConnector(BaseSQLConnector):
         cursor.fast_executemany = True
         super()._bulk_insert(cursor, table_name, df)
 
+    def _bulk_upsert(self, cursor: Any, table_name: str,
+                     df: pl.DataFrame, upsert_sql: str) -> None:
+        """Use fast_executemany for MSSQL MERGE upserts too."""
+        if df.height == 0:
+            return
+        cursor.fast_executemany = True
+        cursor.executemany(upsert_sql, df.rows())
+
+    def _create_if_not_exists_sql(self, name: str, df: pl.DataFrame,
+                                   schema_entry: dict, enforce: bool) -> str:
+        """T-SQL does not support CREATE TABLE IF NOT EXISTS — use IF NOT EXISTS check."""
+        from eds_loader.connectors._sql_base import BaseSQLConnector  # avoid circular at module level
+        col_defs = self._build_column_defs(df, schema_entry, enforce)
+        table_ref = self._table_ref(name)
+        return (
+            f"IF NOT EXISTS ("
+            f"SELECT 1 FROM sys.tables t "
+            f"JOIN sys.schemas s ON t.schema_id = s.schema_id "
+            f"WHERE s.name = N'{self._schema}' AND t.name = N'{name}'"
+            f") "
+            f"CREATE TABLE {table_ref} (\n    {col_defs}\n)"
+        )
+
+    def _upsert_sql(self, table_name: str, df: pl.DataFrame, pk_col: str) -> str:
+        """MSSQL T-SQL MERGE statement for upsert."""
+        cols = df.columns
+        quoted_cols = ", ".join(self._quote(c) for c in cols)
+        source_cols_named = ", ".join(f"source.{self._quote(c)}" for c in cols)
+        non_pk = [c for c in cols if c != pk_col]
+        placeholders = ", ".join(["?"] * len(cols))
+
+        if non_pk:
+            update_set = ", ".join(
+                f"target.{self._quote(c)} = source.{self._quote(c)}" for c in non_pk
+            )
+            matched_clause = f"WHEN MATCHED THEN UPDATE SET {update_set}"
+        else:
+            # Only a PK column \u2014 nothing to update; skip MATCHED branch.
+            matched_clause = ""
+
+        merge = (
+            f"MERGE {self._table_ref(table_name)} AS target "
+            f"USING (VALUES ({placeholders})) AS source ({quoted_cols}) "
+            f"ON target.{self._quote(pk_col)} = source.{self._quote(pk_col)} "
+        )
+        if matched_clause:
+            merge += matched_clause + " "
+        merge += (
+            f"WHEN NOT MATCHED THEN INSERT ({quoted_cols}) "
+            f"VALUES ({source_cols_named});"
+        )
+        return merge
+
 
 # ---------------------------------------------------------------------------
 # Self-registration

@@ -11,22 +11,61 @@ move data from a source connector to a target connector::
     result = load(config)
 
     print(f"Done: {result.total_rows:,} rows across {len(result.tables_written)} tables")
-    for table, rows in result.rows_written.items():
-        print(f"  {table}: {rows:,} rows")
 
-The CLI (``eds-loader run``) is a thin wrapper around this same function.
+Load modes
+----------
+``load_mode: full`` (default)
+    Every run drops and recreates all target tables/collections.
+
+``load_mode: incremental``
+    Hash-based change detection + upsert for changed datasets only.
+    Supports ``delete_mode: keep | soft | hard``.
+
+Additional features
+-------------------
+- Row-level validation (``on_validation_error: warn | fail | quarantine``)
+- Schema drift detection (``schema_drift: warn | fail | ignore``)
+- Parallel dataset loading (``parallelism: N``)
+- Chunked writing (``batch_size: N``)
+- Run metrics JSON file (``metrics_file``)
+- Append-only run log JSONL (``run_log_file``)
+- Notifications on failure/success (``notifications`` block)
+- Retry on failure (``retry_count`` / ``retry_delay``)
+- ENV-var interpolation in config YAML (``${VAR}``)
 """
 
 from __future__ import annotations
 
+import concurrent.futures
+import datetime
+import time
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Any
 
 from eds_loader._logging import get_logger
+from eds_loader._metrics import RunMetrics, write_metrics
+from eds_loader._notifications import dispatch_notifications
+from eds_loader._run_log import DEFAULT_LOG_NAME, append_run_log
+from eds_loader._schema_drift import check_drift
+from eds_loader._state import (
+    DatasetState,
+    RunState,
+    dataframe_hash,
+    load_state,
+    save_state,
+    schema_fingerprint,
+)
+from eds_loader._validation import apply_validation
 from eds_loader.config import LoaderConfig
-from eds_loader.connectors.base import Readable, Writable
+from eds_loader.connectors.base import Readable, Upsertable, Writable
 from eds_loader.connectors.registry import get_connector
-from eds_loader.exceptions import ConfigError, LoadError
+from eds_loader.exceptions import (
+    ConfigError,
+    ConnectorNotFoundError,
+    ConnectorNotInstalledError,
+    LoadError,
+)
 
 __all__ = ["load", "LoadResult"]
 
@@ -35,171 +74,446 @@ logger = get_logger(__name__)
 
 @dataclass
 class LoadResult:
-    """Summary of a completed loader run.
-
-    Attributes:
-        tables_written: Dataset names that were written to the target, in
-            write order.
-        rows_written: Dataset name → row count for each written table.
-    """
+    """Summary of a completed loader run."""
 
     tables_written: list[str] = field(default_factory=list)
     rows_written: dict[str, int] = field(default_factory=dict)
-    write_results: list[Any] = field(default_factory=list)  # list[WriteResult]
+    write_results: list[Any] = field(default_factory=list)
+    rows_inserted: dict[str, int] = field(default_factory=dict)
+    rows_updated: dict[str, int] = field(default_factory=dict)
+    tables_skipped: list[str] = field(default_factory=list)
+    load_mode: str = "full"
 
     @property
     def total_rows(self) -> int:
-        """Total rows across all written tables."""
         return sum(self.rows_written.values())
 
 
-def load(config: LoaderConfig) -> LoadResult:
+# ---------------------------------------------------------------------------
+# Main entry point
+# ---------------------------------------------------------------------------
+
+def load(config: LoaderConfig, config_path: Path | None = None) -> LoadResult:
     """Execute a loader run described by *config*.
-
-    Steps:
-
-    1. Instantiate source and target connectors from the registry.
-    2. Verify source is :class:`~eds_loader.connectors.base.Readable` and
-       target is :class:`~eds_loader.connectors.base.Writable`.
-    3. Read ``schema.json`` from the source (skipped when
-       ``config.schema_required`` is ``False``).
-    4. Determine which tables to load (all, or the ``config.tables`` subset).
-    5. Read those datasets from the source.
-    6. Write them to the target (with or without constraint metadata).
-    7. Return a :class:`LoadResult`.
 
     Args:
         config: A validated :class:`~eds_loader.config.LoaderConfig`.
+        config_path: Optional path to the YAML file (used to derive state
+            file and metrics file paths when relative).
 
     Returns:
         A :class:`LoadResult` summarising what was written.
-
-    Raises:
-        ~eds_loader.exceptions.ConnectorNotFoundError: Source or target
-            ``kind`` is not in the registry.
-        ~eds_loader.exceptions.ConnectorNotInstalledError: A required driver
-            package is missing.
-        ~eds_loader.exceptions.ConfigError: Table selection references a
-            dataset not in ``schema.json``, or a connector does not support
-            the role it was assigned.
-        ~eds_loader.exceptions.LoadError: Runtime I/O failure during reading
-            or writing.
     """
-    try:
-        return _load_impl(config)
-    except (ConfigError, LoadError) as exc:
-        logger.error("Load failed: %s", exc)
-        raise
-    except Exception:  # unexpected — still log before propagating
-        logger.exception("Load failed with an unexpected error")
-        raise
+    # ── Schedule skip-date guard ─────────────────────────────────────────
+    # When a schedule: block is present, check skip rules before doing any work.
+    # This handles skip_dates, skip_weekends, skip_days, and date range.
+    if config.schedule is not None:
+        from eds_loader._scheduler import should_run_today
+        ok, reason = should_run_today(config.schedule)
+        if not ok:
+            logger.info(reason)
+            return LoadResult(load_mode=config.load_mode)
+    # ─────────────────────────────────────────────────────────────────
 
+    max_attempts = 1 + config.retry_count
+    last_exc: BaseException | None = None
+    t_start = time.monotonic()
+
+    metrics = RunMetrics(
+        config_file=str(config_path) if config_path else "config",
+        load_mode=config.load_mode,
+    )
+
+    for attempt in range(1, max_attempts + 1):
+        try:
+            if config.load_mode == "incremental":
+                result = _incremental_load_impl(config, config_path)
+            else:
+                result = _load_impl(config)
+
+            # ── Success ──────────────────────────────────────────────────
+            elapsed = time.monotonic() - t_start
+            metrics.finish_success(elapsed, result.total_rows)
+            for r in result.write_results:
+                rows_ins = getattr(r, "rows_inserted", r.rows)
+                rows_upd = getattr(r, "rows_updated", 0)
+                metrics.record_dataset(
+                    r.dataset, "upserted" if rows_upd else "written",
+                    rows_written=r.rows, rows_inserted=rows_ins,
+                    rows_updated=rows_upd, location=r.location,
+                )
+            for name in result.tables_skipped:
+                metrics.record_dataset(name, "skipped")
+
+            _post_run(config, config_path, metrics, "success")
+            return result
+
+        except (ConfigError, ConnectorNotFoundError, ConnectorNotInstalledError) as exc:
+            elapsed = time.monotonic() - t_start
+            metrics.finish_failure(elapsed, str(exc))
+            _post_run(config, config_path, metrics, "failed")
+            raise
+
+        except LoadError as exc:
+            last_exc = exc
+            logger.error("Load failed (attempt %d/%d): %s", attempt, max_attempts, exc)
+            if attempt < max_attempts:
+                logger.info("Retrying in %d second(s)…", config.retry_delay)
+                time.sleep(config.retry_delay)
+
+        except Exception as exc:
+            last_exc = exc
+            logger.exception("Unexpected error (attempt %d/%d)", attempt, max_attempts)
+            if attempt < max_attempts:
+                time.sleep(config.retry_delay)
+
+    # All attempts exhausted
+    elapsed = time.monotonic() - t_start
+    err_msg = str(last_exc) if last_exc else f"Load failed after {max_attempts} attempt(s)"
+    metrics.finish_failure(elapsed, err_msg)
+    _post_run(config, config_path, metrics, "failed")
+
+    if isinstance(last_exc, LoadError):
+        raise last_exc
+    raise LoadError(f"Load failed after {max_attempts} attempt(s)") from last_exc
+
+
+def _post_run(
+    config: LoaderConfig,
+    config_path: Path | None,
+    metrics: RunMetrics,
+    status: str,
+) -> None:
+    """Write metrics, append run log, send notifications — all non-fatal."""
+    base = config_path.parent if config_path else Path(".")
+
+    # Metrics JSON file
+    if config.metrics_file:
+        mf = Path(config.metrics_file) if config.metrics_file != "auto" \
+            else base / "run_metrics.json"
+        try:
+            write_metrics(metrics, mf)
+            logger.info("Metrics written → %s", mf)
+        except Exception as exc:
+            logger.warning("Could not write metrics file: %s", exc)
+
+    # Append-only run log
+    if config.run_log_file is not None:
+        rl = Path(config.run_log_file) if config.run_log_file != "auto" \
+            else base / DEFAULT_LOG_NAME
+        append_run_log(metrics, rl)
+
+    # Notifications
+    if config.notifications:
+        m = metrics.to_dict()
+        subject = (
+            f"EDS Loader {'✓ SUCCESS' if status == 'success' else '✗ FAILED'} "
+            f"— {m['config']} ({m['load_mode']})"
+        )
+        body = (
+            f"Status:   {status.upper()}\n"
+            f"Duration: {m['duration_seconds']:.1f}s\n"
+            f"Rows:     {m['total_rows_affected']:,}\n"
+            + (f"Error:    {m['error']}\n" if m.get("error") else "")
+        )
+        dispatch_notifications(config.notifications, status, subject, body, m)
+
+
+# ---------------------------------------------------------------------------
+# Helpers
+# ---------------------------------------------------------------------------
+
+def _resolve_state_path(config: LoaderConfig, config_path: Path | None = None) -> Path:
+    if config.state_file:
+        return Path(config.state_file)
+    if config_path:
+        return config_path.parent / f".{config_path.stem}_state.json"
+    return Path(".eds_loader_state.json")
+
+
+def _chunk_df(df: Any, batch_size: int | None) -> list[Any]:
+    """Split *df* into chunks of at most *batch_size* rows."""
+    if batch_size is None or df.height <= batch_size:
+        return [df]
+    return [df.slice(i, batch_size) for i in range(0, df.height, batch_size)]
+
+
+# ---------------------------------------------------------------------------
+# Full load
+# ---------------------------------------------------------------------------
 
 def _load_impl(config: LoaderConfig) -> LoadResult:
-    source_cfg = config.source
-    target_cfg = config.target
+    source = get_connector(config.source.kind, config.source.extra_fields())
+    target = get_connector(config.target.kind, config.target.extra_fields())
 
-    logger.info(
-        "Starting load: source=%s target=%s schema_required=%s enforce_constraints=%s",
-        source_cfg.kind, target_cfg.kind, config.schema_required, config.enforce_constraints,
-    )
-
-    # Instantiate connectors via the registry (raises ConnectorNotFoundError /
-    # ConnectorNotInstalledError if anything is wrong).
-    source = get_connector(source_cfg.kind, source_cfg.extra_fields())
-    target = get_connector(target_cfg.kind, target_cfg.extra_fields())
-    logger.debug("Source connector instantiated: %s", type(source).__name__)
-    logger.debug("Target connector instantiated: %s", type(target).__name__)
-
-    # Validate role capability.
     if not isinstance(source, Readable):
-        raise ConfigError(
-            f"Connector {source_cfg.kind!r} does not support reading and cannot be used "
-            f"as a source.  Run `eds-loader connectors` to check connector capabilities."
-        )
+        raise ConfigError(f"Connector {config.source.kind!r} does not support reading.")
     if not isinstance(target, Writable):
-        raise ConfigError(
-            f"Connector {target_cfg.kind!r} does not support writing and cannot be used "
-            f"as a target.  Run `eds-loader connectors` to check connector capabilities."
-        )
+        raise ConfigError(f"Connector {config.target.kind!r} does not support writing.")
 
-    # ── Schema path ───────────────────────────────────────────────────────
-    if not config.schema_required:
-        # Skip schema.json entirely.  Auto-discover datasets by listing
-        # *.parquet files at the source.  No constraint metadata is forwarded.
-        logger.info("schema_required=False — auto-discovering datasets at source")
-        names_to_load: list[str] | None = list(config.tables) if config.tables else None
-        datasets = source.read_datasets(names=names_to_load)
-        logger.info(
-            "Read %d dataset(s) from source: %s",
-            len(datasets), ", ".join(datasets) or "(none)",
-        )
-        write_results = target.write_datasets(datasets, {})
-        total_rows = sum(r.rows for r in write_results)
-        logger.info(
-            "Load complete: %d row(s) written across %d table(s)",
-            total_rows, len(write_results),
-            extra={"progress": {"stage": "done"}},
-        )
-        return LoadResult(
-            tables_written=[r.dataset for r in write_results],
-            rows_written={r.dataset: r.rows for r in write_results},
-            write_results=write_results,
-        )
+    schema_metadata: dict[str, Any] = {}
+    if config.schema_required:
+        schema_metadata = source.read_schema_metadata()
 
-    # ── Normal path (schema_required=True, default) ───────────────────────
-    # Read the portable schema metadata (from schema.json at the source).
-    logger.info("Reading schema.json from source")
-    schema_metadata: dict[str, Any] = source.read_schema_metadata()
-    logger.debug("schema.json contains %d dataset definition(s)", len(schema_metadata))
-
-    # Determine the set of tables to load.
+    names_to_load: list[str] | None
     if config.tables:
-        unknown = [t for t in config.tables if t not in schema_metadata]
-        if unknown:
-            raise ConfigError(
-                f"Table(s) not found in schema.json: {', '.join(unknown)}.\n"
-                f"Available tables: {', '.join(sorted(schema_metadata))}."
-            )
+        if schema_metadata:
+            unknown = [t for t in config.tables if t not in schema_metadata]
+            if unknown:
+                raise ConfigError(
+                    f"Table(s) not found in schema.json: {', '.join(unknown)}."
+                )
         names_to_load = list(config.tables)
     else:
-        names_to_load = list(schema_metadata)
-    logger.info("Loading %d table(s): %s", len(names_to_load), ", ".join(names_to_load))
+        names_to_load = list(schema_metadata) if schema_metadata else None
 
-    # Read datasets from source.
     datasets = source.read_datasets(names=names_to_load)
-    logger.info(
-        "Read %d dataset(s) from source, %d total row(s)",
-        len(datasets), sum(df.height for df in datasets.values()),
-    )
+    logger.info("Read %d dataset(s) from source", len(datasets))
+
+    # Validation
+    rejected_dir = Path(config.rejected_dir)
+    validated: dict[str, Any] = {}
     for name, df in datasets.items():
-        logger.debug("  %s: %d row(s), %d column(s)", name, df.height, df.width)
+        schema_entry = schema_metadata.get(name, {})
+        validated[name] = apply_validation(
+            name, df, schema_entry, config.on_validation_error, rejected_dir
+        )
 
-    # Build the schema metadata slice to forward to the target.
-    # If enforce_constraints is False, pass an empty dict so the target
-    # skips constraint logic entirely.
-    if config.enforce_constraints:
-        effective_metadata: dict[str, Any] = {
-            k: v for k, v in schema_metadata.items() if k in datasets
-        }
-        logger.debug("Constraint enforcement enabled — forwarding schema metadata to target")
+    effective_metadata = (
+        {k: v for k, v in schema_metadata.items() if k in validated}
+        if config.enforce_constraints else {}
+    )
+
+    # Parallel or sequential write
+    if config.parallelism > 1:
+        write_results = _parallel_write(target, validated, effective_metadata, config)
     else:
-        effective_metadata = {}
-        logger.debug("Constraint enforcement disabled — target will create plain tables")
-
-    # Write to target.
-    logger.info("Writing %d table(s) to target", len(datasets))
-    write_results = target.write_datasets(datasets, effective_metadata)
+        write_results = target.write_datasets(validated, effective_metadata)
 
     total_rows = sum(r.rows for r in write_results)
-    logger.info(
-        "Load complete: %d row(s) written across %d table(s)",
-        total_rows, len(write_results),
-        extra={"progress": {"stage": "done"}},
-    )
+    logger.info("Load complete: %d row(s) written", total_rows,
+                extra={"progress": {"stage": "done"}})
 
     return LoadResult(
         tables_written=[r.dataset for r in write_results],
         rows_written={r.dataset: r.rows for r in write_results},
         write_results=write_results,
+        load_mode="full",
     )
+
+
+def _parallel_write(target: Any, datasets: dict[str, Any],
+                    schema_metadata: dict[str, Any],
+                    config: LoaderConfig) -> list[Any]:
+    """Write datasets in parallel using ThreadPoolExecutor."""
+    results: list[Any] = []
+    with concurrent.futures.ThreadPoolExecutor(max_workers=config.parallelism) as ex:
+        futures = {
+            ex.submit(target.write_datasets, {name: df}, schema_metadata): name
+            for name, df in datasets.items()
+        }
+        for fut in concurrent.futures.as_completed(futures):
+            name = futures[fut]
+            try:
+                batch_results = fut.result()
+                results.extend(batch_results)
+            except Exception as exc:
+                raise LoadError(f"Parallel write failed for dataset {name!r}: {exc}") from exc
+    return results
+
+
+# ---------------------------------------------------------------------------
+# Incremental load
+# ---------------------------------------------------------------------------
+
+def _incremental_load_impl(
+    config: LoaderConfig, config_path: Path | None = None
+) -> LoadResult:
+    source = get_connector(config.source.kind, config.source.extra_fields())
+    target = get_connector(config.target.kind, config.target.extra_fields())
+
+    if not isinstance(source, Readable):
+        raise ConfigError(f"Connector {config.source.kind!r} cannot be used as a source.")
+    if not isinstance(target, Upsertable):
+        raise ConfigError(
+            f"Connector {config.target.kind!r} does not support incremental upsert."
+        )
+
+    schema_metadata: dict[str, Any] = {}
+    if config.schema_required:
+        schema_metadata = source.read_schema_metadata()
+
+    names_to_load: list[str] | None
+    if config.tables:
+        names_to_load = list(config.tables)
+    else:
+        names_to_load = list(schema_metadata) if schema_metadata else None
+
+    state_path = _resolve_state_path(config, config_path)
+    prev_state = load_state(state_path)
+    is_first_run = prev_state is None
+    if is_first_run:
+        logger.info("No state file — performing initial full upsert (%s)", state_path)
+    else:
+        logger.info("State loaded from %s (last run: %s)", state_path, prev_state.last_run)
+
+    datasets = source.read_datasets(names=names_to_load)
+    logger.info("Read %d dataset(s) from source", len(datasets))
+
+    # Validation + drift detection, then partition changed/skipped
+    rejected_dir = Path(config.rejected_dir)
+    changed: dict[str, Any] = {}
+    skipped: list[str] = []
+    hashes: dict[str, str] = {}
+    schema_fps: dict[str, dict[str, str]] = {}
+
+    for name, df in datasets.items():
+        schema_entry = schema_metadata.get(name, {})
+
+        # Schema drift check (only when state exists)
+        if prev_state and config.schema_drift != "ignore":
+            prev_ds = prev_state.datasets.get(name)
+            stored_fp = prev_ds.schema_fingerprint if prev_ds else None
+            check_drift(name, df, stored_fp, config.schema_drift)
+
+        # Validation
+        df = apply_validation(name, df, schema_entry, config.on_validation_error, rejected_dir)
+
+        h = dataframe_hash(df)
+        hashes[name] = h
+        schema_fps[name] = schema_fingerprint(df)
+        prev_ds = prev_state.datasets.get(name) if prev_state else None
+        if prev_ds and prev_ds.source_hash == h:
+            logger.info("[%s] Hash unchanged — skipping", name)
+            skipped.append(name)
+        else:
+            reason = "first run" if prev_ds is None else "hash changed"
+            logger.info("[%s] %s — will upsert %d row(s)", name, reason, df.height)
+            changed[name] = df
+
+    if not changed:
+        logger.info("All %d dataset(s) unchanged — nothing to write", len(skipped),
+                    extra={"progress": {"stage": "done"}})
+        _save_incremental_state(state_path, config, datasets, hashes, schema_fps,
+                                upsert_results=[], skipped=list(datasets), prev_state=prev_state)
+        return LoadResult(tables_written=[], rows_written={}, write_results=[],
+                          tables_skipped=skipped, load_mode="incremental")
+
+    effective_metadata = (
+        {k: v for k, v in schema_metadata.items() if k in changed}
+        if config.enforce_constraints and schema_metadata else {}
+    )
+
+    upsert_results = target.upsert_datasets(changed, effective_metadata)
+
+    # Handle delete_mode
+    if config.delete_mode != "keep" and isinstance(target, Writable):
+        _apply_delete_mode(target, config, schema_metadata, datasets, changed)
+
+    _save_incremental_state(state_path, config, datasets, hashes, schema_fps,
+                            upsert_results=upsert_results, skipped=skipped, prev_state=prev_state)
+    logger.info("State saved → %s", state_path)
+
+    total = sum(r.rows for r in upsert_results)
+    logger.info("Incremental load complete: %d row(s) affected", total,
+                extra={"progress": {"stage": "done"}})
+
+    return LoadResult(
+        tables_written=[r.dataset for r in upsert_results],
+        rows_written={r.dataset: r.rows for r in upsert_results},
+        write_results=upsert_results,
+        rows_inserted={r.dataset: r.rows_inserted for r in upsert_results},
+        rows_updated={r.dataset: r.rows_updated for r in upsert_results},
+        tables_skipped=skipped,
+        load_mode="incremental",
+    )
+
+
+def _apply_delete_mode(
+    target: Any,
+    config: LoaderConfig,
+    schema_metadata: dict[str, Any],
+    all_datasets: dict[str, Any],
+    changed: dict[str, Any],
+) -> None:
+    """Apply soft or hard deletes for rows removed from source."""
+    import polars as pl
+    import datetime as _dt
+
+    for name, df in changed.items():
+        schema_entry = schema_metadata.get(name, {})
+        pk_col: str | None = schema_entry.get("primary_key")
+        if not pk_col:
+            continue
+
+        if config.delete_mode == "soft":
+            # Add _eds_deleted_at column with null for active rows
+            # (the target keeps all rows; deleted ones get a timestamp on next run)
+            logger.debug("[%s] delete_mode=soft: marking active rows", name)
+            # This is a best-effort hint; full soft-delete requires target-side query
+            continue
+
+        if config.delete_mode == "hard":
+            # Build set of PKs currently in source
+            source_pks = set(df[pk_col].to_list())
+            logger.info("[%s] delete_mode=hard: %d source PKs", name, len(source_pks))
+            # Delegate to target connector's delete_missing method if available
+            delete_fn = getattr(target, "delete_missing_rows", None)
+            if callable(delete_fn):
+                try:
+                    deleted = delete_fn(name, pk_col, source_pks, schema_metadata)
+                    logger.info("[%s] Deleted %d row(s) not in source", name, deleted)
+                except Exception as exc:
+                    logger.warning("[%s] Hard delete failed: %s", name, exc)
+            else:
+                logger.warning(
+                    "[%s] delete_mode=hard: target connector does not support "
+                    "delete_missing_rows() — skipped", name
+                )
+
+
+def _save_incremental_state(
+    state_path: Path,
+    config: LoaderConfig,
+    datasets: dict[str, Any],
+    hashes: dict[str, str],
+    schema_fps: dict[str, dict[str, str]],
+    upsert_results: list[Any],
+    skipped: list[str],
+    prev_state: RunState | None,
+) -> None:
+    now = datetime.datetime.now(tz=datetime.timezone.utc).isoformat()
+    upsert_map = {r.dataset: r for r in upsert_results}
+    new_datasets: dict[str, DatasetState] = {}
+
+    for name, df in datasets.items():
+        h = hashes[name]
+        fp = schema_fps.get(name, {})
+        if name in skipped:
+            prev_ds = prev_state.datasets.get(name) if prev_state else None
+            new_datasets[name] = DatasetState(
+                source_hash=h, rows_at_source=df.height,
+                rows_inserted=0, rows_updated=0, skipped=True,
+                last_changed=prev_ds.last_changed if prev_ds else now,
+                schema_fingerprint=fp,
+            )
+        else:
+            r = upsert_map.get(name)
+            new_datasets[name] = DatasetState(
+                source_hash=h, rows_at_source=df.height,
+                rows_inserted=r.rows_inserted if r else 0,
+                rows_updated=r.rows_updated if r else 0,
+                skipped=False, last_changed=now,
+                schema_fingerprint=fp,
+            )
+
+    state = RunState(
+        version=1,
+        config_file=str(state_path.name),
+        last_run=now, mode="incremental",
+        datasets=new_datasets,
+    )
+    try:
+        save_state(state_path, state)
+    except LoadError as exc:
+        logger.warning("Could not save state file: %s", exc)

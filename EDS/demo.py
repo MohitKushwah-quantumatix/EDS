@@ -30,8 +30,8 @@ small = config.model_copy(
 )
 
 project = create_project(Path("./my-shop"), name="Demo Shop", domain="retail", seed=42)
-clock = create_clock(date(2026, 1, 1), end=date(2026, 1, 3))
-run = create_run(project, clock, RunConfiguration(stop_condition=AfterTicks(3)))
+clock = create_clock(date(2026, 1, 1), end=date(2026, 1, 5))
+run = create_run(project, clock, RunConfiguration(stop_condition=AfterTicks(5)))
 
 report = execute(run, RetailExecutor(config=small))
 
