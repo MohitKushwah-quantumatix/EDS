@@ -72,9 +72,9 @@ def run_cron_scheduler(config: dict[str, Any]) -> None:
         
         if i > current_day:
             wait_seconds = interval_minutes * 60
-            next_run = datetime.now() + timedelta(seconds=wait_seconds)
+            next_sim_date = start_date + timedelta(days=i)
             print(f"Waiting {interval_minutes} minutes until next run...")
-            print(f"Next run scheduled at: {next_run.strftime('%Y-%m-%d %H:%M:%S')}")
+            print(f"Next run scheduled at: {next_sim_date.isoformat()}")
             time.sleep(wait_seconds)
         
         try:

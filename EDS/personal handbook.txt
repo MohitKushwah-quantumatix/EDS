@@ -171,3 +171,10 @@ Setup	                None	                                    Install Java, dow
 Performance	            Excellent for TBs (with proper tuning)	    Good
 In-memory mode	        :memory:	                                jdbc:h2:mem:
 JSON backup	            Easy (pandas/Polars)	                    More complex
+
+
+
+Switching domains: Just change domain and project_dir in config.yaml:
+
+domain: retail        # or healthcare
+project_dir: my-shop  # or my-hospital

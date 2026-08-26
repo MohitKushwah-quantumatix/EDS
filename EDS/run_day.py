@@ -166,6 +166,7 @@ def _export_daily_data(adapter: SQLiteAdapter, project_dir: Path, domain: str, t
     output_dir.mkdir(parents=True, exist_ok=True)
 
     all_data = adapter.read_all()
+    master_tables = MASTER_DATA_TABLES.get(domain, set())
 
     schema = {}
 
@@ -178,8 +179,28 @@ def _export_daily_data(adapter: SQLiteAdapter, project_dir: Path, domain: str, t
 
         schema[name] = {col: str(dtype) for col, dtype in df.schema.items()}
 
+        if name in master_tables:
+            dest = output_dir / f"{name}.parquet"
+            df.write_parquet(dest, compression="snappy")
+            continue
+
+        date_col = _pick_date_column(df)
+        if date_col is None:
+            dest = output_dir / f"{name}.parquet"
+            df.write_parquet(dest, compression="snappy")
+            continue
+
+        col_type = str(df.schema[date_col]).lower()
+        if "datetime" in col_type:
+            filtered = df.filter(pl.col(date_col).dt.date().cast(pl.String) == target_date.isoformat())
+        else:
+            filtered = df.filter(pl.col(date_col).cast(pl.String) == target_date.isoformat())
+
+        if filtered.is_empty():
+            continue
+
         dest = output_dir / f"{name}.parquet"
-        df.write_parquet(dest, compression="snappy")
+        filtered.write_parquet(dest, compression="snappy")
 
     schema_path = project_dir / "schema.json"
     schema_path.write_text(json.dumps(schema, indent=2, default=str))
