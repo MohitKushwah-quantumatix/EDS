@@ -374,11 +374,13 @@ class LoaderConfig(BaseModel):
             "is automatically disabled (no schema metadata to forward)."
         ),
     )
-    load_mode: Literal["full", "incremental"] = Field(
+    load_mode: Literal["full", "incremental", "append"] = Field(
         default="full",
         description=(
-            "'full' = full replace every run (default). "
-            "'incremental' = hash-based change detection + upsert for changed datasets only."
+            "'full' = full replace every run (default): drop + recreate tables. "
+            "'incremental' = hash-based change detection + upsert for changed datasets only. "
+            "'append' = insert-only: table grows every run, existing rows are never touched. "
+            "Use append when source files contain only today's new rows."
         ),
     )
     state_file: str | None = Field(

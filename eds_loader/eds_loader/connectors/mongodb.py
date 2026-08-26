@@ -465,6 +465,77 @@ class MongoDBConnector:
 
         return results
 
+    # ------------------------------------------------------------------
+    # Appendable interface — append-only / growing-history load
+    # ------------------------------------------------------------------
+
+    def append_datasets(
+        self,
+        datasets: dict[str, pl.DataFrame],
+        schema_metadata: dict[str, Any],
+    ) -> list["AppendResult"]:
+        """Append documents to MongoDB collections without dropping existing data.
+
+        For each collection:
+
+        1. ``insert_many`` all documents unconditionally — no drop, no duplicates check.
+        2. Ensure indexes from schema.json exist (idempotent).
+
+        The collection grows with every run.
+
+        Args:
+            datasets:        Dataset name → Polars DataFrame of new documents.
+            schema_metadata: Parsed ``schema.json`` for index creation.
+
+        Returns:
+            One :class:`~eds_loader.connectors.base.AppendResult` per dataset.
+
+        Raises:
+            ~eds_loader.exceptions.LoadError: On connection or insert failure.
+        """
+        from eds_loader.connectors.base import AppendResult
+
+        if not _PYMONGO_AVAILABLE:
+            raise LoadError(
+                "pymongo is not installed. Run: pip install eds-loader[mongodb]"
+            )
+
+        db = self._connect()
+        enforce = bool(schema_metadata)
+        results: list[AppendResult] = []
+        total = len(datasets)
+
+        for i, (name, df) in enumerate(datasets.items(), start=1):
+            schema_entry = schema_metadata.get(name, {})
+            location = f"mongodb://{self._host}:{self._port}/{self._database}/{name}"
+            t0 = time.monotonic()
+
+            try:
+                collection = db[name]
+                if df.height > 0:
+                    docs = _sanitise_docs(df.to_dicts())
+                    collection.insert_many(docs, ordered=False)
+                if enforce:
+                    self._create_indexes(collection, schema_entry)
+            except Exception as exc:
+                logger.error("[%s] append failed: %s", name, exc)
+                raise LoadError(
+                    f"Failed to append dataset {name!r} into collection "
+                    f"{name!r} in {self._database}@{self._host}: {exc}"
+                ) from exc
+
+            elapsed = time.monotonic() - t0
+            logger.info(
+                "[%s] appended %d doc(s) in %.2fs", name, df.height, elapsed,
+                extra={"progress": {"stage": "write", "current": i,
+                                    "total": total, "label": name}},
+            )
+            results.append(AppendResult(
+                dataset=name, location=location, rows_appended=df.height,
+            ))
+
+        return results
+
 
 # ---------------------------------------------------------------------------
 # Self-registration

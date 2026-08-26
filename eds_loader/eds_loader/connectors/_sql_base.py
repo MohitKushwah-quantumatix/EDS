@@ -718,3 +718,105 @@ class BaseSQLConnector(abc.ABC):
             ))
 
         return results
+
+    # ------------------------------------------------------------------
+    # Appendable interface — append-only / growing-history load
+    # ------------------------------------------------------------------
+
+    def append_datasets(
+        self,
+        datasets: dict[str, pl.DataFrame],
+        schema_metadata: dict[str, Any],
+    ) -> list["AppendResult"]:
+        """Append rows to SQL tables without dropping or updating existing data.
+
+        For each dataset:
+
+        1. ``CREATE TABLE IF NOT EXISTS`` — preserves existing rows.
+        2. Bulk-``INSERT`` all rows from the DataFrame unconditionally.
+        3. Commit.
+
+        The table grows with every run.  No rows are ever deleted or updated.
+
+        Args:
+            datasets:        Dataset name → Polars DataFrame of new rows.
+            schema_metadata: Parsed ``schema.json``.  Empty dict skips
+                             constraint enforcement in DDL.
+
+        Returns:
+            One :class:`~eds_loader.connectors.base.AppendResult` per dataset.
+
+        Raises:
+            ~eds_loader.exceptions.LoadError: Connection, DDL, or insert error.
+        """
+        from eds_loader.connectors.base import AppendResult
+
+        conn = self._connect()
+        logger.info(
+            "Connected to %s@%s:%s/%s for append",
+            self._user, self._host, self._port, self._database,
+            extra={"progress": {"stage": "connect_target",
+                                "label": f"{self._host}:{self._port}"}},
+        )
+
+        # Ensure the target namespace exists.
+        ns_sql = self._ensure_namespace_sql()
+        if ns_sql:
+            try:
+                with conn.cursor() as cur:
+                    cur.execute(ns_sql)
+                conn.commit()
+            except Exception as exc:
+                raise LoadError(
+                    f"Cannot ensure namespace in {self._database}@{self._host}: {exc}"
+                ) from exc
+
+        enforce = bool(schema_metadata)
+        results: list[AppendResult] = []
+        total = len(datasets)
+
+        for i, (name, df) in enumerate(datasets.items(), start=1):
+            schema_entry = schema_metadata.get(name, {})
+            t0 = time.monotonic()
+
+            # Step 1: CREATE TABLE IF NOT EXISTS (no DROP).
+            try:
+                with conn.cursor() as cur:
+                    create_if_sql = self._create_if_not_exists_sql(
+                        name, df, schema_entry, enforce
+                    )
+                    cur.execute(create_if_sql)
+                conn.commit()
+            except Exception as exc:
+                raise LoadError(
+                    f"Cannot ensure table {self._table_ref(name)} exists: {exc}"
+                ) from exc
+
+            # Step 2: Plain INSERT (no conflict handling).
+            try:
+                with conn.cursor() as cur:
+                    self._bulk_insert(cur, name, df)
+                conn.commit()
+            except Exception as exc:
+                try:
+                    conn.rollback()
+                except Exception:
+                    pass
+                raise LoadError(
+                    f"Failed to append dataset {name!r} into "
+                    f"{self._table_ref(name)}: {exc}"
+                ) from exc
+
+            elapsed = time.monotonic() - t0
+            logger.info(
+                "[%s] appended %d row(s) in %.2fs", name, df.height, elapsed,
+                extra={"progress": {"stage": "write", "current": i,
+                                    "total": total, "label": name}},
+            )
+            results.append(AppendResult(
+                dataset=name,
+                location=self._build_location(name),
+                rows_appended=df.height,
+            ))
+
+        return results

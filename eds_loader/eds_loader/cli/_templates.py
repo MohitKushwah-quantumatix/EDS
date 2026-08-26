@@ -229,9 +229,13 @@ enforce_constraints: true   # apply PK / FK / UNIQUE constraints on the target (
 schema_required: true       # set to false if there is no schema.json at the source
                             # (datasets will be auto-discovered from *.parquet files)
 
-# Load mode: full (default) = complete replace every run.
-# incremental = hash-based change detection; only upsert changed datasets.
-load_mode: full             # full | incremental
+# Load mode:
+#   full        (default) — complete replace every run: DROP + CREATE + INSERT.
+#   incremental — hash-based change detection; only upsert changed datasets.
+#   append      — insert-only: never drops or updates existing rows.
+#                 Use when source files contain ONLY today's new rows and you
+#                 want the target DB to grow continuously, day by day.
+load_mode: full             # full | incremental | append
 
 # ---------------------------------------------------------------------------
 # Incremental load options (only used when load_mode: incremental)

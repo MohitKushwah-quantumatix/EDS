@@ -464,6 +464,86 @@ notifications:
 
 ---
 
+## 6.10 Append Mode — Growing History Load (v0.5+)
+
+Use `load_mode: append` when **new data files are generated every day** and you want
+the target database to **accumulate all history** — rows are only ever added, never deleted or overwritten.
+
+### When to use it
+
+| Situation | Use |
+|---|---|
+| Source files contain **only today's new rows** | `append` ✅ |
+| Source files contain ALL rows (full snapshot) | `full` or `incremental` |
+| You want complete history in the target DB | `append` ✅ |
+| You need to detect and handle changes to existing rows | `incremental` |
+
+### How to configure
+
+```yaml
+load_mode: append
+```
+
+That's all. No state file needed — append mode has no memory of previous runs.
+
+### How it works
+
+Every run:
+1. Read all datasets from source (the new day's files)
+2. Validate each dataset (same rules as full/incremental)
+3. **`CREATE TABLE IF NOT EXISTS`** — creates the table on the first run, does nothing on subsequent runs
+4. **Plain `INSERT`** all rows — no DROP, no UPDATE, no conflict check
+
+```
+Day 1 file: 500 rows  →  INSERT 500 rows  →  Target: 500 rows
+Day 2 file: 500 rows  →  INSERT 500 rows  →  Target: 1,000 rows
+Day 3 file: 500 rows  →  INSERT 500 rows  →  Target: 1,500 rows
+Day 4 file: 500 rows  →  INSERT 500 rows  →  Target: 2,000 rows
+```
+
+> **The database grows continuously, day by day. All history is preserved.**
+
+### Important assumption
+
+> ⚠️ **Append mode trusts that source files contain only new rows.**
+>
+> If the same row appears in Day 1 and Day 2 files, it will be inserted **twice** into the target.
+> There is no duplicate detection.
+>
+> If your EDS generator produces **full snapshots** (all rows every day), use `load_mode: full` or `load_mode: incremental` instead.
+
+### Combine with schedule for fully automated daily ingestion
+
+```yaml
+load_mode: append
+
+schedule:
+  time: "02:00"
+  timezone: Asia/Kolkata
+  frequency: daily
+  skip_weekends: true
+  skip_dates:
+    - "2026-10-02"   # Gandhi Jayanti
+    - "2026-10-24"   # Dussehra
+```
+
+Then register once:
+```bash
+eds-loader schedule -c loader.yaml
+```
+
+Every night at 02:00 IST (skipping weekends and holidays), the loader runs and appends that day's new rows into your database automatically.
+
+### Supported targets
+
+All SQL-family connectors support append mode:
+- PostgreSQL, MySQL, MSSQL, SQLite, Oracle
+- MongoDB
+
+Storage connectors (local_fs, S3, Azure, GCS) fall back to full-write behaviour in append mode (they write a new file per run).
+
+---
+
 ## 7. Preview With Dry-Run
 
 See exactly what would be written without touching the target:

@@ -58,7 +58,7 @@ from eds_loader._state import (
 )
 from eds_loader._validation import apply_validation
 from eds_loader.config import LoaderConfig
-from eds_loader.connectors.base import Readable, Upsertable, Writable
+from eds_loader.connectors.base import Appendable, Readable, Upsertable, Writable
 from eds_loader.connectors.registry import get_connector
 from eds_loader.exceptions import (
     ConfigError,
@@ -128,6 +128,8 @@ def load(config: LoaderConfig, config_path: Path | None = None) -> LoadResult:
         try:
             if config.load_mode == "incremental":
                 result = _incremental_load_impl(config, config_path)
+            elif config.load_mode == "append":
+                result = _append_load_impl(config)
             else:
                 result = _load_impl(config)
 
@@ -426,6 +428,95 @@ def _incremental_load_impl(
         rows_updated={r.dataset: r.rows_updated for r in upsert_results},
         tables_skipped=skipped,
         load_mode="incremental",
+    )
+
+
+# ---------------------------------------------------------------------------
+# Append load
+# ---------------------------------------------------------------------------
+
+def _append_load_impl(config: LoaderConfig) -> LoadResult:
+    """Append-only load — inserts rows without ever dropping or updating existing data.
+
+    Every run:
+    1. Read all datasets from source.
+    2. Validate each dataset (same as full/incremental).
+    3. ``CREATE TABLE IF NOT EXISTS`` on target (first run only in practice).
+    4. Bulk-INSERT all rows unconditionally.
+
+    No state file is needed. The target table grows permanently with every run.
+
+    Args:
+        config: A validated :class:`~eds_loader.config.LoaderConfig` with
+                ``load_mode: append``.
+
+    Returns:
+        :class:`LoadResult` with ``load_mode='append'``.
+
+    Raises:
+        ~eds_loader.exceptions.ConfigError: If the target connector does not
+            implement :class:`~eds_loader.connectors.base.Appendable`.
+        ~eds_loader.exceptions.LoadError: On any read or write failure.
+    """
+    source = get_connector(config.source.kind, config.source.extra_fields())
+    target = get_connector(config.target.kind, config.target.extra_fields())
+
+    if not isinstance(source, Readable):
+        raise ConfigError(f"Connector {config.source.kind!r} cannot be used as a source.")
+    if not isinstance(target, Appendable):
+        raise ConfigError(
+            f"Connector {config.target.kind!r} does not support append mode. "
+            "Use a SQL-family connector (postgres, mysql, mssql, sqlite) or "
+            "MongoDB as the target."
+        )
+
+    schema_metadata: dict[str, Any] = {}
+    if config.schema_required:
+        schema_metadata = source.read_schema_metadata()
+
+    names_to_load: list[str] | None
+    if config.tables:
+        if schema_metadata:
+            unknown = [t for t in config.tables if t not in schema_metadata]
+            if unknown:
+                raise ConfigError(
+                    f"Table(s) not found in schema.json: {', '.join(unknown)}."
+                )
+        names_to_load = list(config.tables)
+    else:
+        names_to_load = list(schema_metadata) if schema_metadata else None
+
+    datasets = source.read_datasets(names=names_to_load)
+    logger.info("Read %d dataset(s) from source for append", len(datasets))
+
+    # Validation — same rules as full/incremental
+    rejected_dir = Path(config.rejected_dir)
+    validated: dict[str, Any] = {}
+    for name, df in datasets.items():
+        schema_entry = schema_metadata.get(name, {})
+        validated[name] = apply_validation(
+            name, df, schema_entry, config.on_validation_error, rejected_dir
+        )
+
+    effective_metadata = (
+        {k: v for k, v in schema_metadata.items() if k in validated}
+        if config.enforce_constraints else {}
+    )
+
+    append_results = target.append_datasets(validated, effective_metadata)
+
+    total_rows = sum(r.rows_appended for r in append_results)
+    logger.info(
+        "Append load complete: %d row(s) inserted across %d dataset(s)",
+        total_rows, len(append_results),
+        extra={"progress": {"stage": "done"}},
+    )
+
+    return LoadResult(
+        tables_written=[r.dataset for r in append_results],
+        rows_written={r.dataset: r.rows_appended for r in append_results},
+        write_results=append_results,
+        load_mode="append",
     )
 
 
