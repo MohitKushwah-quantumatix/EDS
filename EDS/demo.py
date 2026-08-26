@@ -35,8 +35,8 @@ small = config.model_copy(
 # it reaches the end date, so data is generated for the whole range and spreads
 # across it (instead of stopping after a fixed tick count).
 project = create_project(Path("./my-shop"), name="Demo Shop", domain="retail", seed=42)
-clock = create_clock(date(2026, 1, 1), end=date(2026, 3, 1))
-run = create_run(project, clock, RunConfiguration(stop_condition=EndOfPeriod()))
+clock = create_clock(date(2026, 1, 1), end=date(2026, 1, 5))
+run = create_run(project, clock, RunConfiguration(stop_condition=AfterTicks(5)))
 
 report = execute(run, RetailExecutor(config=small))
 

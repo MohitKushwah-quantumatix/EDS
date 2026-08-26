@@ -22,7 +22,7 @@ from typing import Any, Protocol, runtime_checkable
 
 import polars as pl
 
-__all__ = ["Readable", "Writable", "WriteResult"]
+__all__ = ["Readable", "Writable", "Upsertable", "Appendable", "WriteResult", "UpsertResult", "AppendResult"]
 
 
 @dataclass(frozen=True, slots=True)
@@ -48,6 +48,36 @@ class WriteResult:
             raise ValueError(f"WriteResult for {self.dataset!r} must record a location")
         if self.rows < 0:
             raise ValueError(f"WriteResult for {self.dataset!r} cannot have negative rows")
+
+
+@dataclass(frozen=True, slots=True)
+class UpsertResult:
+    """What one dataset became after an incremental upsert to the target.
+
+    Attributes:
+        dataset: The dataset name that was upserted (e.g. ``"orders"``).
+        location: Where it landed — same semantics as :attr:`WriteResult.location`.
+        rows_inserted: Net new rows that did not previously exist in the target.
+        rows_updated: Rows that already existed and were updated with new values.
+    """
+
+    dataset: str
+    location: str
+    rows_inserted: int
+    rows_updated: int
+
+    @property
+    def rows(self) -> int:
+        """Total rows affected (inserted + updated)."""
+        return self.rows_inserted + self.rows_updated
+
+    def __post_init__(self) -> None:
+        if not self.dataset.strip():
+            raise ValueError("UpsertResult must name its dataset")
+        if not self.location.strip():
+            raise ValueError(f"UpsertResult for {self.dataset!r} must record a location")
+        if self.rows_inserted < 0 or self.rows_updated < 0:
+            raise ValueError(f"UpsertResult for {self.dataset!r} cannot have negative row counts")
 
 
 @runtime_checkable
@@ -140,5 +170,129 @@ class Writable(Protocol):
         Raises:
             ~eds_loader.exceptions.LoadError: If any dataset cannot be
                 written (I/O error, constraint violation, etc.).
+        """
+        ...
+
+
+@runtime_checkable
+class Upsertable(Protocol):
+    """A connector that supports incremental upsert into an existing target.
+
+    Connectors that implement this protocol can be used as targets in
+    ``load_mode: incremental`` runs.  Instead of dropping and recreating
+    tables/collections, they merge new data with existing data using
+    primary-key-based ``INSERT ... ON CONFLICT`` / ``MERGE`` / ``replace_one``
+    semantics.
+
+    Connector classes satisfy this protocol structurally — no inheritance
+    required.
+    """
+
+    def upsert_datasets(
+        self,
+        datasets: dict[str, pl.DataFrame],
+        schema_metadata: dict[str, Any],
+    ) -> list[UpsertResult]:
+        """Upsert datasets into this target, merging with existing data.
+
+        For each dataset the connector must:
+
+        1. Ensure the target table / collection exists (create if missing).
+        2. For each row, ``INSERT`` if the primary key is new, ``UPDATE``
+           if it already exists.
+        3. Return one :class:`UpsertResult` per dataset with counts of
+           inserted vs updated rows.
+
+        Datasets without a primary key (empty ``schema_metadata`` or no
+        ``primary_key`` field) **must** fall back to a full replace for that
+        dataset and log a warning — they must not raise.
+
+        Args:
+            datasets: Dataset name → Polars DataFrame with the latest source
+                data for that dataset.
+            schema_metadata: Parsed ``schema.json`` contents.  Used to
+                obtain the primary key column name per dataset.
+
+        Returns:
+            One :class:`UpsertResult` per dataset in *datasets* iteration order.
+
+        Raises:
+            ~eds_loader.exceptions.LoadError: If any dataset cannot be
+                upserted (connection error, constraint violation, etc.).
+        """
+        ...
+
+
+@dataclass(frozen=True, slots=True)
+class AppendResult:
+    """What one dataset became after an append-only insert to the target.
+
+    Attributes:
+        dataset:       Dataset name that was appended (e.g. ``"orders"``).
+        location:      Where it landed — table name, file path, etc.
+        rows_appended: Number of rows inserted in this run.
+    """
+
+    dataset: str
+    location: str
+    rows_appended: int
+
+    @property
+    def rows(self) -> int:
+        """Alias for rows_appended — consistent with other result types."""
+        return self.rows_appended
+
+    def __post_init__(self) -> None:
+        if not self.dataset.strip():
+            raise ValueError("AppendResult must name its dataset")
+        if not self.location.strip():
+            raise ValueError(f"AppendResult for {self.dataset!r} must record a location")
+        if self.rows_appended < 0:
+            raise ValueError(
+                f"AppendResult for {self.dataset!r} cannot have negative rows_appended"
+            )
+
+
+@runtime_checkable
+class Appendable(Protocol):
+    """A connector that supports append-only inserts into an existing target.
+
+    Connectors that implement this protocol can be used as targets in
+    ``load_mode: append`` runs.  Unlike :class:`Writable` (which drops and
+    recreates) and :class:`Upsertable` (which merges by primary key),
+    :class:`Appendable` **only ever inserts** — it never deletes, updates,
+    or truncates existing data.  The target dataset grows with every run.
+
+    Connector classes satisfy this protocol structurally — no inheritance
+    required.
+    """
+
+    def append_datasets(
+        self,
+        datasets: dict[str, pl.DataFrame],
+        schema_metadata: dict[str, Any],
+    ) -> list[AppendResult]:
+        """Append rows to the target without touching existing data.
+
+        For each dataset the connector must:
+
+        1. Ensure the target table / collection / file exists (create if
+           missing).
+        2. ``INSERT`` all rows from the DataFrame unconditionally — no
+           duplicate checking, no updates.
+        3. Return one :class:`AppendResult` per dataset with the count of
+           rows appended.
+
+        Args:
+            datasets:        Dataset name → Polars DataFrame of rows to insert.
+            schema_metadata: Parsed ``schema.json`` contents.  Used for DDL
+                             on first run (table creation). Pass ``{}`` to
+                             skip constraint enforcement.
+
+        Returns:
+            One :class:`AppendResult` per dataset in *datasets* iteration order.
+
+        Raises:
+            ~eds_loader.exceptions.LoadError: If any dataset cannot be appended.
         """
         ...

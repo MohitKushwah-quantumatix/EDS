@@ -1,0 +1,979 @@
+2026-08-21 11:28:38,385  INFO      eds_loader.cli.main  eds-loader run invoked (config=C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_run_exits_zero_on_success0\loader.yaml, dry_run=False)
+2026-08-21 11:28:38,399  INFO      eds_loader.cli.main  Config loaded: source=local_fs target=local_fs tables=(all) enforce_constraints=True schema_required=True
+2026-08-21 11:28:38,399  INFO      eds_loader.loader  Starting load: source=local_fs target=local_fs schema_required=True enforce_constraints=True
+2026-08-21 11:28:38,399  DEBUG     eds_loader.loader  Source connector instantiated: LocalFSConnector
+2026-08-21 11:28:38,399  DEBUG     eds_loader.loader  Target connector instantiated: LocalFSConnector
+2026-08-21 11:28:38,399  INFO      eds_loader.loader  Reading schema.json from source
+2026-08-21 11:28:38,399  DEBUG     eds_loader.connectors.local_fs  Reading schema.json from C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_run_exits_zero_on_success0\source\schema.json
+2026-08-21 11:28:38,413  DEBUG     eds_loader.connectors.local_fs  schema.json parsed: 2 dataset(s)
+2026-08-21 11:28:38,414  DEBUG     eds_loader.loader  schema.json contains 2 dataset definition(s)
+2026-08-21 11:28:38,414  INFO      eds_loader.loader  Loading 2 table(s): customers, orders
+2026-08-21 11:28:38,429  INFO      eds_loader.connectors.local_fs  Read customers: 3 row(s) from C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_run_exits_zero_on_success0\source\customers.parquet
+2026-08-21 11:28:38,437  INFO      eds_loader.connectors.local_fs  Read orders: 2 row(s) from C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_run_exits_zero_on_success0\source\orders.parquet
+2026-08-21 11:28:38,438  INFO      eds_loader.loader  Read 2 dataset(s) from source, 5 total row(s)
+2026-08-21 11:28:38,438  DEBUG     eds_loader.loader    customers: 3 row(s), 1 column(s)
+2026-08-21 11:28:38,438  DEBUG     eds_loader.loader    orders: 2 row(s), 1 column(s)
+2026-08-21 11:28:38,438  DEBUG     eds_loader.loader  Constraint enforcement enabled — forwarding schema metadata to target
+2026-08-21 11:28:38,438  INFO      eds_loader.loader  Writing 2 table(s) to target
+2026-08-21 11:28:38,439  INFO      eds_loader.connectors.local_fs  Wrote customers: 3 row(s) to C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_run_exits_zero_on_success0\target\customers.parquet
+2026-08-21 11:28:38,440  INFO      eds_loader.connectors.local_fs  Wrote orders: 2 row(s) to C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_run_exits_zero_on_success0\target\orders.parquet
+2026-08-21 11:28:38,440  DEBUG     eds_loader.connectors.local_fs  Merging schema.json at target
+2026-08-21 11:28:38,440  INFO      eds_loader.loader  Load complete: 5 row(s) written across 2 table(s)
+2026-08-21 11:28:38,440  INFO      eds_loader.cli.main  Run complete: 5 row(s) across 2 table(s) in 0.0s
+2026-08-21 11:28:38,450  INFO      eds_loader.cli.main  eds-loader run invoked (config=C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_run_prints_table_with_row0\loader.yaml, dry_run=False)
+2026-08-21 11:28:38,463  INFO      eds_loader.cli.main  Config loaded: source=local_fs target=local_fs tables=(all) enforce_constraints=True schema_required=True
+2026-08-21 11:28:38,464  INFO      eds_loader.loader  Starting load: source=local_fs target=local_fs schema_required=True enforce_constraints=True
+2026-08-21 11:28:38,464  DEBUG     eds_loader.loader  Source connector instantiated: LocalFSConnector
+2026-08-21 11:28:38,464  DEBUG     eds_loader.loader  Target connector instantiated: LocalFSConnector
+2026-08-21 11:28:38,464  INFO      eds_loader.loader  Reading schema.json from source
+2026-08-21 11:28:38,464  DEBUG     eds_loader.connectors.local_fs  Reading schema.json from C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_run_prints_table_with_row0\source\schema.json
+2026-08-21 11:28:38,466  DEBUG     eds_loader.connectors.local_fs  schema.json parsed: 2 dataset(s)
+2026-08-21 11:28:38,466  DEBUG     eds_loader.loader  schema.json contains 2 dataset definition(s)
+2026-08-21 11:28:38,466  INFO      eds_loader.loader  Loading 2 table(s): customers, orders
+2026-08-21 11:28:38,469  INFO      eds_loader.connectors.local_fs  Read customers: 3 row(s) from C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_run_prints_table_with_row0\source\customers.parquet
+2026-08-21 11:28:38,471  INFO      eds_loader.connectors.local_fs  Read orders: 2 row(s) from C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_run_prints_table_with_row0\source\orders.parquet
+2026-08-21 11:28:38,471  INFO      eds_loader.loader  Read 2 dataset(s) from source, 5 total row(s)
+2026-08-21 11:28:38,471  DEBUG     eds_loader.loader    customers: 3 row(s), 1 column(s)
+2026-08-21 11:28:38,471  DEBUG     eds_loader.loader    orders: 2 row(s), 1 column(s)
+2026-08-21 11:28:38,471  DEBUG     eds_loader.loader  Constraint enforcement enabled — forwarding schema metadata to target
+2026-08-21 11:28:38,471  INFO      eds_loader.loader  Writing 2 table(s) to target
+2026-08-21 11:28:38,472  INFO      eds_loader.connectors.local_fs  Wrote customers: 3 row(s) to C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_run_prints_table_with_row0\target\customers.parquet
+2026-08-21 11:28:38,473  INFO      eds_loader.connectors.local_fs  Wrote orders: 2 row(s) to C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_run_prints_table_with_row0\target\orders.parquet
+2026-08-21 11:28:38,473  DEBUG     eds_loader.connectors.local_fs  Merging schema.json at target
+2026-08-21 11:28:38,473  INFO      eds_loader.loader  Load complete: 5 row(s) written across 2 table(s)
+2026-08-21 11:28:38,473  INFO      eds_loader.cli.main  Run complete: 5 row(s) across 2 table(s) in 0.0s
+2026-08-21 11:28:38,483  INFO      eds_loader.cli.main  eds-loader run invoked (config=C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_run_prints_timing_in_seco0\loader.yaml, dry_run=False)
+2026-08-21 11:28:38,498  INFO      eds_loader.cli.main  Config loaded: source=local_fs target=local_fs tables=(all) enforce_constraints=True schema_required=True
+2026-08-21 11:28:38,498  INFO      eds_loader.loader  Starting load: source=local_fs target=local_fs schema_required=True enforce_constraints=True
+2026-08-21 11:28:38,498  DEBUG     eds_loader.loader  Source connector instantiated: LocalFSConnector
+2026-08-21 11:28:38,498  DEBUG     eds_loader.loader  Target connector instantiated: LocalFSConnector
+2026-08-21 11:28:38,498  INFO      eds_loader.loader  Reading schema.json from source
+2026-08-21 11:28:38,498  DEBUG     eds_loader.connectors.local_fs  Reading schema.json from C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_run_prints_timing_in_seco0\source\schema.json
+2026-08-21 11:28:38,499  DEBUG     eds_loader.connectors.local_fs  schema.json parsed: 2 dataset(s)
+2026-08-21 11:28:38,499  DEBUG     eds_loader.loader  schema.json contains 2 dataset definition(s)
+2026-08-21 11:28:38,499  INFO      eds_loader.loader  Loading 2 table(s): customers, orders
+2026-08-21 11:28:38,501  INFO      eds_loader.connectors.local_fs  Read customers: 3 row(s) from C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_run_prints_timing_in_seco0\source\customers.parquet
+2026-08-21 11:28:38,503  INFO      eds_loader.connectors.local_fs  Read orders: 2 row(s) from C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_run_prints_timing_in_seco0\source\orders.parquet
+2026-08-21 11:28:38,503  INFO      eds_loader.loader  Read 2 dataset(s) from source, 5 total row(s)
+2026-08-21 11:28:38,503  DEBUG     eds_loader.loader    customers: 3 row(s), 1 column(s)
+2026-08-21 11:28:38,503  DEBUG     eds_loader.loader    orders: 2 row(s), 1 column(s)
+2026-08-21 11:28:38,503  DEBUG     eds_loader.loader  Constraint enforcement enabled — forwarding schema metadata to target
+2026-08-21 11:28:38,503  INFO      eds_loader.loader  Writing 2 table(s) to target
+2026-08-21 11:28:38,505  INFO      eds_loader.connectors.local_fs  Wrote customers: 3 row(s) to C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_run_prints_timing_in_seco0\target\customers.parquet
+2026-08-21 11:28:38,506  INFO      eds_loader.connectors.local_fs  Wrote orders: 2 row(s) to C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_run_prints_timing_in_seco0\target\orders.parquet
+2026-08-21 11:28:38,506  DEBUG     eds_loader.connectors.local_fs  Merging schema.json at target
+2026-08-21 11:28:38,506  INFO      eds_loader.loader  Load complete: 5 row(s) written across 2 table(s)
+2026-08-21 11:28:38,506  INFO      eds_loader.cli.main  Run complete: 5 row(s) across 2 table(s) in 0.0s
+2026-08-21 11:28:38,515  INFO      eds_loader.cli.main  eds-loader run invoked (config=C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_run_table_has_location_co0\loader.yaml, dry_run=False)
+2026-08-21 11:28:38,528  INFO      eds_loader.cli.main  Config loaded: source=local_fs target=local_fs tables=(all) enforce_constraints=True schema_required=True
+2026-08-21 11:28:38,528  INFO      eds_loader.loader  Starting load: source=local_fs target=local_fs schema_required=True enforce_constraints=True
+2026-08-21 11:28:38,528  DEBUG     eds_loader.loader  Source connector instantiated: LocalFSConnector
+2026-08-21 11:28:38,528  DEBUG     eds_loader.loader  Target connector instantiated: LocalFSConnector
+2026-08-21 11:28:38,528  INFO      eds_loader.loader  Reading schema.json from source
+2026-08-21 11:28:38,528  DEBUG     eds_loader.connectors.local_fs  Reading schema.json from C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_run_table_has_location_co0\source\schema.json
+2026-08-21 11:28:38,530  DEBUG     eds_loader.connectors.local_fs  schema.json parsed: 2 dataset(s)
+2026-08-21 11:28:38,530  DEBUG     eds_loader.loader  schema.json contains 2 dataset definition(s)
+2026-08-21 11:28:38,530  INFO      eds_loader.loader  Loading 2 table(s): customers, orders
+2026-08-21 11:28:38,533  INFO      eds_loader.connectors.local_fs  Read customers: 3 row(s) from C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_run_table_has_location_co0\source\customers.parquet
+2026-08-21 11:28:38,534  INFO      eds_loader.connectors.local_fs  Read orders: 2 row(s) from C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_run_table_has_location_co0\source\orders.parquet
+2026-08-21 11:28:38,535  INFO      eds_loader.loader  Read 2 dataset(s) from source, 5 total row(s)
+2026-08-21 11:28:38,535  DEBUG     eds_loader.loader    customers: 3 row(s), 1 column(s)
+2026-08-21 11:28:38,535  DEBUG     eds_loader.loader    orders: 2 row(s), 1 column(s)
+2026-08-21 11:28:38,535  DEBUG     eds_loader.loader  Constraint enforcement enabled — forwarding schema metadata to target
+2026-08-21 11:28:38,535  INFO      eds_loader.loader  Writing 2 table(s) to target
+2026-08-21 11:28:38,536  INFO      eds_loader.connectors.local_fs  Wrote customers: 3 row(s) to C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_run_table_has_location_co0\target\customers.parquet
+2026-08-21 11:28:38,537  INFO      eds_loader.connectors.local_fs  Wrote orders: 2 row(s) to C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_run_table_has_location_co0\target\orders.parquet
+2026-08-21 11:28:38,537  DEBUG     eds_loader.connectors.local_fs  Merging schema.json at target
+2026-08-21 11:28:38,538  INFO      eds_loader.loader  Load complete: 5 row(s) written across 2 table(s)
+2026-08-21 11:28:38,538  INFO      eds_loader.cli.main  Run complete: 5 row(s) across 2 table(s) in 0.0s
+2026-08-21 11:28:38,543  INFO      eds_loader.cli.main  eds-loader run invoked (config=C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_run_missing_config_exits_0\nope.yaml, dry_run=False)
+2026-08-21 11:28:38,543  ERROR     eds_loader.cli.main  Config parse failed: Config file not found: C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_run_missing_config_exits_0\nope.yaml
+2026-08-21 11:28:38,549  INFO      eds_loader.cli.main  eds-loader run invoked (config=C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_run_invalid_yaml_exits_20\loader.yaml, dry_run=False)
+2026-08-21 11:28:38,561  ERROR     eds_loader.cli.main  Config parse failed: Config file C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_run_invalid_yaml_exits_20\loader.yaml is not valid YAML: while parsing a flow sequence
+  in "<unicode string>", line 1, column 9:
+    source: [unclosed
+            ^
+expected ',' or ']', but got '<stream end>'
+  in "<unicode string>", line 1, column 18:
+    source: [unclosed
+                     ^
+2026-08-21 11:28:38,568  INFO      eds_loader.cli.main  eds-loader run invoked (config=C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_run_unknown_connector_kin0\loader.yaml, dry_run=False)
+2026-08-21 11:28:38,586  INFO      eds_loader.cli.main  Config loaded: source=nosuchdb target=local_fs tables=(all) enforce_constraints=True schema_required=True
+2026-08-21 11:28:38,586  INFO      eds_loader.loader  Starting load: source=nosuchdb target=local_fs schema_required=True enforce_constraints=True
+2026-08-21 11:28:38,586  ERROR     eds_loader.loader  Load failed with an unexpected error
+Traceback (most recent call last):
+  File "C:\Users\Mohit Patel\Downloads\EDS\eds_loader\eds_loader\loader.py", line 89, in load
+    return _load_impl(config)
+  File "C:\Users\Mohit Patel\Downloads\EDS\eds_loader\eds_loader\loader.py", line 109, in _load_impl
+    source = get_connector(source_cfg.kind, source_cfg.extra_fields())
+  File "C:\Users\Mohit Patel\Downloads\EDS\eds_loader\eds_loader\connectors\registry.py", line 139, in get_connector
+    raise ConnectorNotFoundError(kind=kind, available=list(CONNECTORS))
+eds_loader.exceptions.ConnectorNotFoundError: Unknown connector kind 'nosuchdb'.
+Known connectors: azure_blob, gcs, local_fs, mongodb, mssql, mysql, postgres, remote_fs, s3.
+Run `eds-loader connectors` to see install status.
+2026-08-21 11:28:38,597  ERROR     eds_loader.cli.main  Configuration error: Unknown connector kind 'nosuchdb'.
+Known connectors: azure_blob, gcs, local_fs, mongodb, mssql, mysql, postgres, remote_fs, s3.
+Run `eds-loader connectors` to see install status.
+2026-08-21 11:28:38,607  INFO      eds_loader.cli.main  eds-loader run invoked (config=C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_run_load_error_exits_30\loader.yaml, dry_run=False)
+2026-08-21 11:28:38,623  INFO      eds_loader.cli.main  Config loaded: source=local_fs target=local_fs tables=(all) enforce_constraints=True schema_required=True
+2026-08-21 11:28:38,623  ERROR     eds_loader.cli.main  Load failed after 0.0s: disk full
+2026-08-21 11:28:38,632  INFO      eds_loader.cli.main  eds-loader run invoked (config=C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_dry_run_exits_zero0\loader.yaml, dry_run=True)
+2026-08-21 11:28:38,650  INFO      eds_loader.cli.main  Config loaded: source=local_fs target=local_fs tables=(all) enforce_constraints=True schema_required=True
+2026-08-21 11:28:38,650  DEBUG     eds_loader.connectors.local_fs  Reading schema.json from C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_dry_run_exits_zero0\source\schema.json
+2026-08-21 11:28:38,652  DEBUG     eds_loader.connectors.local_fs  schema.json parsed: 2 dataset(s)
+2026-08-21 11:28:38,652  INFO      eds_loader.cli.main  Dry-run: reading ['customers', 'orders'] dataset(s) from source
+2026-08-21 11:28:38,654  INFO      eds_loader.connectors.local_fs  Read customers: 3 row(s) from C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_dry_run_exits_zero0\source\customers.parquet
+2026-08-21 11:28:38,656  INFO      eds_loader.connectors.local_fs  Read orders: 2 row(s) from C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_dry_run_exits_zero0\source\orders.parquet
+2026-08-21 11:28:38,657  INFO      eds_loader.cli.main  Dry-run complete: 5 row(s) across 2 dataset(s)
+2026-08-21 11:28:38,666  INFO      eds_loader.cli.main  eds-loader run invoked (config=C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_dry_run_shows_dataset_nam0\loader.yaml, dry_run=True)
+2026-08-21 11:28:38,679  INFO      eds_loader.cli.main  Config loaded: source=local_fs target=local_fs tables=(all) enforce_constraints=True schema_required=True
+2026-08-21 11:28:38,679  DEBUG     eds_loader.connectors.local_fs  Reading schema.json from C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_dry_run_shows_dataset_nam0\source\schema.json
+2026-08-21 11:28:38,680  DEBUG     eds_loader.connectors.local_fs  schema.json parsed: 2 dataset(s)
+2026-08-21 11:28:38,681  INFO      eds_loader.cli.main  Dry-run: reading ['customers', 'orders'] dataset(s) from source
+2026-08-21 11:28:38,682  INFO      eds_loader.connectors.local_fs  Read customers: 3 row(s) from C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_dry_run_shows_dataset_nam0\source\customers.parquet
+2026-08-21 11:28:38,684  INFO      eds_loader.connectors.local_fs  Read orders: 2 row(s) from C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_dry_run_shows_dataset_nam0\source\orders.parquet
+2026-08-21 11:28:38,684  INFO      eds_loader.cli.main  Dry-run complete: 5 row(s) across 2 dataset(s)
+2026-08-21 11:28:38,693  INFO      eds_loader.cli.main  eds-loader run invoked (config=C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_dry_run_shows_total_rows0\loader.yaml, dry_run=True)
+2026-08-21 11:28:38,709  INFO      eds_loader.cli.main  Config loaded: source=local_fs target=local_fs tables=(all) enforce_constraints=True schema_required=True
+2026-08-21 11:28:38,709  DEBUG     eds_loader.connectors.local_fs  Reading schema.json from C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_dry_run_shows_total_rows0\source\schema.json
+2026-08-21 11:28:38,711  DEBUG     eds_loader.connectors.local_fs  schema.json parsed: 2 dataset(s)
+2026-08-21 11:28:38,711  INFO      eds_loader.cli.main  Dry-run: reading ['customers', 'orders'] dataset(s) from source
+2026-08-21 11:28:38,713  INFO      eds_loader.connectors.local_fs  Read customers: 3 row(s) from C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_dry_run_shows_total_rows0\source\customers.parquet
+2026-08-21 11:28:38,716  INFO      eds_loader.connectors.local_fs  Read orders: 2 row(s) from C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_dry_run_shows_total_rows0\source\orders.parquet
+2026-08-21 11:28:38,716  INFO      eds_loader.cli.main  Dry-run complete: 5 row(s) across 2 dataset(s)
+2026-08-21 11:28:38,726  INFO      eds_loader.cli.main  eds-loader run invoked (config=C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_dry_run_does_not_write_ta0\loader.yaml, dry_run=True)
+2026-08-21 11:28:38,747  INFO      eds_loader.cli.main  Config loaded: source=local_fs target=local_fs tables=(all) enforce_constraints=True schema_required=True
+2026-08-21 11:28:38,748  DEBUG     eds_loader.connectors.local_fs  Reading schema.json from C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_dry_run_does_not_write_ta0\source\schema.json
+2026-08-21 11:28:38,749  DEBUG     eds_loader.connectors.local_fs  schema.json parsed: 2 dataset(s)
+2026-08-21 11:28:38,749  INFO      eds_loader.cli.main  Dry-run: reading ['customers', 'orders'] dataset(s) from source
+2026-08-21 11:28:38,751  INFO      eds_loader.connectors.local_fs  Read customers: 3 row(s) from C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_dry_run_does_not_write_ta0\source\customers.parquet
+2026-08-21 11:28:38,752  INFO      eds_loader.connectors.local_fs  Read orders: 2 row(s) from C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_dry_run_does_not_write_ta0\source\orders.parquet
+2026-08-21 11:28:38,752  INFO      eds_loader.cli.main  Dry-run complete: 5 row(s) across 2 dataset(s)
+2026-08-21 11:28:38,762  INFO      eds_loader.cli.main  eds-loader run invoked (config=C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_dry_run_shows_dry_run_hea0\loader.yaml, dry_run=True)
+2026-08-21 11:28:38,769  INFO      eds_loader.cli.main  Config loaded: source=local_fs target=local_fs tables=(all) enforce_constraints=True schema_required=True
+2026-08-21 11:28:38,770  DEBUG     eds_loader.connectors.local_fs  Reading schema.json from C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_dry_run_shows_dry_run_hea0\source\schema.json
+2026-08-21 11:28:38,771  DEBUG     eds_loader.connectors.local_fs  schema.json parsed: 2 dataset(s)
+2026-08-21 11:28:38,771  INFO      eds_loader.cli.main  Dry-run: reading ['customers', 'orders'] dataset(s) from source
+2026-08-21 11:28:38,772  INFO      eds_loader.connectors.local_fs  Read customers: 3 row(s) from C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_dry_run_shows_dry_run_hea0\source\customers.parquet
+2026-08-21 11:28:38,774  INFO      eds_loader.connectors.local_fs  Read orders: 2 row(s) from C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_dry_run_shows_dry_run_hea0\source\orders.parquet
+2026-08-21 11:28:38,774  INFO      eds_loader.cli.main  Dry-run complete: 5 row(s) across 2 dataset(s)
+2026-08-21 11:28:38,784  INFO      eds_loader.cli.main  eds-loader run invoked (config=C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_dry_run_source_error_exit0\loader.yaml, dry_run=True)
+2026-08-21 11:28:38,800  INFO      eds_loader.cli.main  Config loaded: source=local_fs target=local_fs tables=(all) enforce_constraints=True schema_required=True
+2026-08-21 11:28:38,800  ERROR     eds_loader.cli.main  Dry-run read failed: source down
+2026-08-21 11:28:38,827  DEBUG     eds_loader.connectors.local_fs  Reading schema.json from C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_validate_good_config_exit0\source\schema.json
+2026-08-21 11:28:38,829  DEBUG     eds_loader.connectors.local_fs  schema.json parsed: 2 dataset(s)
+2026-08-21 11:28:38,859  DEBUG     eds_loader.connectors.local_fs  Reading schema.json from C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_validate_prints_checkmark0\source\schema.json
+2026-08-21 11:28:38,860  DEBUG     eds_loader.connectors.local_fs  schema.json parsed: 2 dataset(s)
+2026-08-21 11:28:38,878  DEBUG     eds_loader.connectors.local_fs  Reading schema.json from C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_validate_shows_dataset_co0\source\schema.json
+2026-08-21 11:28:38,880  DEBUG     eds_loader.connectors.local_fs  schema.json parsed: 2 dataset(s)
+2026-08-21 11:28:38,971  DEBUG     eds_loader.connectors.local_fs  Reading schema.json from C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_validate_shows_connector_0\source\schema.json
+2026-08-21 11:28:38,972  DEBUG     eds_loader.connectors.local_fs  schema.json parsed: 2 dataset(s)
+2026-08-21 11:28:39,366  INFO      eds_loader.loader  Starting load: source=gcs target=local_fs schema_required=True enforce_constraints=True
+2026-08-21 11:28:39,366  DEBUG     eds_loader.loader  Source connector instantiated: GCSConnector
+2026-08-21 11:28:39,366  DEBUG     eds_loader.loader  Target connector instantiated: LocalFSConnector
+2026-08-21 11:28:39,366  INFO      eds_loader.loader  Reading schema.json from source
+2026-08-21 11:28:39,366  DEBUG     eds_loader.loader  schema.json contains 2 dataset definition(s)
+2026-08-21 11:28:39,366  INFO      eds_loader.loader  Loading 2 table(s): customers, orders
+2026-08-21 11:28:39,369  INFO      eds_loader.loader  Read 2 dataset(s) from source, 5 total row(s)
+2026-08-21 11:28:39,369  DEBUG     eds_loader.loader    customers: 3 row(s), 1 column(s)
+2026-08-21 11:28:39,369  DEBUG     eds_loader.loader    orders: 2 row(s), 1 column(s)
+2026-08-21 11:28:39,369  DEBUG     eds_loader.loader  Constraint enforcement enabled — forwarding schema metadata to target
+2026-08-21 11:28:39,369  INFO      eds_loader.loader  Writing 2 table(s) to target
+2026-08-21 11:28:39,371  INFO      eds_loader.connectors.local_fs  Wrote customers: 3 row(s) to C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_integration_gcs_source_vi0\target\customers.parquet
+2026-08-21 11:28:39,372  INFO      eds_loader.connectors.local_fs  Wrote orders: 2 row(s) to C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_integration_gcs_source_vi0\target\orders.parquet
+2026-08-21 11:28:39,372  DEBUG     eds_loader.connectors.local_fs  Merging schema.json at target
+2026-08-21 11:28:39,373  INFO      eds_loader.loader  Load complete: 5 row(s) written across 2 table(s)
+2026-08-21 11:28:39,376  INFO      eds_loader.loader  Starting load: source=mock_source target=mock_target schema_required=True enforce_constraints=True
+2026-08-21 11:28:39,376  DEBUG     eds_loader.loader  Source connector instantiated: MagicMock
+2026-08-21 11:28:39,376  DEBUG     eds_loader.loader  Target connector instantiated: MagicMock
+2026-08-21 11:28:39,376  INFO      eds_loader.loader  Reading schema.json from source
+2026-08-21 11:28:39,376  DEBUG     eds_loader.loader  schema.json contains 2 dataset definition(s)
+2026-08-21 11:28:39,376  INFO      eds_loader.loader  Loading 2 table(s): customers, orders
+2026-08-21 11:28:39,376  INFO      eds_loader.loader  Read 2 dataset(s) from source, 3 total row(s)
+2026-08-21 11:28:39,376  DEBUG     eds_loader.loader    customers: 2 row(s), 1 column(s)
+2026-08-21 11:28:39,376  DEBUG     eds_loader.loader    orders: 1 row(s), 2 column(s)
+2026-08-21 11:28:39,376  DEBUG     eds_loader.loader  Constraint enforcement enabled — forwarding schema metadata to target
+2026-08-21 11:28:39,376  INFO      eds_loader.loader  Writing 2 table(s) to target
+2026-08-21 11:28:39,376  INFO      eds_loader.loader  Load complete: 3 row(s) written across 2 table(s)
+2026-08-21 11:28:39,379  INFO      eds_loader.loader  Starting load: source=mock_source target=mock_target schema_required=True enforce_constraints=True
+2026-08-21 11:28:39,379  DEBUG     eds_loader.loader  Source connector instantiated: MagicMock
+2026-08-21 11:28:39,379  DEBUG     eds_loader.loader  Target connector instantiated: MagicMock
+2026-08-21 11:28:39,379  INFO      eds_loader.loader  Reading schema.json from source
+2026-08-21 11:28:39,380  DEBUG     eds_loader.loader  schema.json contains 2 dataset definition(s)
+2026-08-21 11:28:39,380  INFO      eds_loader.loader  Loading 2 table(s): customers, orders
+2026-08-21 11:28:39,380  INFO      eds_loader.loader  Read 2 dataset(s) from source, 3 total row(s)
+2026-08-21 11:28:39,380  DEBUG     eds_loader.loader    customers: 2 row(s), 1 column(s)
+2026-08-21 11:28:39,380  DEBUG     eds_loader.loader    orders: 1 row(s), 2 column(s)
+2026-08-21 11:28:39,380  DEBUG     eds_loader.loader  Constraint enforcement enabled — forwarding schema metadata to target
+2026-08-21 11:28:39,380  INFO      eds_loader.loader  Writing 2 table(s) to target
+2026-08-21 11:28:39,380  INFO      eds_loader.loader  Load complete: 3 row(s) written across 2 table(s)
+2026-08-21 11:28:39,383  INFO      eds_loader.loader  Starting load: source=mock_source target=mock_target schema_required=True enforce_constraints=False
+2026-08-21 11:28:39,383  DEBUG     eds_loader.loader  Source connector instantiated: MagicMock
+2026-08-21 11:28:39,383  DEBUG     eds_loader.loader  Target connector instantiated: MagicMock
+2026-08-21 11:28:39,383  INFO      eds_loader.loader  Reading schema.json from source
+2026-08-21 11:28:39,383  DEBUG     eds_loader.loader  schema.json contains 2 dataset definition(s)
+2026-08-21 11:28:39,383  INFO      eds_loader.loader  Loading 2 table(s): customers, orders
+2026-08-21 11:28:39,383  INFO      eds_loader.loader  Read 2 dataset(s) from source, 3 total row(s)
+2026-08-21 11:28:39,383  DEBUG     eds_loader.loader    customers: 2 row(s), 1 column(s)
+2026-08-21 11:28:39,383  DEBUG     eds_loader.loader    orders: 1 row(s), 2 column(s)
+2026-08-21 11:28:39,384  DEBUG     eds_loader.loader  Constraint enforcement disabled — target will create plain tables
+2026-08-21 11:28:39,384  INFO      eds_loader.loader  Writing 2 table(s) to target
+2026-08-21 11:28:39,384  INFO      eds_loader.loader  Load complete: 3 row(s) written across 2 table(s)
+2026-08-21 11:28:39,386  INFO      eds_loader.loader  Starting load: source=mock_source target=mock_target schema_required=True enforce_constraints=True
+2026-08-21 11:28:39,386  DEBUG     eds_loader.loader  Source connector instantiated: MagicMock
+2026-08-21 11:28:39,386  DEBUG     eds_loader.loader  Target connector instantiated: MagicMock
+2026-08-21 11:28:39,386  INFO      eds_loader.loader  Reading schema.json from source
+2026-08-21 11:28:39,386  DEBUG     eds_loader.loader  schema.json contains 2 dataset definition(s)
+2026-08-21 11:28:39,386  INFO      eds_loader.loader  Loading 2 table(s): customers, orders
+2026-08-21 11:28:39,386  INFO      eds_loader.loader  Read 2 dataset(s) from source, 3 total row(s)
+2026-08-21 11:28:39,386  DEBUG     eds_loader.loader    customers: 2 row(s), 1 column(s)
+2026-08-21 11:28:39,386  DEBUG     eds_loader.loader    orders: 1 row(s), 2 column(s)
+2026-08-21 11:28:39,387  DEBUG     eds_loader.loader  Constraint enforcement enabled — forwarding schema metadata to target
+2026-08-21 11:28:39,387  INFO      eds_loader.loader  Writing 2 table(s) to target
+2026-08-21 11:28:39,387  INFO      eds_loader.loader  Load complete: 3 row(s) written across 2 table(s)
+2026-08-21 11:28:39,389  INFO      eds_loader.loader  Starting load: source=mock_source target=mock_target schema_required=True enforce_constraints=True
+2026-08-21 11:28:39,389  DEBUG     eds_loader.loader  Source connector instantiated: MagicMock
+2026-08-21 11:28:39,389  DEBUG     eds_loader.loader  Target connector instantiated: MagicMock
+2026-08-21 11:28:39,389  INFO      eds_loader.loader  Reading schema.json from source
+2026-08-21 11:28:39,390  DEBUG     eds_loader.loader  schema.json contains 2 dataset definition(s)
+2026-08-21 11:28:39,390  INFO      eds_loader.loader  Loading 1 table(s): customers
+2026-08-21 11:28:39,390  INFO      eds_loader.loader  Read 1 dataset(s) from source, 1 total row(s)
+2026-08-21 11:28:39,390  DEBUG     eds_loader.loader    customers: 1 row(s), 1 column(s)
+2026-08-21 11:28:39,390  DEBUG     eds_loader.loader  Constraint enforcement enabled — forwarding schema metadata to target
+2026-08-21 11:28:39,390  INFO      eds_loader.loader  Writing 1 table(s) to target
+2026-08-21 11:28:39,390  INFO      eds_loader.loader  Load complete: 1 row(s) written across 1 table(s)
+2026-08-21 11:28:39,392  INFO      eds_loader.loader  Starting load: source=mock_source target=mock_target schema_required=True enforce_constraints=True
+2026-08-21 11:28:39,393  DEBUG     eds_loader.loader  Source connector instantiated: MagicMock
+2026-08-21 11:28:39,393  DEBUG     eds_loader.loader  Target connector instantiated: MagicMock
+2026-08-21 11:28:39,393  INFO      eds_loader.loader  Reading schema.json from source
+2026-08-21 11:28:39,393  DEBUG     eds_loader.loader  schema.json contains 2 dataset definition(s)
+2026-08-21 11:28:39,393  ERROR     eds_loader.loader  Load failed: Table(s) not found in schema.json: no_such_table.
+Available tables: customers, orders.
+2026-08-21 11:28:39,396  INFO      eds_loader.loader  Starting load: source=write_only target=mock_target2 schema_required=True enforce_constraints=True
+2026-08-21 11:28:39,396  DEBUG     eds_loader.loader  Source connector instantiated: MagicMock
+2026-08-21 11:28:39,396  DEBUG     eds_loader.loader  Target connector instantiated: MagicMock
+2026-08-21 11:28:39,396  ERROR     eds_loader.loader  Load failed: Connector 'write_only' does not support reading and cannot be used as a source.  Run `eds-loader connectors` to check connector capabilities.
+2026-08-21 11:28:39,399  INFO      eds_loader.loader  Starting load: source=mock_source2 target=read_only_target schema_required=True enforce_constraints=True
+2026-08-21 11:28:39,399  DEBUG     eds_loader.loader  Source connector instantiated: MagicMock
+2026-08-21 11:28:39,399  DEBUG     eds_loader.loader  Target connector instantiated: MagicMock
+2026-08-21 11:28:39,399  ERROR     eds_loader.loader  Load failed: Connector 'read_only_target' does not support writing and cannot be used as a target.  Run `eds-loader connectors` to check connector capabilities.
+2026-08-21 11:28:39,410  DEBUG     eds_loader.connectors.local_fs  Reading schema.json from C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_read_schema_metadata_retu0\schema.json
+2026-08-21 11:28:39,422  DEBUG     eds_loader.connectors.local_fs  schema.json parsed: 2 dataset(s)
+2026-08-21 11:28:39,428  DEBUG     eds_loader.connectors.local_fs  Reading schema.json from C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_read_schema_metadata_cont0\schema.json
+2026-08-21 11:28:39,429  DEBUG     eds_loader.connectors.local_fs  schema.json parsed: 2 dataset(s)
+2026-08-21 11:28:39,437  DEBUG     eds_loader.connectors.local_fs  Reading schema.json from C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_read_schema_metadata_corr0\schema.json
+2026-08-21 11:28:39,453  DEBUG     eds_loader.connectors.local_fs  Reading schema.json from C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_read_schema_metadata_empt0\schema.json
+2026-08-21 11:28:39,459  DEBUG     eds_loader.connectors.local_fs  Auto-discovered 2 parquet file(s) in C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_read_datasets_none_reads_0
+2026-08-21 11:28:39,474  INFO      eds_loader.connectors.local_fs  Read customers: 3 row(s) from C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_read_datasets_none_reads_0\customers.parquet
+2026-08-21 11:28:39,489  INFO      eds_loader.connectors.local_fs  Read orders: 2 row(s) from C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_read_datasets_none_reads_0\orders.parquet
+2026-08-21 11:28:39,495  DEBUG     eds_loader.connectors.local_fs  Auto-discovered 1 parquet file(s) in C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_read_datasets_none_ignore0
+2026-08-21 11:28:39,503  INFO      eds_loader.connectors.local_fs  Read data: 1 row(s) from C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_read_datasets_none_ignore0\data.parquet
+2026-08-21 11:28:39,510  DEBUG     eds_loader.connectors.local_fs  Auto-discovered 2 parquet file(s) in C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_read_datasets_none_return0
+2026-08-21 11:28:39,513  INFO      eds_loader.connectors.local_fs  Read customers: 3 row(s) from C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_read_datasets_none_return0\customers.parquet
+2026-08-21 11:28:39,516  INFO      eds_loader.connectors.local_fs  Read orders: 2 row(s) from C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_read_datasets_none_return0\orders.parquet
+2026-08-21 11:28:39,519  DEBUG     eds_loader.connectors.local_fs  Auto-discovered 0 parquet file(s) in C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_read_datasets_none_empty_0
+2026-08-21 11:28:39,530  INFO      eds_loader.connectors.local_fs  Read customers: 3 row(s) from C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_read_datasets_explicit_na0\customers.parquet
+2026-08-21 11:28:39,538  INFO      eds_loader.connectors.local_fs  Read customers: 3 row(s) from C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_read_datasets_explicit_pr0\customers.parquet
+2026-08-21 11:28:39,554  INFO      eds_loader.connectors.local_fs  Read customers: 3 row(s) from C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_read_datasets_one_missing0\customers.parquet
+2026-08-21 11:28:39,560  INFO      eds_loader.connectors.local_fs  Wrote customers: 3 row(s) to C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_write_datasets_creates_di0\deep\nested\dir\customers.parquet
+2026-08-21 11:28:39,561  INFO      eds_loader.connectors.local_fs  Wrote orders: 2 row(s) to C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_write_datasets_creates_di0\deep\nested\dir\orders.parquet
+2026-08-21 11:28:39,567  INFO      eds_loader.connectors.local_fs  Wrote customers: 3 row(s) to C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_write_datasets_writes_par0\customers.parquet
+2026-08-21 11:28:39,568  INFO      eds_loader.connectors.local_fs  Wrote orders: 2 row(s) to C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_write_datasets_writes_par0\orders.parquet
+2026-08-21 11:28:39,572  INFO      eds_loader.connectors.local_fs  Wrote customers: 3 row(s) to C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_write_datasets_returns_on0\customers.parquet
+2026-08-21 11:28:39,573  INFO      eds_loader.connectors.local_fs  Wrote orders: 2 row(s) to C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_write_datasets_returns_on0\orders.parquet
+2026-08-21 11:28:39,578  INFO      eds_loader.connectors.local_fs  Wrote customers: 3 row(s) to C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_write_datasets_result_row0\customers.parquet
+2026-08-21 11:28:39,579  INFO      eds_loader.connectors.local_fs  Wrote orders: 2 row(s) to C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_write_datasets_result_row0\orders.parquet
+2026-08-21 11:28:39,585  INFO      eds_loader.connectors.local_fs  Wrote customers: 3 row(s) to C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_write_datasets_result_loc0\customers.parquet
+2026-08-21 11:28:39,586  INFO      eds_loader.connectors.local_fs  Wrote orders: 2 row(s) to C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_write_datasets_result_loc0\orders.parquet
+2026-08-21 11:28:39,591  INFO      eds_loader.connectors.local_fs  Wrote data: 3 row(s) to C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_write_datasets_overwrites0\data.parquet
+2026-08-21 11:28:39,592  INFO      eds_loader.connectors.local_fs  Wrote data: 1 row(s) to C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_write_datasets_overwrites0\data.parquet
+2026-08-21 11:28:39,614  INFO      eds_loader.connectors.local_fs  Wrote customers: 3 row(s) to C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_write_datasets_writes_sch0\customers.parquet
+2026-08-21 11:28:39,615  INFO      eds_loader.connectors.local_fs  Wrote orders: 2 row(s) to C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_write_datasets_writes_sch0\orders.parquet
+2026-08-21 11:28:39,615  DEBUG     eds_loader.connectors.local_fs  Merging schema.json at target
+2026-08-21 11:28:39,637  INFO      eds_loader.connectors.local_fs  Wrote customers: 3 row(s) to C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_write_datasets_skips_sche0\customers.parquet
+2026-08-21 11:28:39,638  INFO      eds_loader.connectors.local_fs  Wrote orders: 2 row(s) to C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_write_datasets_skips_sche0\orders.parquet
+2026-08-21 11:28:39,643  INFO      eds_loader.connectors.local_fs  Wrote customers: 3 row(s) to C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_write_datasets_merges_sch0\customers.parquet
+2026-08-21 11:28:39,645  INFO      eds_loader.connectors.local_fs  Wrote orders: 2 row(s) to C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_write_datasets_merges_sch0\orders.parquet
+2026-08-21 11:28:39,645  DEBUG     eds_loader.connectors.local_fs  Merging schema.json at target
+2026-08-21 11:28:39,683  INFO      eds_loader.connectors.local_fs  Wrote customers: 3 row(s) to C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_write_datasets_corrupt_ex0\customers.parquet
+2026-08-21 11:28:39,685  INFO      eds_loader.connectors.local_fs  Wrote orders: 2 row(s) to C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_write_datasets_corrupt_ex0\orders.parquet
+2026-08-21 11:28:39,685  DEBUG     eds_loader.connectors.local_fs  Merging schema.json at target
+2026-08-21 11:28:39,699  INFO      eds_loader.connectors.local_fs  Wrote customers: 3 row(s) to C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_round_trip_dataframes_mat0\customers.parquet
+2026-08-21 11:28:39,700  INFO      eds_loader.connectors.local_fs  Wrote orders: 2 row(s) to C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_round_trip_dataframes_mat0\orders.parquet
+2026-08-21 11:28:39,701  DEBUG     eds_loader.connectors.local_fs  Merging schema.json at target
+2026-08-21 11:28:39,703  INFO      eds_loader.connectors.local_fs  Read customers: 3 row(s) from C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_round_trip_dataframes_mat0\customers.parquet
+2026-08-21 11:28:39,705  INFO      eds_loader.connectors.local_fs  Read orders: 2 row(s) from C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_round_trip_dataframes_mat0\orders.parquet
+2026-08-21 11:28:39,712  INFO      eds_loader.connectors.local_fs  Wrote customers: 3 row(s) to C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_round_trip_schema_survive0\customers.parquet
+2026-08-21 11:28:39,714  INFO      eds_loader.connectors.local_fs  Wrote orders: 2 row(s) to C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_round_trip_schema_survive0\orders.parquet
+2026-08-21 11:28:39,714  DEBUG     eds_loader.connectors.local_fs  Merging schema.json at target
+2026-08-21 11:28:39,715  DEBUG     eds_loader.connectors.local_fs  Reading schema.json from C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_round_trip_schema_survive0\schema.json
+2026-08-21 11:28:39,716  DEBUG     eds_loader.connectors.local_fs  schema.json parsed: 2 dataset(s)
+2026-08-21 11:28:39,723  INFO      eds_loader.loader  Starting load: source=local_fs target=local_fs schema_required=True enforce_constraints=True
+2026-08-21 11:28:39,723  DEBUG     eds_loader.loader  Source connector instantiated: LocalFSConnector
+2026-08-21 11:28:39,723  DEBUG     eds_loader.loader  Target connector instantiated: LocalFSConnector
+2026-08-21 11:28:39,723  INFO      eds_loader.loader  Reading schema.json from source
+2026-08-21 11:28:39,723  DEBUG     eds_loader.connectors.local_fs  Reading schema.json from C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_integration_local_to_loca0\schema.json
+2026-08-21 11:28:39,725  DEBUG     eds_loader.connectors.local_fs  schema.json parsed: 2 dataset(s)
+2026-08-21 11:28:39,725  DEBUG     eds_loader.loader  schema.json contains 2 dataset definition(s)
+2026-08-21 11:28:39,725  INFO      eds_loader.loader  Loading 2 table(s): customers, orders
+2026-08-21 11:28:39,728  INFO      eds_loader.connectors.local_fs  Read customers: 3 row(s) from C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_integration_local_to_loca0\customers.parquet
+2026-08-21 11:28:39,732  INFO      eds_loader.connectors.local_fs  Read orders: 2 row(s) from C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_integration_local_to_loca0\orders.parquet
+2026-08-21 11:28:39,732  INFO      eds_loader.loader  Read 2 dataset(s) from source, 5 total row(s)
+2026-08-21 11:28:39,732  DEBUG     eds_loader.loader    customers: 3 row(s), 2 column(s)
+2026-08-21 11:28:39,732  DEBUG     eds_loader.loader    orders: 2 row(s), 2 column(s)
+2026-08-21 11:28:39,732  DEBUG     eds_loader.loader  Constraint enforcement enabled — forwarding schema metadata to target
+2026-08-21 11:28:39,732  INFO      eds_loader.loader  Writing 2 table(s) to target
+2026-08-21 11:28:39,734  INFO      eds_loader.connectors.local_fs  Wrote customers: 3 row(s) to C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_integration_local_to_loca0\target\customers.parquet
+2026-08-21 11:28:39,735  INFO      eds_loader.connectors.local_fs  Wrote orders: 2 row(s) to C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_integration_local_to_loca0\target\orders.parquet
+2026-08-21 11:28:39,735  DEBUG     eds_loader.connectors.local_fs  Merging schema.json at target
+2026-08-21 11:28:39,736  INFO      eds_loader.loader  Load complete: 5 row(s) written across 2 table(s)
+2026-08-21 11:28:39,745  INFO      eds_loader.loader  Starting load: source=local_fs target=local_fs schema_required=True enforce_constraints=True
+2026-08-21 11:28:39,745  DEBUG     eds_loader.loader  Source connector instantiated: LocalFSConnector
+2026-08-21 11:28:39,745  DEBUG     eds_loader.loader  Target connector instantiated: LocalFSConnector
+2026-08-21 11:28:39,745  INFO      eds_loader.loader  Reading schema.json from source
+2026-08-21 11:28:39,745  DEBUG     eds_loader.connectors.local_fs  Reading schema.json from C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_integration_table_subset_0\schema.json
+2026-08-21 11:28:39,747  DEBUG     eds_loader.connectors.local_fs  schema.json parsed: 2 dataset(s)
+2026-08-21 11:28:39,747  DEBUG     eds_loader.loader  schema.json contains 2 dataset definition(s)
+2026-08-21 11:28:39,747  INFO      eds_loader.loader  Loading 1 table(s): customers
+2026-08-21 11:28:39,749  INFO      eds_loader.connectors.local_fs  Read customers: 3 row(s) from C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_integration_table_subset_0\customers.parquet
+2026-08-21 11:28:39,749  INFO      eds_loader.loader  Read 1 dataset(s) from source, 3 total row(s)
+2026-08-21 11:28:39,749  DEBUG     eds_loader.loader    customers: 3 row(s), 2 column(s)
+2026-08-21 11:28:39,749  DEBUG     eds_loader.loader  Constraint enforcement enabled — forwarding schema metadata to target
+2026-08-21 11:28:39,749  INFO      eds_loader.loader  Writing 1 table(s) to target
+2026-08-21 11:28:39,750  INFO      eds_loader.connectors.local_fs  Wrote customers: 3 row(s) to C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_integration_table_subset_0\target_subset\customers.parquet
+2026-08-21 11:28:39,751  DEBUG     eds_loader.connectors.local_fs  Merging schema.json at target
+2026-08-21 11:28:39,751  INFO      eds_loader.loader  Load complete: 3 row(s) written across 1 table(s)
+2026-08-21 11:28:39,759  INFO      eds_loader.loader  Starting load: source=local_fs target=local_fs schema_required=True enforce_constraints=True
+2026-08-21 11:28:39,759  DEBUG     eds_loader.loader  Source connector instantiated: LocalFSConnector
+2026-08-21 11:28:39,759  DEBUG     eds_loader.loader  Target connector instantiated: LocalFSConnector
+2026-08-21 11:28:39,759  INFO      eds_loader.loader  Reading schema.json from source
+2026-08-21 11:28:39,759  DEBUG     eds_loader.connectors.local_fs  Reading schema.json from C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_integration_schema_json_w0\schema.json
+2026-08-21 11:28:39,760  DEBUG     eds_loader.connectors.local_fs  schema.json parsed: 2 dataset(s)
+2026-08-21 11:28:39,760  DEBUG     eds_loader.loader  schema.json contains 2 dataset definition(s)
+2026-08-21 11:28:39,760  INFO      eds_loader.loader  Loading 2 table(s): customers, orders
+2026-08-21 11:28:39,764  INFO      eds_loader.connectors.local_fs  Read customers: 3 row(s) from C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_integration_schema_json_w0\customers.parquet
+2026-08-21 11:28:39,766  INFO      eds_loader.connectors.local_fs  Read orders: 2 row(s) from C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_integration_schema_json_w0\orders.parquet
+2026-08-21 11:28:39,766  INFO      eds_loader.loader  Read 2 dataset(s) from source, 5 total row(s)
+2026-08-21 11:28:39,766  DEBUG     eds_loader.loader    customers: 3 row(s), 2 column(s)
+2026-08-21 11:28:39,766  DEBUG     eds_loader.loader    orders: 2 row(s), 2 column(s)
+2026-08-21 11:28:39,766  DEBUG     eds_loader.loader  Constraint enforcement enabled — forwarding schema metadata to target
+2026-08-21 11:28:39,766  INFO      eds_loader.loader  Writing 2 table(s) to target
+2026-08-21 11:28:39,767  INFO      eds_loader.connectors.local_fs  Wrote customers: 3 row(s) to C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_integration_schema_json_w0\target_schema\customers.parquet
+2026-08-21 11:28:39,768  INFO      eds_loader.connectors.local_fs  Wrote orders: 2 row(s) to C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_integration_schema_json_w0\target_schema\orders.parquet
+2026-08-21 11:28:39,769  DEBUG     eds_loader.connectors.local_fs  Merging schema.json at target
+2026-08-21 11:28:39,770  INFO      eds_loader.loader  Load complete: 5 row(s) written across 2 table(s)
+2026-08-21 11:28:39,777  INFO      eds_loader.loader  Starting load: source=local_fs target=local_fs schema_required=True enforce_constraints=False
+2026-08-21 11:28:39,777  DEBUG     eds_loader.loader  Source connector instantiated: LocalFSConnector
+2026-08-21 11:28:39,778  DEBUG     eds_loader.loader  Target connector instantiated: LocalFSConnector
+2026-08-21 11:28:39,778  INFO      eds_loader.loader  Reading schema.json from source
+2026-08-21 11:28:39,778  DEBUG     eds_loader.connectors.local_fs  Reading schema.json from C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_integration_schema_json_n0\schema.json
+2026-08-21 11:28:39,779  DEBUG     eds_loader.connectors.local_fs  schema.json parsed: 2 dataset(s)
+2026-08-21 11:28:39,779  DEBUG     eds_loader.loader  schema.json contains 2 dataset definition(s)
+2026-08-21 11:28:39,779  INFO      eds_loader.loader  Loading 2 table(s): customers, orders
+2026-08-21 11:28:39,781  INFO      eds_loader.connectors.local_fs  Read customers: 3 row(s) from C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_integration_schema_json_n0\customers.parquet
+2026-08-21 11:28:39,784  INFO      eds_loader.connectors.local_fs  Read orders: 2 row(s) from C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_integration_schema_json_n0\orders.parquet
+2026-08-21 11:28:39,784  INFO      eds_loader.loader  Read 2 dataset(s) from source, 5 total row(s)
+2026-08-21 11:28:39,785  DEBUG     eds_loader.loader    customers: 3 row(s), 2 column(s)
+2026-08-21 11:28:39,785  DEBUG     eds_loader.loader    orders: 2 row(s), 2 column(s)
+2026-08-21 11:28:39,785  DEBUG     eds_loader.loader  Constraint enforcement disabled — target will create plain tables
+2026-08-21 11:28:39,785  INFO      eds_loader.loader  Writing 2 table(s) to target
+2026-08-21 11:28:39,788  INFO      eds_loader.connectors.local_fs  Wrote customers: 3 row(s) to C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_integration_schema_json_n0\target_no_schema\customers.parquet
+2026-08-21 11:28:39,792  INFO      eds_loader.connectors.local_fs  Wrote orders: 2 row(s) to C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_integration_schema_json_n0\target_no_schema\orders.parquet
+2026-08-21 11:28:39,792  INFO      eds_loader.loader  Load complete: 5 row(s) written across 2 table(s)
+2026-08-21 11:28:39,811  INFO      eds_loader.connectors.mongodb  Connected to MongoDB localhost:27017/test_db
+2026-08-21 11:28:39,811  DEBUG     eds_loader.connectors.mongodb  [customers] dropping existing collection
+2026-08-21 11:28:39,812  DEBUG     eds_loader.connectors.mongodb  [customers] inserting 3 document(s)
+2026-08-21 11:28:39,813  INFO      eds_loader.connectors.mongodb  [customers] wrote 3 document(s) in 0.00s
+2026-08-21 11:28:39,813  DEBUG     eds_loader.connectors.mongodb  [orders] dropping existing collection
+2026-08-21 11:28:39,813  DEBUG     eds_loader.connectors.mongodb  [orders] inserting 2 document(s)
+2026-08-21 11:28:39,814  INFO      eds_loader.connectors.mongodb  [orders] wrote 2 document(s) in 0.00s
+2026-08-21 11:28:39,815  INFO      eds_loader.connectors.mongodb  Connected to MongoDB localhost:27017/test_db
+2026-08-21 11:28:39,816  DEBUG     eds_loader.connectors.mongodb  [data] dropping existing collection
+2026-08-21 11:28:39,816  DEBUG     eds_loader.connectors.mongodb  [data] inserting 2 document(s)
+2026-08-21 11:28:39,816  INFO      eds_loader.connectors.mongodb  [data] wrote 2 document(s) in 0.00s
+2026-08-21 11:28:39,817  INFO      eds_loader.connectors.mongodb  Connected to MongoDB localhost:27017/test_db
+2026-08-21 11:28:39,818  DEBUG     eds_loader.connectors.mongodb  [t] dropping existing collection
+2026-08-21 11:28:39,818  DEBUG     eds_loader.connectors.mongodb  [t] inserting 1 document(s)
+2026-08-21 11:28:39,818  INFO      eds_loader.connectors.mongodb  [t] wrote 1 document(s) in 0.00s
+2026-08-21 11:28:39,820  INFO      eds_loader.connectors.mongodb  Connected to MongoDB localhost:27017/test_db
+2026-08-21 11:28:39,820  DEBUG     eds_loader.connectors.mongodb  [empty] dropping existing collection
+2026-08-21 11:28:39,821  INFO      eds_loader.connectors.mongodb  [empty] wrote 0 document(s) in 0.00s
+2026-08-21 11:28:39,822  INFO      eds_loader.connectors.mongodb  Connected to MongoDB localhost:27017/test_db
+2026-08-21 11:28:39,822  DEBUG     eds_loader.connectors.mongodb  [empty] dropping existing collection
+2026-08-21 11:28:39,823  INFO      eds_loader.connectors.mongodb  [empty] wrote 0 document(s) in 0.00s
+2026-08-21 11:28:39,824  INFO      eds_loader.connectors.mongodb  Connected to MongoDB localhost:27017/test_db
+2026-08-21 11:28:39,824  DEBUG     eds_loader.connectors.mongodb  [customers] dropping existing collection
+2026-08-21 11:28:39,824  DEBUG     eds_loader.connectors.mongodb  [customers] inserting 3 document(s)
+2026-08-21 11:28:39,825  INFO      eds_loader.connectors.mongodb  [customers] wrote 3 document(s) in 0.00s
+2026-08-21 11:28:39,825  DEBUG     eds_loader.connectors.mongodb  [orders] dropping existing collection
+2026-08-21 11:28:39,825  DEBUG     eds_loader.connectors.mongodb  [orders] inserting 2 document(s)
+2026-08-21 11:28:39,825  INFO      eds_loader.connectors.mongodb  [orders] wrote 2 document(s) in 0.00s
+2026-08-21 11:28:39,827  INFO      eds_loader.connectors.mongodb  Connected to MongoDB localhost:27017/test_db
+2026-08-21 11:28:39,827  DEBUG     eds_loader.connectors.mongodb  [customers] dropping existing collection
+2026-08-21 11:28:39,828  DEBUG     eds_loader.connectors.mongodb  [customers] inserting 3 document(s)
+2026-08-21 11:28:39,828  INFO      eds_loader.connectors.mongodb  [customers] wrote 3 document(s) in 0.00s
+2026-08-21 11:28:39,828  DEBUG     eds_loader.connectors.mongodb  [orders] dropping existing collection
+2026-08-21 11:28:39,828  DEBUG     eds_loader.connectors.mongodb  [orders] inserting 2 document(s)
+2026-08-21 11:28:39,828  INFO      eds_loader.connectors.mongodb  [orders] wrote 2 document(s) in 0.00s
+2026-08-21 11:28:39,832  INFO      eds_loader.connectors.mongodb  Connected to MongoDB mgserver:27020/mydb
+2026-08-21 11:28:39,832  DEBUG     eds_loader.connectors.mongodb  [tbl] dropping existing collection
+2026-08-21 11:28:39,832  DEBUG     eds_loader.connectors.mongodb  [tbl] inserting 1 document(s)
+2026-08-21 11:28:39,832  INFO      eds_loader.connectors.mongodb  [tbl] wrote 1 document(s) in 0.00s
+2026-08-21 11:28:39,834  INFO      eds_loader.connectors.mongodb  Connected to MongoDB localhost:27017/test_db
+2026-08-21 11:28:39,834  DEBUG     eds_loader.connectors.mongodb  [z] dropping existing collection
+2026-08-21 11:28:39,834  DEBUG     eds_loader.connectors.mongodb  [z] inserting 1 document(s)
+2026-08-21 11:28:39,834  INFO      eds_loader.connectors.mongodb  [z] wrote 1 document(s) in 0.00s
+2026-08-21 11:28:39,835  DEBUG     eds_loader.connectors.mongodb  [a] dropping existing collection
+2026-08-21 11:28:39,835  DEBUG     eds_loader.connectors.mongodb  [a] inserting 1 document(s)
+2026-08-21 11:28:39,835  INFO      eds_loader.connectors.mongodb  [a] wrote 1 document(s) in 0.00s
+2026-08-21 11:28:39,838  INFO      eds_loader.connectors.mongodb  Connected to MongoDB localhost:27017/test_db
+2026-08-21 11:28:39,838  DEBUG     eds_loader.connectors.mongodb  [orders] dropping existing collection
+2026-08-21 11:28:39,838  DEBUG     eds_loader.connectors.mongodb  [orders] inserting 1 document(s)
+2026-08-21 11:28:39,839  DEBUG     eds_loader.connectors.mongodb  [orders] creating indexes from schema metadata
+2026-08-21 11:28:39,839  INFO      eds_loader.connectors.mongodb  [orders] wrote 1 document(s) in 0.00s
+2026-08-21 11:28:39,839  DEBUG     eds_loader.connectors.mongodb  [customers] dropping existing collection
+2026-08-21 11:28:39,839  DEBUG     eds_loader.connectors.mongodb  [customers] inserting 1 document(s)
+2026-08-21 11:28:39,839  DEBUG     eds_loader.connectors.mongodb  [customers] creating indexes from schema metadata
+2026-08-21 11:28:39,839  INFO      eds_loader.connectors.mongodb  [customers] wrote 1 document(s) in 0.00s
+2026-08-21 11:28:39,847  INFO      eds_loader.connectors.mongodb  Connected to MongoDB localhost:27017/test_db
+2026-08-21 11:28:39,847  DEBUG     eds_loader.connectors.mongodb  [customers] dropping existing collection
+2026-08-21 11:28:39,847  DEBUG     eds_loader.connectors.mongodb  [customers] inserting 1 document(s)
+2026-08-21 11:28:39,848  DEBUG     eds_loader.connectors.mongodb  [customers] creating indexes from schema metadata
+2026-08-21 11:28:39,848  INFO      eds_loader.connectors.mongodb  [customers] wrote 1 document(s) in 0.00s
+2026-08-21 11:28:39,850  INFO      eds_loader.connectors.mongodb  Connected to MongoDB localhost:27017/test_db
+2026-08-21 11:28:39,850  DEBUG     eds_loader.connectors.mongodb  [customers] dropping existing collection
+2026-08-21 11:28:39,850  DEBUG     eds_loader.connectors.mongodb  [customers] inserting 1 document(s)
+2026-08-21 11:28:39,850  DEBUG     eds_loader.connectors.mongodb  [customers] creating indexes from schema metadata
+2026-08-21 11:28:39,850  INFO      eds_loader.connectors.mongodb  [customers] wrote 1 document(s) in 0.00s
+2026-08-21 11:28:39,852  INFO      eds_loader.connectors.mongodb  Connected to MongoDB localhost:27017/test_db
+2026-08-21 11:28:39,852  DEBUG     eds_loader.connectors.mongodb  [orders] dropping existing collection
+2026-08-21 11:28:39,852  DEBUG     eds_loader.connectors.mongodb  [orders] inserting 1 document(s)
+2026-08-21 11:28:39,852  DEBUG     eds_loader.connectors.mongodb  [orders] creating indexes from schema metadata
+2026-08-21 11:28:39,853  INFO      eds_loader.connectors.mongodb  [orders] wrote 1 document(s) in 0.00s
+2026-08-21 11:28:39,854  INFO      eds_loader.connectors.mongodb  Connected to MongoDB localhost:27017/test_db
+2026-08-21 11:28:39,854  DEBUG     eds_loader.connectors.mongodb  [customers] dropping existing collection
+2026-08-21 11:28:39,854  DEBUG     eds_loader.connectors.mongodb  [customers] inserting 1 document(s)
+2026-08-21 11:28:39,855  INFO      eds_loader.connectors.mongodb  [customers] wrote 1 document(s) in 0.00s
+2026-08-21 11:28:39,865  INFO      eds_loader.connectors.mongodb  Connected to MongoDB localhost:27017/test_db
+2026-08-21 11:28:39,865  DEBUG     eds_loader.connectors.mongodb  [t] dropping existing collection
+2026-08-21 11:28:39,866  ERROR     eds_loader.connectors.mongodb  [t] write failed: network error
+2026-08-21 11:28:39,867  INFO      eds_loader.connectors.mongodb  Connected to MongoDB localhost:27017/test_db
+2026-08-21 11:28:39,867  DEBUG     eds_loader.connectors.mongodb  [t] dropping existing collection
+2026-08-21 11:28:39,867  DEBUG     eds_loader.connectors.mongodb  [t] inserting 1 document(s)
+2026-08-21 11:28:39,867  ERROR     eds_loader.connectors.mongodb  [t] write failed: duplicate key
+2026-08-21 11:28:39,879  INFO      eds_loader.loader  Starting load: source=local_fs target=mongodb schema_required=True enforce_constraints=True
+2026-08-21 11:28:39,880  DEBUG     eds_loader.loader  Source connector instantiated: LocalFSConnector
+2026-08-21 11:28:39,880  DEBUG     eds_loader.loader  Target connector instantiated: MongoDBConnector
+2026-08-21 11:28:39,880  INFO      eds_loader.loader  Reading schema.json from source
+2026-08-21 11:28:39,880  DEBUG     eds_loader.connectors.local_fs  Reading schema.json from C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_integration_local_fs_to_m0\source\schema.json
+2026-08-21 11:28:39,895  DEBUG     eds_loader.connectors.local_fs  schema.json parsed: 2 dataset(s)
+2026-08-21 11:28:39,895  DEBUG     eds_loader.loader  schema.json contains 2 dataset definition(s)
+2026-08-21 11:28:39,895  INFO      eds_loader.loader  Loading 2 table(s): customers, orders
+2026-08-21 11:28:39,909  INFO      eds_loader.connectors.local_fs  Read customers: 3 row(s) from C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_integration_local_fs_to_m0\source\customers.parquet
+2026-08-21 11:28:39,927  INFO      eds_loader.connectors.local_fs  Read orders: 2 row(s) from C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_integration_local_fs_to_m0\source\orders.parquet
+2026-08-21 11:28:39,927  INFO      eds_loader.loader  Read 2 dataset(s) from source, 5 total row(s)
+2026-08-21 11:28:39,927  DEBUG     eds_loader.loader    customers: 3 row(s), 2 column(s)
+2026-08-21 11:28:39,927  DEBUG     eds_loader.loader    orders: 2 row(s), 3 column(s)
+2026-08-21 11:28:39,928  DEBUG     eds_loader.loader  Constraint enforcement enabled — forwarding schema metadata to target
+2026-08-21 11:28:39,928  INFO      eds_loader.loader  Writing 2 table(s) to target
+2026-08-21 11:28:39,928  INFO      eds_loader.connectors.mongodb  Connected to MongoDB localhost:27017/test_db
+2026-08-21 11:28:39,928  DEBUG     eds_loader.connectors.mongodb  [customers] dropping existing collection
+2026-08-21 11:28:39,928  DEBUG     eds_loader.connectors.mongodb  [customers] inserting 3 document(s)
+2026-08-21 11:28:39,928  DEBUG     eds_loader.connectors.mongodb  [customers] creating indexes from schema metadata
+2026-08-21 11:28:39,928  INFO      eds_loader.connectors.mongodb  [customers] wrote 3 document(s) in 0.00s
+2026-08-21 11:28:39,928  DEBUG     eds_loader.connectors.mongodb  [orders] dropping existing collection
+2026-08-21 11:28:39,929  DEBUG     eds_loader.connectors.mongodb  [orders] inserting 2 document(s)
+2026-08-21 11:28:39,929  DEBUG     eds_loader.connectors.mongodb  [orders] creating indexes from schema metadata
+2026-08-21 11:28:39,929  INFO      eds_loader.connectors.mongodb  [orders] wrote 2 document(s) in 0.00s
+2026-08-21 11:28:39,929  INFO      eds_loader.loader  Load complete: 5 row(s) written across 2 table(s)
+2026-08-21 11:28:39,937  INFO      eds_loader.loader  Starting load: source=local_fs target=mongodb schema_required=True enforce_constraints=False
+2026-08-21 11:28:39,937  DEBUG     eds_loader.loader  Source connector instantiated: LocalFSConnector
+2026-08-21 11:28:39,937  DEBUG     eds_loader.loader  Target connector instantiated: MongoDBConnector
+2026-08-21 11:28:39,937  INFO      eds_loader.loader  Reading schema.json from source
+2026-08-21 11:28:39,937  DEBUG     eds_loader.connectors.local_fs  Reading schema.json from C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_integration_enforce_false0\source2\schema.json
+2026-08-21 11:28:39,938  DEBUG     eds_loader.connectors.local_fs  schema.json parsed: 2 dataset(s)
+2026-08-21 11:28:39,938  DEBUG     eds_loader.loader  schema.json contains 2 dataset definition(s)
+2026-08-21 11:28:39,938  INFO      eds_loader.loader  Loading 2 table(s): customers, orders
+2026-08-21 11:28:39,940  INFO      eds_loader.connectors.local_fs  Read customers: 3 row(s) from C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_integration_enforce_false0\source2\customers.parquet
+2026-08-21 11:28:39,942  INFO      eds_loader.connectors.local_fs  Read orders: 2 row(s) from C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_integration_enforce_false0\source2\orders.parquet
+2026-08-21 11:28:39,942  INFO      eds_loader.loader  Read 2 dataset(s) from source, 5 total row(s)
+2026-08-21 11:28:39,942  DEBUG     eds_loader.loader    customers: 3 row(s), 2 column(s)
+2026-08-21 11:28:39,942  DEBUG     eds_loader.loader    orders: 2 row(s), 3 column(s)
+2026-08-21 11:28:39,942  DEBUG     eds_loader.loader  Constraint enforcement disabled — target will create plain tables
+2026-08-21 11:28:39,942  INFO      eds_loader.loader  Writing 2 table(s) to target
+2026-08-21 11:28:39,942  INFO      eds_loader.connectors.mongodb  Connected to MongoDB localhost:27017/test_db
+2026-08-21 11:28:39,942  DEBUG     eds_loader.connectors.mongodb  [customers] dropping existing collection
+2026-08-21 11:28:39,943  DEBUG     eds_loader.connectors.mongodb  [customers] inserting 3 document(s)
+2026-08-21 11:28:39,943  INFO      eds_loader.connectors.mongodb  [customers] wrote 3 document(s) in 0.00s
+2026-08-21 11:28:39,943  DEBUG     eds_loader.connectors.mongodb  [orders] dropping existing collection
+2026-08-21 11:28:39,943  DEBUG     eds_loader.connectors.mongodb  [orders] inserting 2 document(s)
+2026-08-21 11:28:39,943  INFO      eds_loader.connectors.mongodb  [orders] wrote 2 document(s) in 0.00s
+2026-08-21 11:28:39,943  INFO      eds_loader.loader  Load complete: 5 row(s) written across 2 table(s)
+2026-08-21 11:28:39,958  INFO      eds_loader.connectors._sql_base  Connected to test_user@localhost:3306/test_db
+2026-08-21 11:28:39,958  DEBUG     eds_loader.connectors._sql_base  Ensuring namespace exists: CREATE DATABASE IF NOT EXISTS `test_db`
+2026-08-21 11:28:39,958  DEBUG     eds_loader.connectors._sql_base  [t] DROP TABLE IF EXISTS `test_db`.`t`
+2026-08-21 11:28:39,958  DEBUG     eds_loader.connectors._sql_base  [t] CREATE TABLE `test_db`.`t` (
+    `id` BIGINT
+)
+2026-08-21 11:28:39,958  DEBUG     eds_loader.connectors._sql_base  [t] inserting 1 row(s)
+2026-08-21 11:28:39,959  INFO      eds_loader.connectors._sql_base  [t] wrote 1 row(s) in 0.00s
+2026-08-21 11:28:39,960  INFO      eds_loader.connectors._sql_base  Connected to test_user@localhost:3306/test_db
+2026-08-21 11:28:39,960  DEBUG     eds_loader.connectors._sql_base  Ensuring namespace exists: CREATE DATABASE IF NOT EXISTS `test_db`
+2026-08-21 11:28:39,961  DEBUG     eds_loader.connectors._sql_base  [t] DROP TABLE IF EXISTS `test_db`.`t`
+2026-08-21 11:28:39,961  DEBUG     eds_loader.connectors._sql_base  [t] CREATE TABLE `test_db`.`t` (
+    `id` BIGINT
+)
+2026-08-21 11:28:39,961  DEBUG     eds_loader.connectors._sql_base  [t] inserting 1 row(s)
+2026-08-21 11:28:39,961  INFO      eds_loader.connectors._sql_base  [t] wrote 1 row(s) in 0.00s
+2026-08-21 11:28:39,963  INFO      eds_loader.connectors._sql_base  Connected to test_user@localhost:3306/test_db
+2026-08-21 11:28:39,963  DEBUG     eds_loader.connectors._sql_base  Ensuring namespace exists: CREATE DATABASE IF NOT EXISTS `test_db`
+2026-08-21 11:28:39,963  DEBUG     eds_loader.connectors._sql_base  [t] DROP TABLE IF EXISTS `test_db`.`t`
+2026-08-21 11:28:39,963  ERROR     eds_loader.connectors._sql_base  [t] write failed: DB down
+2026-08-21 11:28:39,965  INFO      eds_loader.connectors._sql_base  Connected to test_user@localhost:3306/eds_db
+2026-08-21 11:28:39,965  DEBUG     eds_loader.connectors._sql_base  Ensuring namespace exists: CREATE DATABASE IF NOT EXISTS `eds_db`
+2026-08-21 11:28:39,966  DEBUG     eds_loader.connectors._sql_base  [customers] DROP TABLE IF EXISTS `eds_db`.`customers`
+2026-08-21 11:28:39,966  DEBUG     eds_loader.connectors._sql_base  [customers] CREATE TABLE `eds_db`.`customers` (
+    `id` BIGINT
+)
+2026-08-21 11:28:39,966  DEBUG     eds_loader.connectors._sql_base  [customers] inserting 1 row(s)
+2026-08-21 11:28:39,967  INFO      eds_loader.connectors._sql_base  [customers] wrote 1 row(s) in 0.00s
+2026-08-21 11:28:39,969  INFO      eds_loader.connectors._sql_base  Connected to test_user@localhost:3306/eds_db
+2026-08-21 11:28:39,969  DEBUG     eds_loader.connectors._sql_base  Table write order (FK-sorted): customers, orders
+2026-08-21 11:28:39,969  DEBUG     eds_loader.connectors._sql_base  Ensuring namespace exists: CREATE DATABASE IF NOT EXISTS `eds_db`
+2026-08-21 11:28:39,972  DEBUG     eds_loader.connectors._sql_base  [customers] DROP TABLE IF EXISTS `eds_db`.`customers`
+2026-08-21 11:28:39,972  DEBUG     eds_loader.connectors._sql_base  [customers] CREATE TABLE `eds_db`.`customers` (
+    `customer_id` BIGINT PRIMARY KEY,
+    `name` TEXT
+)
+2026-08-21 11:28:39,972  DEBUG     eds_loader.connectors._sql_base  [customers] inserting 2 row(s)
+2026-08-21 11:28:39,972  INFO      eds_loader.connectors._sql_base  [customers] wrote 2 row(s) in 0.00s
+2026-08-21 11:28:39,972  DEBUG     eds_loader.connectors._sql_base  [orders] DROP TABLE IF EXISTS `eds_db`.`orders`
+2026-08-21 11:28:39,973  DEBUG     eds_loader.connectors._sql_base  [orders] CREATE TABLE `eds_db`.`orders` (
+    `order_id` BIGINT PRIMARY KEY,
+    `customer_id` BIGINT NOT NULL REFERENCES `eds_db`.`customers`(`customer_id`)
+)
+2026-08-21 11:28:39,973  DEBUG     eds_loader.connectors._sql_base  [orders] inserting 1 row(s)
+2026-08-21 11:28:39,973  INFO      eds_loader.connectors._sql_base  [orders] wrote 1 row(s) in 0.00s
+2026-08-21 11:28:39,975  INFO      eds_loader.connectors._sql_base  Connected to test_user@localhost:3306/test_db
+2026-08-21 11:28:39,975  DEBUG     eds_loader.connectors._sql_base  Ensuring namespace exists: CREATE DATABASE IF NOT EXISTS `test_db`
+2026-08-21 11:28:39,976  DEBUG     eds_loader.connectors._sql_base  [t] DROP TABLE IF EXISTS `test_db`.`t`
+2026-08-21 11:28:39,976  DEBUG     eds_loader.connectors._sql_base  [t] CREATE TABLE `test_db`.`t` (
+    `id` BIGINT
+)
+2026-08-21 11:28:39,976  DEBUG     eds_loader.connectors._sql_base  [t] inserting 1 row(s)
+2026-08-21 11:28:39,976  INFO      eds_loader.connectors._sql_base  [t] wrote 1 row(s) in 0.00s
+2026-08-21 11:28:39,978  INFO      eds_loader.connectors._sql_base  Connected to test_user@srv:3306/db
+2026-08-21 11:28:39,978  DEBUG     eds_loader.connectors._sql_base  Ensuring namespace exists: CREATE DATABASE IF NOT EXISTS `db`
+2026-08-21 11:28:39,979  DEBUG     eds_loader.connectors._sql_base  [tbl] DROP TABLE IF EXISTS `db`.`tbl`
+2026-08-21 11:28:39,979  DEBUG     eds_loader.connectors._sql_base  [tbl] CREATE TABLE `db`.`tbl` (
+    `id` BIGINT
+)
+2026-08-21 11:28:39,979  DEBUG     eds_loader.connectors._sql_base  [tbl] inserting 1 row(s)
+2026-08-21 11:28:39,979  INFO      eds_loader.connectors._sql_base  [tbl] wrote 1 row(s) in 0.00s
+2026-08-21 11:28:39,981  INFO      eds_loader.connectors._sql_base  Connected to test_user@localhost:3306/test_db
+2026-08-21 11:28:39,981  DEBUG     eds_loader.connectors._sql_base  Table write order (FK-sorted): customers, orders
+2026-08-21 11:28:39,981  DEBUG     eds_loader.connectors._sql_base  Ensuring namespace exists: CREATE DATABASE IF NOT EXISTS `test_db`
+2026-08-21 11:28:39,981  DEBUG     eds_loader.connectors._sql_base  [customers] DROP TABLE IF EXISTS `test_db`.`customers`
+2026-08-21 11:28:39,982  DEBUG     eds_loader.connectors._sql_base  [customers] CREATE TABLE `test_db`.`customers` (
+    `customer_id` BIGINT PRIMARY KEY,
+    `name` TEXT
+)
+2026-08-21 11:28:39,982  DEBUG     eds_loader.connectors._sql_base  [customers] inserting 2 row(s)
+2026-08-21 11:28:39,982  INFO      eds_loader.connectors._sql_base  [customers] wrote 2 row(s) in 0.00s
+2026-08-21 11:28:39,982  DEBUG     eds_loader.connectors._sql_base  [orders] DROP TABLE IF EXISTS `test_db`.`orders`
+2026-08-21 11:28:39,982  DEBUG     eds_loader.connectors._sql_base  [orders] CREATE TABLE `test_db`.`orders` (
+    `order_id` BIGINT PRIMARY KEY,
+    `customer_id` BIGINT NOT NULL REFERENCES `test_db`.`customers`(`customer_id`)
+)
+2026-08-21 11:28:39,982  DEBUG     eds_loader.connectors._sql_base  [orders] inserting 1 row(s)
+2026-08-21 11:28:39,982  INFO      eds_loader.connectors._sql_base  [orders] wrote 1 row(s) in 0.00s
+2026-08-21 11:28:39,998  INFO      eds_loader.loader  Starting load: source=local_fs target=mysql schema_required=True enforce_constraints=True
+2026-08-21 11:28:39,998  DEBUG     eds_loader.loader  Source connector instantiated: LocalFSConnector
+2026-08-21 11:28:39,998  DEBUG     eds_loader.loader  Target connector instantiated: MySQLConnector
+2026-08-21 11:28:39,998  INFO      eds_loader.loader  Reading schema.json from source
+2026-08-21 11:28:39,998  DEBUG     eds_loader.connectors.local_fs  Reading schema.json from C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_integration_local_fs_to_m1\source\schema.json
+2026-08-21 11:28:40,011  DEBUG     eds_loader.connectors.local_fs  schema.json parsed: 2 dataset(s)
+2026-08-21 11:28:40,011  DEBUG     eds_loader.loader  schema.json contains 2 dataset definition(s)
+2026-08-21 11:28:40,011  INFO      eds_loader.loader  Loading 2 table(s): customers, orders
+2026-08-21 11:28:40,025  INFO      eds_loader.connectors.local_fs  Read customers: 2 row(s) from C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_integration_local_fs_to_m1\source\customers.parquet
+2026-08-21 11:28:40,042  INFO      eds_loader.connectors.local_fs  Read orders: 1 row(s) from C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_integration_local_fs_to_m1\source\orders.parquet
+2026-08-21 11:28:40,042  INFO      eds_loader.loader  Read 2 dataset(s) from source, 3 total row(s)
+2026-08-21 11:28:40,042  DEBUG     eds_loader.loader    customers: 2 row(s), 2 column(s)
+2026-08-21 11:28:40,042  DEBUG     eds_loader.loader    orders: 1 row(s), 2 column(s)
+2026-08-21 11:28:40,042  DEBUG     eds_loader.loader  Constraint enforcement enabled — forwarding schema metadata to target
+2026-08-21 11:28:40,042  INFO      eds_loader.loader  Writing 2 table(s) to target
+2026-08-21 11:28:40,042  INFO      eds_loader.connectors._sql_base  Connected to test_user@localhost:3306/test_db
+2026-08-21 11:28:40,043  DEBUG     eds_loader.connectors._sql_base  Table write order (FK-sorted): customers, orders
+2026-08-21 11:28:40,043  DEBUG     eds_loader.connectors._sql_base  Ensuring namespace exists: CREATE DATABASE IF NOT EXISTS `test_db`
+2026-08-21 11:28:40,043  DEBUG     eds_loader.connectors._sql_base  [customers] DROP TABLE IF EXISTS `test_db`.`customers`
+2026-08-21 11:28:40,043  DEBUG     eds_loader.connectors._sql_base  [customers] CREATE TABLE `test_db`.`customers` (
+    `customer_id` BIGINT PRIMARY KEY,
+    `name` TEXT
+)
+2026-08-21 11:28:40,043  DEBUG     eds_loader.connectors._sql_base  [customers] inserting 2 row(s)
+2026-08-21 11:28:40,044  INFO      eds_loader.connectors._sql_base  [customers] wrote 2 row(s) in 0.00s
+2026-08-21 11:28:40,044  DEBUG     eds_loader.connectors._sql_base  [orders] DROP TABLE IF EXISTS `test_db`.`orders`
+2026-08-21 11:28:40,044  DEBUG     eds_loader.connectors._sql_base  [orders] CREATE TABLE `test_db`.`orders` (
+    `order_id` BIGINT PRIMARY KEY,
+    `customer_id` BIGINT NOT NULL REFERENCES `test_db`.`customers`(`customer_id`)
+)
+2026-08-21 11:28:40,044  DEBUG     eds_loader.connectors._sql_base  [orders] inserting 1 row(s)
+2026-08-21 11:28:40,044  INFO      eds_loader.connectors._sql_base  [orders] wrote 1 row(s) in 0.00s
+2026-08-21 11:28:40,044  INFO      eds_loader.loader  Load complete: 3 row(s) written across 2 table(s)
+2026-08-21 11:28:40,071  INFO      eds_loader.connectors._sql_base  Connected to test_user@localhost:5432/test_db
+2026-08-21 11:28:40,071  DEBUG     eds_loader.connectors._sql_base  Ensuring namespace exists: CREATE SCHEMA IF NOT EXISTS "public"
+2026-08-21 11:28:40,071  DEBUG     eds_loader.connectors._sql_base  [customers] DROP TABLE IF EXISTS "public"."customers" CASCADE
+2026-08-21 11:28:40,071  DEBUG     eds_loader.connectors._sql_base  [customers] CREATE TABLE "public"."customers" (
+    "customer_id" BIGINT,
+    "name" TEXT
+)
+2026-08-21 11:28:40,071  DEBUG     eds_loader.connectors._sql_base  [customers] inserting 3 row(s)
+2026-08-21 11:28:40,072  INFO      eds_loader.connectors._sql_base  [customers] wrote 3 row(s) in 0.00s
+2026-08-21 11:28:40,072  DEBUG     eds_loader.connectors._sql_base  [orders] DROP TABLE IF EXISTS "public"."orders" CASCADE
+2026-08-21 11:28:40,072  DEBUG     eds_loader.connectors._sql_base  [orders] CREATE TABLE "public"."orders" (
+    "order_id" BIGINT,
+    "customer_id" BIGINT,
+    "amount" DOUBLE PRECISION
+)
+2026-08-21 11:28:40,072  DEBUG     eds_loader.connectors._sql_base  [orders] inserting 2 row(s)
+2026-08-21 11:28:40,072  INFO      eds_loader.connectors._sql_base  [orders] wrote 2 row(s) in 0.00s
+2026-08-21 11:28:40,073  INFO      eds_loader.connectors._sql_base  Connected to test_user@localhost:5432/test_db
+2026-08-21 11:28:40,073  DEBUG     eds_loader.connectors._sql_base  Ensuring namespace exists: CREATE SCHEMA IF NOT EXISTS "public"
+2026-08-21 11:28:40,074  DEBUG     eds_loader.connectors._sql_base  [customers] DROP TABLE IF EXISTS "public"."customers" CASCADE
+2026-08-21 11:28:40,074  DEBUG     eds_loader.connectors._sql_base  [customers] CREATE TABLE "public"."customers" (
+    "id" BIGINT
+)
+2026-08-21 11:28:40,074  DEBUG     eds_loader.connectors._sql_base  [customers] inserting 1 row(s)
+2026-08-21 11:28:40,074  INFO      eds_loader.connectors._sql_base  [customers] wrote 1 row(s) in 0.00s
+2026-08-21 11:28:40,076  INFO      eds_loader.connectors._sql_base  Connected to test_user@localhost:5432/test_db
+2026-08-21 11:28:40,076  DEBUG     eds_loader.connectors._sql_base  Ensuring namespace exists: CREATE SCHEMA IF NOT EXISTS "public"
+2026-08-21 11:28:40,076  DEBUG     eds_loader.connectors._sql_base  [tbl] DROP TABLE IF EXISTS "public"."tbl" CASCADE
+2026-08-21 11:28:40,076  DEBUG     eds_loader.connectors._sql_base  [tbl] CREATE TABLE "public"."tbl" (
+    "a" BIGINT
+)
+2026-08-21 11:28:40,076  DEBUG     eds_loader.connectors._sql_base  [tbl] inserting 1 row(s)
+2026-08-21 11:28:40,077  INFO      eds_loader.connectors._sql_base  [tbl] wrote 1 row(s) in 0.00s
+2026-08-21 11:28:40,079  INFO      eds_loader.connectors._sql_base  Connected to test_user@localhost:5432/test_db
+2026-08-21 11:28:40,079  DEBUG     eds_loader.connectors._sql_base  Ensuring namespace exists: CREATE SCHEMA IF NOT EXISTS "public"
+2026-08-21 11:28:40,079  DEBUG     eds_loader.connectors._sql_base  [data] DROP TABLE IF EXISTS "public"."data" CASCADE
+2026-08-21 11:28:40,079  DEBUG     eds_loader.connectors._sql_base  [data] CREATE TABLE "public"."data" (
+    "id" BIGINT,
+    "val" TEXT
+)
+2026-08-21 11:28:40,079  DEBUG     eds_loader.connectors._sql_base  [data] inserting 3 row(s)
+2026-08-21 11:28:40,080  INFO      eds_loader.connectors._sql_base  [data] wrote 3 row(s) in 0.00s
+2026-08-21 11:28:40,082  INFO      eds_loader.connectors._sql_base  Connected to test_user@localhost:5432/test_db
+2026-08-21 11:28:40,082  DEBUG     eds_loader.connectors._sql_base  Ensuring namespace exists: CREATE SCHEMA IF NOT EXISTS "public"
+2026-08-21 11:28:40,082  DEBUG     eds_loader.connectors._sql_base  [customers] DROP TABLE IF EXISTS "public"."customers" CASCADE
+2026-08-21 11:28:40,082  DEBUG     eds_loader.connectors._sql_base  [customers] CREATE TABLE "public"."customers" (
+    "customer_id" BIGINT,
+    "name" TEXT
+)
+2026-08-21 11:28:40,082  DEBUG     eds_loader.connectors._sql_base  [customers] inserting 3 row(s)
+2026-08-21 11:28:40,083  INFO      eds_loader.connectors._sql_base  [customers] wrote 3 row(s) in 0.00s
+2026-08-21 11:28:40,083  DEBUG     eds_loader.connectors._sql_base  [orders] DROP TABLE IF EXISTS "public"."orders" CASCADE
+2026-08-21 11:28:40,083  DEBUG     eds_loader.connectors._sql_base  [orders] CREATE TABLE "public"."orders" (
+    "order_id" BIGINT,
+    "customer_id" BIGINT,
+    "amount" DOUBLE PRECISION
+)
+2026-08-21 11:28:40,083  DEBUG     eds_loader.connectors._sql_base  [orders] inserting 2 row(s)
+2026-08-21 11:28:40,083  INFO      eds_loader.connectors._sql_base  [orders] wrote 2 row(s) in 0.00s
+2026-08-21 11:28:40,085  INFO      eds_loader.connectors._sql_base  Connected to test_user@localhost:5432/test_db
+2026-08-21 11:28:40,085  DEBUG     eds_loader.connectors._sql_base  Ensuring namespace exists: CREATE SCHEMA IF NOT EXISTS "public"
+2026-08-21 11:28:40,085  DEBUG     eds_loader.connectors._sql_base  [customers] DROP TABLE IF EXISTS "public"."customers" CASCADE
+2026-08-21 11:28:40,085  DEBUG     eds_loader.connectors._sql_base  [customers] CREATE TABLE "public"."customers" (
+    "customer_id" BIGINT,
+    "name" TEXT
+)
+2026-08-21 11:28:40,085  DEBUG     eds_loader.connectors._sql_base  [customers] inserting 3 row(s)
+2026-08-21 11:28:40,086  INFO      eds_loader.connectors._sql_base  [customers] wrote 3 row(s) in 0.00s
+2026-08-21 11:28:40,086  DEBUG     eds_loader.connectors._sql_base  [orders] DROP TABLE IF EXISTS "public"."orders" CASCADE
+2026-08-21 11:28:40,086  DEBUG     eds_loader.connectors._sql_base  [orders] CREATE TABLE "public"."orders" (
+    "order_id" BIGINT,
+    "customer_id" BIGINT,
+    "amount" DOUBLE PRECISION
+)
+2026-08-21 11:28:40,086  DEBUG     eds_loader.connectors._sql_base  [orders] inserting 2 row(s)
+2026-08-21 11:28:40,086  INFO      eds_loader.connectors._sql_base  [orders] wrote 2 row(s) in 0.00s
+2026-08-21 11:28:40,087  INFO      eds_loader.connectors._sql_base  Connected to test_user@localhost:5432/test_db
+2026-08-21 11:28:40,087  DEBUG     eds_loader.connectors._sql_base  Ensuring namespace exists: CREATE SCHEMA IF NOT EXISTS "public"
+2026-08-21 11:28:40,088  DEBUG     eds_loader.connectors._sql_base  [customers] DROP TABLE IF EXISTS "public"."customers" CASCADE
+2026-08-21 11:28:40,088  DEBUG     eds_loader.connectors._sql_base  [customers] CREATE TABLE "public"."customers" (
+    "customer_id" BIGINT,
+    "name" TEXT
+)
+2026-08-21 11:28:40,088  DEBUG     eds_loader.connectors._sql_base  [customers] inserting 3 row(s)
+2026-08-21 11:28:40,088  INFO      eds_loader.connectors._sql_base  [customers] wrote 3 row(s) in 0.00s
+2026-08-21 11:28:40,088  DEBUG     eds_loader.connectors._sql_base  [orders] DROP TABLE IF EXISTS "public"."orders" CASCADE
+2026-08-21 11:28:40,088  DEBUG     eds_loader.connectors._sql_base  [orders] CREATE TABLE "public"."orders" (
+    "order_id" BIGINT,
+    "customer_id" BIGINT,
+    "amount" DOUBLE PRECISION
+)
+2026-08-21 11:28:40,088  DEBUG     eds_loader.connectors._sql_base  [orders] inserting 2 row(s)
+2026-08-21 11:28:40,089  INFO      eds_loader.connectors._sql_base  [orders] wrote 2 row(s) in 0.00s
+2026-08-21 11:28:40,090  INFO      eds_loader.connectors._sql_base  Connected to test_user@dbserver:5433/mydb
+2026-08-21 11:28:40,090  DEBUG     eds_loader.connectors._sql_base  Ensuring namespace exists: CREATE SCHEMA IF NOT EXISTS "public"
+2026-08-21 11:28:40,091  DEBUG     eds_loader.connectors._sql_base  [tbl] DROP TABLE IF EXISTS "public"."tbl" CASCADE
+2026-08-21 11:28:40,091  DEBUG     eds_loader.connectors._sql_base  [tbl] CREATE TABLE "public"."tbl" (
+    "id" BIGINT
+)
+2026-08-21 11:28:40,091  DEBUG     eds_loader.connectors._sql_base  [tbl] inserting 1 row(s)
+2026-08-21 11:28:40,091  INFO      eds_loader.connectors._sql_base  [tbl] wrote 1 row(s) in 0.00s
+2026-08-21 11:28:40,093  INFO      eds_loader.connectors._sql_base  Connected to test_user@localhost:5432/test_db
+2026-08-21 11:28:40,093  DEBUG     eds_loader.connectors._sql_base  Table write order (FK-sorted): customers, orders
+2026-08-21 11:28:40,094  DEBUG     eds_loader.connectors._sql_base  Ensuring namespace exists: CREATE SCHEMA IF NOT EXISTS "public"
+2026-08-21 11:28:40,095  DEBUG     eds_loader.connectors._sql_base  [customers] DROP TABLE IF EXISTS "public"."customers" CASCADE
+2026-08-21 11:28:40,095  DEBUG     eds_loader.connectors._sql_base  [customers] CREATE TABLE "public"."customers" (
+    "customer_id" BIGINT PRIMARY KEY,
+    "name" TEXT UNIQUE
+)
+2026-08-21 11:28:40,095  DEBUG     eds_loader.connectors._sql_base  [customers] inserting 3 row(s)
+2026-08-21 11:28:40,095  INFO      eds_loader.connectors._sql_base  [customers] wrote 3 row(s) in 0.00s
+2026-08-21 11:28:40,095  DEBUG     eds_loader.connectors._sql_base  [orders] DROP TABLE IF EXISTS "public"."orders" CASCADE
+2026-08-21 11:28:40,096  DEBUG     eds_loader.connectors._sql_base  [orders] CREATE TABLE "public"."orders" (
+    "order_id" BIGINT PRIMARY KEY,
+    "customer_id" BIGINT NOT NULL REFERENCES "public"."customers"("customer_id"),
+    "amount" DOUBLE PRECISION
+)
+2026-08-21 11:28:40,096  DEBUG     eds_loader.connectors._sql_base  [orders] inserting 2 row(s)
+2026-08-21 11:28:40,096  INFO      eds_loader.connectors._sql_base  [orders] wrote 2 row(s) in 0.00s
+2026-08-21 11:28:40,100  INFO      eds_loader.connectors._sql_base  Connected to test_user@localhost:5432/test_db
+2026-08-21 11:28:40,100  DEBUG     eds_loader.connectors._sql_base  Table write order (FK-sorted): customers, orders
+2026-08-21 11:28:40,100  DEBUG     eds_loader.connectors._sql_base  Ensuring namespace exists: CREATE SCHEMA IF NOT EXISTS "public"
+2026-08-21 11:28:40,102  DEBUG     eds_loader.connectors._sql_base  [customers] DROP TABLE IF EXISTS "public"."customers" CASCADE
+2026-08-21 11:28:40,102  DEBUG     eds_loader.connectors._sql_base  [customers] CREATE TABLE "public"."customers" (
+    "customer_id" BIGINT PRIMARY KEY,
+    "name" TEXT UNIQUE
+)
+2026-08-21 11:28:40,102  DEBUG     eds_loader.connectors._sql_base  [customers] inserting 3 row(s)
+2026-08-21 11:28:40,103  INFO      eds_loader.connectors._sql_base  [customers] wrote 3 row(s) in 0.00s
+2026-08-21 11:28:40,103  DEBUG     eds_loader.connectors._sql_base  [orders] DROP TABLE IF EXISTS "public"."orders" CASCADE
+2026-08-21 11:28:40,103  DEBUG     eds_loader.connectors._sql_base  [orders] CREATE TABLE "public"."orders" (
+    "order_id" BIGINT PRIMARY KEY,
+    "customer_id" BIGINT NOT NULL REFERENCES "public"."customers"("customer_id"),
+    "amount" DOUBLE PRECISION
+)
+2026-08-21 11:28:40,103  DEBUG     eds_loader.connectors._sql_base  [orders] inserting 2 row(s)
+2026-08-21 11:28:40,103  INFO      eds_loader.connectors._sql_base  [orders] wrote 2 row(s) in 0.00s
+2026-08-21 11:28:40,105  INFO      eds_loader.connectors._sql_base  Connected to test_user@localhost:5432/test_db
+2026-08-21 11:28:40,105  DEBUG     eds_loader.connectors._sql_base  Ensuring namespace exists: CREATE SCHEMA IF NOT EXISTS "public"
+2026-08-21 11:28:40,105  DEBUG     eds_loader.connectors._sql_base  [empty] DROP TABLE IF EXISTS "public"."empty" CASCADE
+2026-08-21 11:28:40,105  DEBUG     eds_loader.connectors._sql_base  [empty] CREATE TABLE "public"."empty" (
+    "id" BIGINT
+)
+2026-08-21 11:28:40,105  DEBUG     eds_loader.connectors._sql_base  [empty] inserting 0 row(s)
+2026-08-21 11:28:40,105  INFO      eds_loader.connectors._sql_base  [empty] wrote 0 row(s) in 0.00s
+2026-08-21 11:28:40,107  INFO      eds_loader.connectors._sql_base  Connected to test_user@localhost:5432/test_db
+2026-08-21 11:28:40,107  DEBUG     eds_loader.connectors._sql_base  Ensuring namespace exists: CREATE SCHEMA IF NOT EXISTS "public"
+2026-08-21 11:28:40,107  DEBUG     eds_loader.connectors._sql_base  [tbl] DROP TABLE IF EXISTS "public"."tbl" CASCADE
+2026-08-21 11:28:40,107  DEBUG     eds_loader.connectors._sql_base  [tbl] CREATE TABLE "public"."tbl" (
+    "id" BIGINT
+)
+2026-08-21 11:28:40,107  ERROR     eds_loader.connectors._sql_base  [tbl] write failed: DB error
+2026-08-21 11:28:40,109  INFO      eds_loader.connectors._sql_base  Connected to test_user@localhost:5432/test_db
+2026-08-21 11:28:40,110  DEBUG     eds_loader.connectors._sql_base  Ensuring namespace exists: CREATE SCHEMA IF NOT EXISTS "public"
+2026-08-21 11:28:40,110  DEBUG     eds_loader.connectors._sql_base  [tbl] DROP TABLE IF EXISTS "public"."tbl" CASCADE
+2026-08-21 11:28:40,110  DEBUG     eds_loader.connectors._sql_base  [tbl] CREATE TABLE "public"."tbl" (
+    "id" BIGINT
+)
+2026-08-21 11:28:40,110  ERROR     eds_loader.connectors._sql_base  [tbl] write failed: oops
+2026-08-21 11:28:40,126  INFO      eds_loader.loader  Starting load: source=local_fs target=postgres schema_required=True enforce_constraints=True
+2026-08-21 11:28:40,126  DEBUG     eds_loader.loader  Source connector instantiated: LocalFSConnector
+2026-08-21 11:28:40,126  DEBUG     eds_loader.loader  Target connector instantiated: PostgresConnector
+2026-08-21 11:28:40,126  INFO      eds_loader.loader  Reading schema.json from source
+2026-08-21 11:28:40,126  DEBUG     eds_loader.connectors.local_fs  Reading schema.json from C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_integration_local_fs_to_p0\source\schema.json
+2026-08-21 11:28:40,139  DEBUG     eds_loader.connectors.local_fs  schema.json parsed: 2 dataset(s)
+2026-08-21 11:28:40,139  DEBUG     eds_loader.loader  schema.json contains 2 dataset definition(s)
+2026-08-21 11:28:40,139  INFO      eds_loader.loader  Loading 2 table(s): customers, orders
+2026-08-21 11:28:40,142  INFO      eds_loader.connectors.local_fs  Read customers: 3 row(s) from C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_integration_local_fs_to_p0\source\customers.parquet
+2026-08-21 11:28:40,144  INFO      eds_loader.connectors.local_fs  Read orders: 2 row(s) from C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_integration_local_fs_to_p0\source\orders.parquet
+2026-08-21 11:28:40,144  INFO      eds_loader.loader  Read 2 dataset(s) from source, 5 total row(s)
+2026-08-21 11:28:40,144  DEBUG     eds_loader.loader    customers: 3 row(s), 2 column(s)
+2026-08-21 11:28:40,144  DEBUG     eds_loader.loader    orders: 2 row(s), 3 column(s)
+2026-08-21 11:28:40,145  DEBUG     eds_loader.loader  Constraint enforcement enabled — forwarding schema metadata to target
+2026-08-21 11:28:40,145  INFO      eds_loader.loader  Writing 2 table(s) to target
+2026-08-21 11:28:40,145  INFO      eds_loader.connectors._sql_base  Connected to test_user@localhost:5432/test_db
+2026-08-21 11:28:40,145  DEBUG     eds_loader.connectors._sql_base  Table write order (FK-sorted): customers, orders
+2026-08-21 11:28:40,145  DEBUG     eds_loader.connectors._sql_base  Ensuring namespace exists: CREATE SCHEMA IF NOT EXISTS "public"
+2026-08-21 11:28:40,145  DEBUG     eds_loader.connectors._sql_base  [customers] DROP TABLE IF EXISTS "public"."customers" CASCADE
+2026-08-21 11:28:40,145  DEBUG     eds_loader.connectors._sql_base  [customers] CREATE TABLE "public"."customers" (
+    "customer_id" BIGINT PRIMARY KEY,
+    "name" TEXT UNIQUE
+)
+2026-08-21 11:28:40,146  DEBUG     eds_loader.connectors._sql_base  [customers] inserting 3 row(s)
+2026-08-21 11:28:40,146  INFO      eds_loader.connectors._sql_base  [customers] wrote 3 row(s) in 0.00s
+2026-08-21 11:28:40,146  DEBUG     eds_loader.connectors._sql_base  [orders] DROP TABLE IF EXISTS "public"."orders" CASCADE
+2026-08-21 11:28:40,146  DEBUG     eds_loader.connectors._sql_base  [orders] CREATE TABLE "public"."orders" (
+    "order_id" BIGINT PRIMARY KEY,
+    "customer_id" BIGINT NOT NULL REFERENCES "public"."customers"("customer_id"),
+    "amount" DOUBLE PRECISION
+)
+2026-08-21 11:28:40,146  DEBUG     eds_loader.connectors._sql_base  [orders] inserting 2 row(s)
+2026-08-21 11:28:40,146  INFO      eds_loader.connectors._sql_base  [orders] wrote 2 row(s) in 0.00s
+2026-08-21 11:28:40,146  INFO      eds_loader.loader  Load complete: 5 row(s) written across 2 table(s)
+2026-08-21 11:28:40,153  INFO      eds_loader.loader  Starting load: source=local_fs target=postgres schema_required=True enforce_constraints=False
+2026-08-21 11:28:40,153  DEBUG     eds_loader.loader  Source connector instantiated: LocalFSConnector
+2026-08-21 11:28:40,154  DEBUG     eds_loader.loader  Target connector instantiated: PostgresConnector
+2026-08-21 11:28:40,154  INFO      eds_loader.loader  Reading schema.json from source
+2026-08-21 11:28:40,154  DEBUG     eds_loader.connectors.local_fs  Reading schema.json from C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_integration_enforce_false1\source2\schema.json
+2026-08-21 11:28:40,155  DEBUG     eds_loader.connectors.local_fs  schema.json parsed: 2 dataset(s)
+2026-08-21 11:28:40,155  DEBUG     eds_loader.loader  schema.json contains 2 dataset definition(s)
+2026-08-21 11:28:40,155  INFO      eds_loader.loader  Loading 2 table(s): customers, orders
+2026-08-21 11:28:40,157  INFO      eds_loader.connectors.local_fs  Read customers: 3 row(s) from C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_integration_enforce_false1\source2\customers.parquet
+2026-08-21 11:28:40,158  INFO      eds_loader.connectors.local_fs  Read orders: 2 row(s) from C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_integration_enforce_false1\source2\orders.parquet
+2026-08-21 11:28:40,158  INFO      eds_loader.loader  Read 2 dataset(s) from source, 5 total row(s)
+2026-08-21 11:28:40,159  DEBUG     eds_loader.loader    customers: 3 row(s), 2 column(s)
+2026-08-21 11:28:40,159  DEBUG     eds_loader.loader    orders: 2 row(s), 3 column(s)
+2026-08-21 11:28:40,159  DEBUG     eds_loader.loader  Constraint enforcement disabled — target will create plain tables
+2026-08-21 11:28:40,159  INFO      eds_loader.loader  Writing 2 table(s) to target
+2026-08-21 11:28:40,159  INFO      eds_loader.connectors._sql_base  Connected to test_user@localhost:5432/test_db
+2026-08-21 11:28:40,159  DEBUG     eds_loader.connectors._sql_base  Ensuring namespace exists: CREATE SCHEMA IF NOT EXISTS "public"
+2026-08-21 11:28:40,160  DEBUG     eds_loader.connectors._sql_base  [customers] DROP TABLE IF EXISTS "public"."customers" CASCADE
+2026-08-21 11:28:40,160  DEBUG     eds_loader.connectors._sql_base  [customers] CREATE TABLE "public"."customers" (
+    "customer_id" BIGINT,
+    "name" TEXT
+)
+2026-08-21 11:28:40,160  DEBUG     eds_loader.connectors._sql_base  [customers] inserting 3 row(s)
+2026-08-21 11:28:40,160  INFO      eds_loader.connectors._sql_base  [customers] wrote 3 row(s) in 0.00s
+2026-08-21 11:28:40,161  DEBUG     eds_loader.connectors._sql_base  [orders] DROP TABLE IF EXISTS "public"."orders" CASCADE
+2026-08-21 11:28:40,161  DEBUG     eds_loader.connectors._sql_base  [orders] CREATE TABLE "public"."orders" (
+    "order_id" BIGINT,
+    "customer_id" BIGINT,
+    "amount" DOUBLE PRECISION
+)
+2026-08-21 11:28:40,161  DEBUG     eds_loader.connectors._sql_base  [orders] inserting 2 row(s)
+2026-08-21 11:28:40,161  INFO      eds_loader.connectors._sql_base  [orders] wrote 2 row(s) in 0.00s
+2026-08-21 11:28:40,161  INFO      eds_loader.loader  Load complete: 5 row(s) written across 2 table(s)
+2026-08-21 11:28:40,174  INFO      eds_loader.connectors.remote_fs  Connected to SFTP testuser@test.example.com:22
+2026-08-21 11:28:40,176  INFO      eds_loader.connectors.remote_fs  Connected to SFTP testuser@test.example.com:22
+2026-08-21 11:28:40,236  INFO      eds_loader.connectors.remote_fs  Connected to SFTP testuser@test.example.com:22
+2026-08-21 11:28:40,253  DEBUG     eds_loader.connectors.remote_fs  Listing remote directory: /data/eds
+2026-08-21 11:28:40,253  DEBUG     eds_loader.connectors.remote_fs  Found 2 .parquet file(s) in /data/eds
+2026-08-21 11:28:40,254  INFO      eds_loader.connectors.remote_fs  Downloaded customers: 2 row(s) from /data/eds/customers.parquet
+2026-08-21 11:28:40,256  INFO      eds_loader.connectors.remote_fs  Downloaded orders: 1 row(s) from /data/eds/orders.parquet
+2026-08-21 11:28:40,259  DEBUG     eds_loader.connectors.remote_fs  Listing remote directory: /data/eds
+2026-08-21 11:28:40,259  DEBUG     eds_loader.connectors.remote_fs  Found 1 .parquet file(s) in /data/eds
+2026-08-21 11:28:40,260  INFO      eds_loader.connectors.remote_fs  Downloaded data: 1 row(s) from /data/eds/data.parquet
+2026-08-21 11:28:40,262  DEBUG     eds_loader.connectors.remote_fs  Listing remote directory: /data/eds
+2026-08-21 11:28:40,267  INFO      eds_loader.connectors.remote_fs  Downloaded customers: 2 row(s) from /data/eds/customers.parquet
+2026-08-21 11:28:40,275  INFO      eds_loader.connectors.remote_fs  Downloaded my_table: 3 row(s) from /data/eds/my_table.parquet
+2026-08-21 11:28:40,316  DEBUG     eds_loader.connectors.remote_fs  Listing remote directory: /data/eds
+2026-08-21 11:28:40,316  DEBUG     eds_loader.connectors.remote_fs  Found 0 .parquet file(s) in /data/eds
+2026-08-21 11:28:40,324  INFO      eds_loader.loader  Starting load: source=remote_fs target=local_fs schema_required=True enforce_constraints=True
+2026-08-21 11:28:40,324  DEBUG     eds_loader.loader  Source connector instantiated: RemoteFSConnector
+2026-08-21 11:28:40,324  DEBUG     eds_loader.loader  Target connector instantiated: LocalFSConnector
+2026-08-21 11:28:40,324  INFO      eds_loader.loader  Reading schema.json from source
+2026-08-21 11:28:40,325  DEBUG     eds_loader.loader  schema.json contains 2 dataset definition(s)
+2026-08-21 11:28:40,325  INFO      eds_loader.loader  Loading 2 table(s): customers, orders
+2026-08-21 11:28:40,326  INFO      eds_loader.connectors.remote_fs  Downloaded customers: 2 row(s) from /data/eds/customers.parquet
+2026-08-21 11:28:40,327  INFO      eds_loader.connectors.remote_fs  Downloaded orders: 1 row(s) from /data/eds/orders.parquet
+2026-08-21 11:28:40,328  INFO      eds_loader.loader  Read 2 dataset(s) from source, 3 total row(s)
+2026-08-21 11:28:40,328  DEBUG     eds_loader.loader    customers: 2 row(s), 2 column(s)
+2026-08-21 11:28:40,328  DEBUG     eds_loader.loader    orders: 1 row(s), 2 column(s)
+2026-08-21 11:28:40,328  DEBUG     eds_loader.loader  Constraint enforcement enabled — forwarding schema metadata to target
+2026-08-21 11:28:40,328  INFO      eds_loader.loader  Writing 2 table(s) to target
+2026-08-21 11:28:40,330  INFO      eds_loader.connectors.local_fs  Wrote customers: 2 row(s) to C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_integration_remote_fs_sou0\remote_to_local_target\customers.parquet
+2026-08-21 11:28:40,336  INFO      eds_loader.connectors.local_fs  Wrote orders: 1 row(s) to C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_integration_remote_fs_sou0\remote_to_local_target\orders.parquet
+2026-08-21 11:28:40,337  DEBUG     eds_loader.connectors.local_fs  Merging schema.json at target
+2026-08-21 11:28:40,338  INFO      eds_loader.loader  Load complete: 3 row(s) written across 2 table(s)
+2026-08-21 11:28:40,346  INFO      eds_loader.loader  Starting load: source=remote_fs target=local_fs schema_required=True enforce_constraints=True
+2026-08-21 11:28:40,346  DEBUG     eds_loader.loader  Source connector instantiated: RemoteFSConnector
+2026-08-21 11:28:40,346  DEBUG     eds_loader.loader  Target connector instantiated: LocalFSConnector
+2026-08-21 11:28:40,346  INFO      eds_loader.loader  Reading schema.json from source
+2026-08-21 11:28:40,346  DEBUG     eds_loader.loader  schema.json contains 2 dataset definition(s)
+2026-08-21 11:28:40,347  INFO      eds_loader.loader  Loading 1 table(s): customers
+2026-08-21 11:28:40,356  INFO      eds_loader.connectors.remote_fs  Downloaded customers: 2 row(s) from /data/eds/customers.parquet
+2026-08-21 11:28:40,356  INFO      eds_loader.loader  Read 1 dataset(s) from source, 2 total row(s)
+2026-08-21 11:28:40,356  DEBUG     eds_loader.loader    customers: 2 row(s), 2 column(s)
+2026-08-21 11:28:40,356  DEBUG     eds_loader.loader  Constraint enforcement enabled — forwarding schema metadata to target
+2026-08-21 11:28:40,356  INFO      eds_loader.loader  Writing 1 table(s) to target
+2026-08-21 11:28:40,360  INFO      eds_loader.connectors.local_fs  Wrote customers: 2 row(s) to C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_integration_table_subset_1\subset_target\customers.parquet
+2026-08-21 11:28:40,360  DEBUG     eds_loader.connectors.local_fs  Merging schema.json at target
+2026-08-21 11:28:40,361  INFO      eds_loader.loader  Load complete: 2 row(s) written across 1 table(s)
+2026-08-21 11:28:40,415  INFO      eds_loader.loader  Starting load: source=s3 target=local_fs schema_required=True enforce_constraints=True
+2026-08-21 11:28:40,415  DEBUG     eds_loader.loader  Source connector instantiated: S3Connector
+2026-08-21 11:28:40,415  DEBUG     eds_loader.loader  Target connector instantiated: LocalFSConnector
+2026-08-21 11:28:40,415  INFO      eds_loader.loader  Reading schema.json from source
+2026-08-21 11:28:40,416  DEBUG     eds_loader.loader  schema.json contains 2 dataset definition(s)
+2026-08-21 11:28:40,416  INFO      eds_loader.loader  Loading 2 table(s): customers, orders
+2026-08-21 11:28:40,417  INFO      eds_loader.loader  Read 2 dataset(s) from source, 3 total row(s)
+2026-08-21 11:28:40,418  DEBUG     eds_loader.loader    customers: 2 row(s), 2 column(s)
+2026-08-21 11:28:40,418  DEBUG     eds_loader.loader    orders: 1 row(s), 2 column(s)
+2026-08-21 11:28:40,418  DEBUG     eds_loader.loader  Constraint enforcement enabled — forwarding schema metadata to target
+2026-08-21 11:28:40,418  INFO      eds_loader.loader  Writing 2 table(s) to target
+2026-08-21 11:28:40,420  INFO      eds_loader.connectors.local_fs  Wrote customers: 2 row(s) to C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_integration_s3_source_via0\target\customers.parquet
+2026-08-21 11:28:40,421  INFO      eds_loader.connectors.local_fs  Wrote orders: 1 row(s) to C:\Users\Mohit Patel\AppData\Local\Temp\pytest-of-spmohit\pytest-22\test_integration_s3_source_via0\target\orders.parquet
+2026-08-21 11:28:40,421  DEBUG     eds_loader.connectors.local_fs  Merging schema.json at target
+2026-08-21 11:28:40,421  INFO      eds_loader.loader  Load complete: 3 row(s) written across 2 table(s)
+2026-08-21 11:28:40,438  INFO      eds_loader.connectors._sql_base  Connected to testuser@testhost:9999/testdb
+2026-08-21 11:28:40,438  DEBUG     eds_loader.connectors._sql_base  Ensuring namespace exists: CREATE DATABASE IF NOT EXISTS [testdb]
+2026-08-21 11:28:40,439  DEBUG     eds_loader.connectors._sql_base  [t] DROP TABLE IF EXISTS [testdb].[t]
+2026-08-21 11:28:40,439  DEBUG     eds_loader.connectors._sql_base  [t] CREATE TABLE [testdb].[t] (
+    [id] INT
+)
+2026-08-21 11:28:40,439  DEBUG     eds_loader.connectors._sql_base  [t] inserting 1 row(s)
+2026-08-21 11:28:40,440  INFO      eds_loader.connectors._sql_base  [t] wrote 1 row(s) in 0.00s
+2026-08-21 11:28:40,444  INFO      eds_loader.connectors._sql_base  Connected to testuser@testhost:9999/testdb
+2026-08-21 11:28:40,445  DEBUG     eds_loader.connectors._sql_base  [t] DROP TABLE IF EXISTS [testdb].[t]
+2026-08-21 11:28:40,445  DEBUG     eds_loader.connectors._sql_base  [t] CREATE TABLE [testdb].[t] (
+    [id] INT
+)
+2026-08-21 11:28:40,445  DEBUG     eds_loader.connectors._sql_base  [t] inserting 1 row(s)
+2026-08-21 11:28:40,445  INFO      eds_loader.connectors._sql_base  [t] wrote 1 row(s) in 0.00s
+2026-08-21 11:28:40,446  INFO      eds_loader.connectors._sql_base  Connected to testuser@testhost:9999/testdb
+2026-08-21 11:28:40,447  DEBUG     eds_loader.connectors._sql_base  [t] DROP TABLE IF EXISTS [testdb].[t]
+2026-08-21 11:28:40,447  ERROR     eds_loader.connectors._sql_base  [t] write failed: DB down
+2026-08-21 11:28:40,449  INFO      eds_loader.connectors._sql_base  Connected to testuser@testhost:9999/testdb
+2026-08-21 11:28:40,451  DEBUG     eds_loader.connectors._sql_base  [a] DROP TABLE IF EXISTS [testdb].[a]
+2026-08-21 11:28:40,451  DEBUG     eds_loader.connectors._sql_base  [a] CREATE TABLE [testdb].[a] (
+    [id] INT
+)
+2026-08-21 11:28:40,451  DEBUG     eds_loader.connectors._sql_base  [a] inserting 1 row(s)
+2026-08-21 11:28:40,451  INFO      eds_loader.connectors._sql_base  [a] wrote 1 row(s) in 0.00s
+2026-08-21 11:28:40,452  DEBUG     eds_loader.connectors._sql_base  [b] DROP TABLE IF EXISTS [testdb].[b]
+2026-08-21 11:28:40,452  DEBUG     eds_loader.connectors._sql_base  [b] CREATE TABLE [testdb].[b] (
+    [id] INT
+)
+2026-08-21 11:28:40,452  DEBUG     eds_loader.connectors._sql_base  [b] inserting 1 row(s)
+2026-08-21 11:28:40,452  INFO      eds_loader.connectors._sql_base  [b] wrote 1 row(s) in 0.00s
+2026-08-21 11:28:40,454  INFO      eds_loader.connectors._sql_base  Connected to testuser@testhost:9999/testdb
+2026-08-21 11:28:40,454  DEBUG     eds_loader.connectors._sql_base  [z] DROP TABLE IF EXISTS [testdb].[z]
+2026-08-21 11:28:40,454  DEBUG     eds_loader.connectors._sql_base  [z] CREATE TABLE [testdb].[z] (
+    [id] INT
+)
+2026-08-21 11:28:40,455  DEBUG     eds_loader.connectors._sql_base  [z] inserting 1 row(s)
+2026-08-21 11:28:40,455  INFO      eds_loader.connectors._sql_base  [z] wrote 1 row(s) in 0.00s
+2026-08-21 11:28:40,455  DEBUG     eds_loader.connectors._sql_base  [a] DROP TABLE IF EXISTS [testdb].[a]
+2026-08-21 11:28:40,455  DEBUG     eds_loader.connectors._sql_base  [a] CREATE TABLE [testdb].[a] (
+    [id] INT
+)
+2026-08-21 11:28:40,455  DEBUG     eds_loader.connectors._sql_base  [a] inserting 1 row(s)
+2026-08-21 11:28:40,456  INFO      eds_loader.connectors._sql_base  [a] wrote 1 row(s) in 0.00s
+2026-08-21 11:28:40,457  INFO      eds_loader.connectors._sql_base  Connected to testuser@testhost:9999/testdb
+2026-08-21 11:28:40,458  DEBUG     eds_loader.connectors._sql_base  [tbl] DROP TABLE IF EXISTS [testdb].[tbl]
+2026-08-21 11:28:40,458  DEBUG     eds_loader.connectors._sql_base  [tbl] CREATE TABLE [testdb].[tbl] (
+    [id] INT
+)
+2026-08-21 11:28:40,458  DEBUG     eds_loader.connectors._sql_base  [tbl] inserting 1 row(s)
+2026-08-21 11:28:40,458  INFO      eds_loader.connectors._sql_base  [tbl] wrote 1 row(s) in 0.00s
+2026-08-21 11:28:40,460  INFO      eds_loader.connectors._sql_base  Connected to testuser@testhost:9999/testdb
+2026-08-21 11:28:40,460  DEBUG     eds_loader.connectors._sql_base  [t] DROP TABLE IF EXISTS [testdb].[t]
+2026-08-21 11:28:40,460  DEBUG     eds_loader.connectors._sql_base  [t] CREATE TABLE [testdb].[t] (
+    [id] INT
+)
+2026-08-21 11:28:40,460  DEBUG     eds_loader.connectors._sql_base  [t] inserting 3 row(s)
+2026-08-21 11:28:40,461  INFO      eds_loader.connectors._sql_base  [t] wrote 3 row(s) in 0.00s
+2026-08-21 11:28:40,462  INFO      eds_loader.connectors._sql_base  Connected to testuser@testhost:9999/testdb
+2026-08-21 11:28:40,463  DEBUG     eds_loader.connectors._sql_base  [t] DROP TABLE IF EXISTS [testdb].[t]
+2026-08-21 11:28:40,463  DEBUG     eds_loader.connectors._sql_base  [t] CREATE TABLE [testdb].[t] (
+    [id] INT
+)
+2026-08-21 11:28:40,463  ERROR     eds_loader.connectors._sql_base  [t] write failed: syntax error
+2026-08-21 11:28:40,465  INFO      eds_loader.connectors._sql_base  Connected to testuser@testhost:9999/testdb
+2026-08-21 11:28:40,466  DEBUG     eds_loader.connectors._sql_base  [t] DROP TABLE IF EXISTS [testdb].[t]
+2026-08-21 11:28:40,466  DEBUG     eds_loader.connectors._sql_base  [t] CREATE TABLE [testdb].[t] (
+    [id] INT
+)
+2026-08-21 11:28:40,466  ERROR     eds_loader.connectors._sql_base  [t] write failed: oops

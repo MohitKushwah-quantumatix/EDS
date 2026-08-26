@@ -30,11 +30,18 @@ EDS generator
 
 ---
 
+## 1.5 Uninstallation 
+```bash
+pip uninstall eds-loader
+
+```
+
 ## 2. Installation
 
 ### Minimum install (local filesystem only)
 ```bash
 pip install eds-loader
+pip install -e "c:\Users\Mohit Patel\Downloads\EDS\eds_loader[all]"
 ```
 
 ### With a specific connector driver
@@ -83,8 +90,10 @@ Install everything at once:  pip install eds-loader[all]
 
 - `[OK]` — driver is installed, connector is ready.
 - `[--]` — driver missing; the hint shows the fix command.
-- `(source/target)` — can read AND write Parquet datasets.
-- `(target)` — write-only (databases don't expose a Parquet source).
+- `(source/target)` — can read AND write datasets.
+- `(target)` — write-only (databases don't expose a source interface).
+
+> **All connector kinds:** `local_fs`, `remote_fs`, `s3`, `azure_blob`, `gcs` (storage) · `postgres`, `mysql`, `mssql`, `oracle`, `mongodb`, `bigquery`, `elasticsearch` (database/analytics targets)
 
 ---
 
@@ -109,7 +118,13 @@ enforce constraints. Example:
   "customers": {
     "primary_key": "customer_id",
     "unique_columns": ["email"],
-    "foreign_keys": []
+    "foreign_keys": [],
+    "validation": {
+      "customer_id": {"not_null": true},
+      "email":       {"not_null": true, "regex": "^[\\w.+-]+@[\\w-]+\\.[\\w.]+$"},
+      "age":         {"min": 0, "max": 150},
+      "status":      {"allowed_values": ["active", "inactive", "pending"]}
+    }
   },
   "orders": {
     "primary_key": "order_id",
@@ -126,27 +141,67 @@ enforce constraints. Example:
 }
 ```
 
+> **Validation rules** (v0.4+): You can add a `"validation"` block per dataset to enforce row-level rules.
+> 7 supported rule types: `not_null`, `min`, `max`, `min_length`, `max_length`, `allowed_values`, `regex`.
+> Control what happens on violation with `on_validation_error: warn | fail | quarantine` in `loader.yaml`.
+
 ---
 
 ## 5. The Config File (`loader.yaml`)
 
-Every run is driven by a YAML file with three top-level sections:
+Every run is driven by a YAML file. Use `eds-loader init` to generate one with every field pre-filled and commented:
 
 ```yaml
 source:                   # where to READ data from
   kind: local_fs
-  path: ./output
+  path: ${DATA_ROOT}/output   # ${ENV_VAR} interpolation supported anywhere
+  # format: parquet       # optional — parquet (default) | csv | json | ndjson | excel | avro | orc
 
 target:                   # where to WRITE data to
   kind: postgres
-  host: localhost
+  host: ${DB_HOST}
   database: eds_db
   user: eds_loader
   password_env: EDS_PG_PASSWORD
 
 tables: []                # [] = load every table in schema.json
 enforce_constraints: true # apply PK / FK / UNIQUE on the target
+schema_required: true     # false = skip schema.json, auto-discover *.parquet files
+load_mode: full           # full | incremental
+
+# ---- Incremental (only used when load_mode: incremental) ----
+# delete_mode: keep       # keep | soft | hard
+
+# ---- Reliability ----
+retry_count: 0
+retry_delay: 60
+
+# ---- Performance ----
+parallelism: 1            # concurrent dataset writes
+# batch_size: 100000      # write in N-row chunks
+
+# ---- Observability ----
+# metrics_file: auto      # write run_metrics.json after every run
+# run_log_file: auto      # enables: eds-loader history
+
+# ---- Data quality ----
+# on_validation_error: warn   # warn | fail | quarantine
+# rejected_dir: rejected
+
+# ---- Schema drift ----
+# schema_drift: warn      # warn | fail | ignore
+
+# ---- Notifications ----
+# notifications:
+#   on_failure:
+#     - kind: slack
+#       webhook_url_env: SLACK_WEBHOOK_URL
+#   on_success:
+#     - kind: webhook
+#       url: https://monitoring.company.com/api/runs
 ```
+
+> **`schema_required: false`** — Use when your source has no `schema.json`. The loader discovers all matching format files and loads without constraint metadata.
 
 ### Generate a config automatically
 
@@ -156,12 +211,14 @@ Instead of writing it by hand, use `eds-loader init`:
 # Generate a starter config for any source/target pair:
 eds-loader init --source local_fs --target postgres --output loader.yaml
 
-# All available sources: local_fs, remote_fs, s3, azure_blob, gcs
-# All available targets: local_fs, remote_fs, s3, azure_blob, gcs,
-#                        postgres, mysql, mongodb
+# All available sources:  local_fs, remote_fs, s3, azure_blob, gcs
+# All available targets:  local_fs, remote_fs, s3, azure_blob, gcs,
+#                         postgres, mysql, mssql, oracle, mongodb,
+#                         bigquery, elasticsearch
 ```
 
-The generated file contains every field with comments explaining each one.
+The generated file contains **every field** with comments — including all v0.4 sections:
+performance, observability, data quality, schema drift, and notifications.
 
 ---
 
@@ -190,6 +247,300 @@ Config is valid — 3 dataset(s) ready to load.
 
 If anything fails it exits with code `2` (config error) or `3` (connectivity
 error) with a clear message.
+
+---
+
+## 6.5 Monitor Status, History & Diff (v0.4+)
+
+### `eds-loader status`
+
+Get a full health summary of a config — connectivity, settings, and last-run state:
+
+```bash
+eds-loader status --config loader.yaml
+```
+
+Output:
+```
+Config:  loader.yaml
+
+  Source:       local_fs
+  Target:       postgres
+  Load mode:    incremental
+  Parallelism:  1
+  Batch size:   (unlimited)
+  Validation:   on_error=warn
+  Schema drift: warn
+  Delete mode:  keep
+
+  ✓  Source reachable — 3 dataset(s): customers, orders, products
+
+  State file:   .loader_state.json
+  ✓  State loaded — last run: 2026-08-24T14:35:15+00:00
+
+  Dataset                 Last Changed               Rows        Status
+  ─────────────────────────────────────────────────────────────────────────
+  customers               2026-08-23T02:00:00+00:00  12,500      SKIPPED
+  orders                  2026-08-24T14:35:15+00:00  47,200      CHANGED
+```
+
+### `eds-loader diff`
+
+Check what would change on the next incremental run — **without writing anything**:
+
+```bash
+eds-loader diff --config loader.yaml
+```
+
+Output:
+```
+  Dataset                 Source Rows   Status      Hash
+  ────────────────────────────────────────────────────────────────────
+  customers               12,500        UNCHANGED   abc123456789…
+  orders                  47,200        CHANGED     9ef789abcdef…
+  products                5,345         NEW         b1c2d3e4f506…
+```
+
+### `eds-loader history`
+
+Show the most recent runs (requires `run_log_file: auto` in `loader.yaml`):
+
+```bash
+eds-loader history --config loader.yaml --limit 10
+```
+
+Output:
+```
+  Timestamp                     Mode            Datasets    Rows Affected   Duration    Status
+  2026-08-24T14:35:15+05:30     incremental     1✓/2⊘/3     2,990           1.9 s       ✓ SUCCESS
+  2026-08-23T02:01:04+05:30     incremental     0✓/3⊘/3     0               0.1 s       ✓ SUCCESS
+  2026-08-20T02:00:31+05:30     full            3✓/0⊘/3     59,700          12.4 s      ✓ SUCCESS
+```
+
+### `eds-loader reset`
+
+Delete the incremental state file to force a full reload next time:
+
+```bash
+eds-loader reset --config loader.yaml        # prompts for confirmation
+eds-loader reset --config loader.yaml --force  # skips prompt
+```
+
+---
+
+## 6.6 Row-Level Data Validation (v0.4+)
+
+Add a `"validation"` block to datasets in `schema.json`:
+
+```json
+{
+  "patients": {
+    "primary_key": "patient_id",
+    "validation": {
+      "patient_id": {"not_null": true},
+      "age":        {"not_null": true, "min": 0, "max": 150},
+      "gender":     {"allowed_values": ["M", "F", "Other"]},
+      "email":      {"regex": "^[\\w.+-]+@[\\w-]+\\.[\\w.]+$"},
+      "name":       {"not_null": true, "min_length": 2, "max_length": 100}
+    }
+  }
+}
+```
+
+**Supported rules:**
+
+| Rule | Type | Description |
+|---|---|---|
+| `not_null` | bool | Value must not be null |
+| `min` | number | Minimum value (inclusive) |
+| `max` | number | Maximum value (inclusive) |
+| `min_length` | int | Minimum string length |
+| `max_length` | int | Maximum string length |
+| `allowed_values` | list | Value must be in the list |
+| `regex` | string | String must match the pattern |
+
+**Control what happens on violation with `on_validation_error` in `loader.yaml`:**
+
+```yaml
+on_validation_error: quarantine   # warn | fail | quarantine
+rejected_dir: ./rejected          # where to write quarantined rows
+```
+
+- `warn` (default) — log violations, load all rows anyway.
+- `fail` — abort the run if any row fails any rule.
+- `quarantine` — load valid rows only; write rejected rows to `./rejected/patients_2026-08-24.parquet`.
+
+---
+
+## 6.7 Schema Drift Detection (v0.4+)
+
+eds-loader automatically detects when the source schema changes between runs — added columns, removed columns, or type changes.
+
+Configure how to react in `loader.yaml`:
+
+```yaml
+schema_drift: warn    # warn | fail | ignore
+```
+
+- `warn` (default) — log the diff and continue the load.
+- `fail` — abort the run if any column was added, removed, or changed type.
+- `ignore` — skip silently (useful in dev environments).
+
+Example output when drift is detected:
+```
+Schema drift detected for dataset 'orders':
+  + Added:   discount_pct  Float64
+  ~ Changed: total_amount  Int64 → Float64
+  - Removed: legacy_flag   Boolean
+```
+
+---
+
+## 6.8 Observability — Metrics & Run History (v0.4+)
+
+### Run metrics file
+
+Enable a machine-readable JSON metrics file written after every run:
+
+```yaml
+metrics_file: auto    # writes run_metrics.json next to loader.yaml
+```
+
+Contents of `run_metrics.json`:
+```json
+{
+  "timestamp": "2026-08-24T09:05:15+00:00",
+  "config": "loader.yaml",
+  "load_mode": "incremental",
+  "status": "success",
+  "duration_seconds": 1.9,
+  "total_rows_affected": 2990,
+  "datasets": {
+    "orders":    {"status": "upserted", "rows_inserted": 2100, "rows_updated": 890},
+    "customers": {"status": "skipped",  "rows_inserted": 0,    "rows_updated": 0}
+  }
+}
+```
+
+### Run history log
+
+Enable an append-only JSONL history file:
+
+```yaml
+run_log_file: auto    # writes .eds_loader_runs.jsonl next to loader.yaml
+```
+
+View it with `eds-loader history --config loader.yaml`.
+
+---
+
+## 6.9 Notifications (v0.4+)
+
+Send alerts on success, failure, or always — via email, Slack, Teams, or any webhook:
+
+```yaml
+notifications:
+  on_failure:
+    - kind: email
+      smtp_host: smtp.gmail.com
+      smtp_port: 587
+      from_addr: eds-loader@company.com
+      to: [data-team@company.com]
+      password_env: SMTP_PASSWORD
+    - kind: slack
+      webhook_url_env: SLACK_WEBHOOK_URL
+    - kind: teams
+      webhook_url_env: TEAMS_WEBHOOK_URL
+  on_success:
+    - kind: webhook
+      url: https://monitoring.company.com/api/runs
+  always:
+    - kind: webhook
+      url: https://audit.company.com/api/events
+```
+
+**Channel kinds:** `email`, `slack`, `teams`, `webhook`
+**Trigger keys:** `on_failure`, `on_success`, `always`
+
+---
+
+## 6.10 Append Mode — Growing History Load (v0.5+)
+
+Use `load_mode: append` when **new data files are generated every day** and you want
+the target database to **accumulate all history** — rows are only ever added, never deleted or overwritten.
+
+### When to use it
+
+| Situation | Use |
+|---|---|
+| Source files contain **only today's new rows** | `append` ✅ |
+| Source files contain ALL rows (full snapshot) | `full` or `incremental` |
+| You want complete history in the target DB | `append` ✅ |
+| You need to detect and handle changes to existing rows | `incremental` |
+
+### How to configure
+
+```yaml
+load_mode: append
+```
+
+That's all. No state file needed — append mode has no memory of previous runs.
+
+### How it works
+
+Every run:
+1. Read all datasets from source (the new day's files)
+2. Validate each dataset (same rules as full/incremental)
+3. **`CREATE TABLE IF NOT EXISTS`** — creates the table on the first run, does nothing on subsequent runs
+4. **Plain `INSERT`** all rows — no DROP, no UPDATE, no conflict check
+
+```
+Day 1 file: 500 rows  →  INSERT 500 rows  →  Target: 500 rows
+Day 2 file: 500 rows  →  INSERT 500 rows  →  Target: 1,000 rows
+Day 3 file: 500 rows  →  INSERT 500 rows  →  Target: 1,500 rows
+Day 4 file: 500 rows  →  INSERT 500 rows  →  Target: 2,000 rows
+```
+
+> **The database grows continuously, day by day. All history is preserved.**
+
+### Important assumption
+
+> ⚠️ **Append mode trusts that source files contain only new rows.**
+>
+> If the same row appears in Day 1 and Day 2 files, it will be inserted **twice** into the target.
+> There is no duplicate detection.
+>
+> If your EDS generator produces **full snapshots** (all rows every day), use `load_mode: full` or `load_mode: incremental` instead.
+
+### Combine with schedule for fully automated daily ingestion
+
+```yaml
+load_mode: append
+
+schedule:
+  time: "02:00"
+  timezone: Asia/Kolkata
+  frequency: daily
+  skip_weekends: true
+  skip_dates:
+    - "2026-10-02"   # Gandhi Jayanti
+    - "2026-10-24"   # Dussehra
+```
+
+Then register once:
+```bash
+eds-loader schedule -c loader.yaml
+```
+
+Every night at 02:00 IST (skipping weekends and holidays), the loader runs and appends that day's new rows into your database automatically.
+
+### Supported targets
+
+All SQL-family connectors support append mode:
+- PostgreSQL, MySQL, MSSQL, SQLite, Oracle
+- MongoDB
+
+Storage connectors (local_fs, S3, Azure, GCS) fall back to full-write behaviour in append mode (they write a new file per run).
 
 ---
 
@@ -255,8 +606,25 @@ Works as **source** and **target** (no extra install needed).
 ```yaml
 source:                   # or target:
   kind: local_fs
-  path: ./output          # path to directory with .parquet + schema.json
+  path: ./output          # path to directory with dataset files + schema.json
+  # format: parquet       # optional — parquet (default) | csv | json | ndjson | excel | avro | orc
 ```
+
+**Supported source formats:**
+
+| Format | Extensions | Notes |
+|---|---|---|
+| `parquet` | `.parquet` | Default — always available |
+| `csv` | `.csv` | Plain comma-separated values |
+| `json` | `.json` | JSON array of objects |
+| `ndjson` | `.ndjson`, `.jsonl` | Newline-delimited JSON |
+| `excel` | `.xlsx`, `.xls` | Requires `pip install eds-loader[excel]`; multi-sheet → one dataset per sheet |
+| `avro` | `.avro` | Apache Avro |
+| `orc` | `.orc` | Apache ORC |
+
+> **Excel multi-sheet behaviour:** a workbook named `sales.xlsx` with sheets `Jan` and `Feb`
+> produces datasets named `sales_Jan` and `sales_Feb`. A single-sheet workbook uses the bare
+> stem (`sales`).
 
 **Typical use:** quickest way to test a load locally before pushing to a real target.
 
@@ -298,6 +666,7 @@ source:
   aws_access_key_id: AKIAIOSFODNN7EXAMPLE   # optional
   aws_secret_access_key_env: AWS_SECRET_ACCESS_KEY
   region: us-east-1             # optional, default: us-east-1
+  # format: parquet             # optional — parquet (default) | csv | json | ndjson | excel | avro | orc
   # endpoint_url: http://localhost:9000  # for MinIO / LocalStack
 ```
 
@@ -415,6 +784,49 @@ constraint enforcement. Uses backtick quoting and `FOREIGN_KEY_CHECKS` hooks.
 
 ---
 
+### 9.9 `mssql` — Microsoft SQL Server
+
+**Target only.** Install: `pip install eds-loader[mssql]`
+
+> **ODBC driver required:** An OS-level ODBC driver must be installed separately.
+> Download from Microsoft: [ODBC Driver for SQL Server](https://learn.microsoft.com/sql/connect/odbc/download-odbc-driver-for-sql-server).
+> List installed drivers: `python -c "import pyodbc; print(pyodbc.drivers())"`
+
+```yaml
+target:
+  kind: mssql
+  host: localhost               # required — hostname or IP
+  database: eds_db              # required
+  user: eds_loader              # required — SQL authentication login
+  password_env: EDS_MSSQL_PASSWORD  # preferred
+  # password: ""               # inline (not recommended for production)
+  port: 1433                    # optional, default: 1433
+  schema: dbo                   # optional, default: dbo
+  driver: "ODBC Driver 17 for SQL Server"  # optional — must match an installed driver
+  encrypt: true                 # optional, default: true
+  trust_server_certificate: false  # optional, default: false (set true for dev/self-signed certs)
+  connect_timeout: 10           # optional, default: 10 seconds
+```
+
+**What it does:**
+- Creates tables using T-SQL DDL derived from `schema.json`.
+- Drops all FK constraints in the target schema before `DROP TABLE` (T-SQL
+  does not support per-session FK-check disabling like MySQL).
+- Uses `fast_executemany = True` for bulk inserts (pyodbc row-at-a-time is
+  dramatically slower without this).
+- Promotes `NVARCHAR(MAX)` to `NVARCHAR(255)` on key/index columns (SQL
+  Server cannot use `MAX` columns as PK/UNIQUE/FK keys).
+- Writes data in **FK-dependency order** (parent tables before child tables).
+- Creates PRIMARY KEY, UNIQUE, and FOREIGN KEY constraints when
+  `enforce_constraints: true`.
+
+```bash
+export EDS_MSSQL_PASSWORD="my-mssql-password"
+eds-loader run -c loader.yaml
+```
+
+---
+
 ### 9.8 `mongodb` — MongoDB
 
 **Target only.** Install: `pip install eds-loader[mongodb]`
@@ -428,6 +840,7 @@ target:
   # password_env: EDS_MONGO_PASSWORD  # optional — omit for unauthenticated
   port: 27017                         # optional, default: 27017
   # auth_source: admin                # optional, default: admin
+  # connect_timeout: 10000            # optional, default: 10000 ms (server-selection)
 ```
 
 **What it does:**
@@ -463,6 +876,81 @@ tables:                    # only load these two tables
 
 enforce_constraints: true
 ```
+
+---
+
+### Load Without `schema.json` (`schema_required: false`)
+
+Use this when the source directory has no `schema.json` — for example, a raw
+export from a non-EDS system or an ad-hoc Parquet dump:
+
+```yaml
+source:
+  kind: local_fs
+  path: ./raw_exports
+
+target:
+  kind: mongodb
+  host: localhost
+  database: eds_db
+
+tables: []
+enforce_constraints: false   # no schema.json → no constraint metadata
+schema_required: false       # skip schema.json — auto-discover *.parquet files
+```
+
+With `schema_required: false`:
+- Every `.parquet` file (or other format file) in the source directory is loaded.
+- `schema.json` is never read or required.
+- Constraint enforcement is automatically disabled (no metadata to forward).
+- You can still use `tables: [name1, name2]` to restrict which files are loaded.
+
+---
+
+### Load CSV / Excel / JSON Source Data
+
+Any storage source connector supports a `format:` field. Example — loading
+CSV exports into MongoDB:
+
+```yaml
+source:
+  kind: local_fs
+  path: ./csv_exports
+  format: csv              # read *.csv files instead of *.parquet
+
+target:
+  kind: mongodb
+  host: localhost
+  database: eds_db
+
+schema_required: false     # CSV exports typically have no schema.json
+enforce_constraints: false
+```
+
+Example — loading an Excel workbook from S3:
+
+```yaml
+source:
+  kind: s3
+  bucket: my-reports-bucket
+  prefix: monthly/
+  format: excel
+  aws_secret_access_key_env: AWS_SECRET_ACCESS_KEY
+
+target:
+  kind: postgres
+  host: localhost
+  database: eds_db
+  user: eds_loader
+  password_env: EDS_PG_PASSWORD
+
+schema_required: false
+enforce_constraints: false
+```
+
+> **Excel note:** each sheet becomes a separate dataset. A `sales.xlsx` with
+> sheets `Jan` and `Feb` produces tables `sales_Jan` and `sales_Feb`.
+> Requires `pip install eds-loader[excel]`.
 
 ---
 
@@ -753,6 +1241,38 @@ error, check that `schema.json` has correct `foreign_keys` entries.
 ```sql
 CREATE DATABASE eds_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ```
+
+---
+
+### MSSQL: `Cannot connect to MSSQL` / driver error
+**Fix:** Confirm the ODBC driver named in the `driver:` field is installed:
+```bash
+python -c "import pyodbc; print(pyodbc.drivers())"
+```
+Download from Microsoft if missing:
+https://learn.microsoft.com/sql/connect/odbc/download-odbc-driver-for-sql-server
+
+---
+
+### MSSQL: `Cannot open database requested by the login`
+**Fix:** Verify `database` and `host` fields. Also check that the SQL login
+has `CONNECT` permission on the target database.
+
+---
+
+### MSSQL: SSL/TLS handshake errors (local/dev server)
+**Fix:** Add `trust_server_certificate: true` to the config for self-signed certs.
+
+---
+
+### `Load failed: Unknown format`
+You set `format:` to an unsupported value.
+**Fix:** Use one of: `parquet`, `csv`, `json`, `ndjson`, `excel`, `avro`, `orc`.
+
+---
+
+### `Load failed: Excel format requires openpyxl`
+**Fix:** `pip install eds-loader[excel]`
 
 ---
 
@@ -1218,14 +1738,26 @@ eds-loader run -c loader.yaml --dry-run
 # Install extras
 pip install eds-loader[postgres]
 pip install eds-loader[mysql]
+pip install eds-loader[mssql]        # + OS ODBC driver from Microsoft
+pip install eds-loader[oracle]
 pip install eds-loader[mongodb]
 pip install eds-loader[remote_fs]
 pip install eds-loader[s3]
 pip install eds-loader[azure]
 pip install eds-loader[gcs]
+pip install eds-loader[excel]
 pip install eds-loader[all]
 
 # Connector kinds
 # Sources:  local_fs, remote_fs, s3, azure_blob, gcs
-# Targets:  local_fs, remote_fs, s3, azure_blob, gcs, postgres, mysql, mongodb
+# Targets:  local_fs, remote_fs, s3, azure_blob, gcs,
+#           postgres, mysql, mssql, oracle, mongodb
+
+# Source formats (set via format: field)
+# parquet (default) | csv | json | ndjson | excel | avro | orc
+
+# Key config fields
+# schema_required: true    # false = skip schema.json, auto-discover files
+# enforce_constraints: true
+# tables: []               # [] = all tables
 ```

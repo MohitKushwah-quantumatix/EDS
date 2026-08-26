@@ -135,15 +135,15 @@ class AzureBlobConnector(CloudBaseConnector):
         except Exception as exc:
             raise LoadError(f"Cannot create Azure Blob client: {exc}") from exc
 
-    def _list_parquet_keys(self) -> list[str]:
-        """List all ``*.parquet`` blob names in the container under the prefix."""
+    def _list_keys_by_extension(self, ext: str) -> list[str]:
+        """List all blob names ending with *ext* in the container under the prefix."""
         client = self._get_client()
         try:
             cc = client.get_container_client(self._container)
             return [
                 b.name
                 for b in cc.list_blobs(name_starts_with=self._prefix)
-                if b.name.endswith(".parquet")
+                if b.name.endswith(ext)
             ]
         except Exception as exc:
             raise LoadError(

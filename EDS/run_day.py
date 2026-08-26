@@ -30,6 +30,7 @@ from eds.platform.time.clock import create_clock
 
 INTERNAL_DIR = ".internal"
 CHECKPOINT_FILE = "daily_checkpoint.json"
+BACKUP_FILE = "backup.json"
 LOADED_MARKER = ".loaded"
 
 DATE_COLUMN_PREFERENCES = (
@@ -92,6 +93,104 @@ def save_checkpoint(project_dir: Path, completed_day: date) -> None:
     import json
     path = _checkpoint_path(project_dir)
     path.write_text(json.dumps({"last_completed_day": completed_day.isoformat()}))
+
+
+def _backup_path(project_dir: Path) -> Path:
+    return project_dir / INTERNAL_DIR / BACKUP_FILE
+
+
+def save_backup(project_dir: Path, adapter: SQLiteAdapter, domain: str, completed_day: date) -> None:
+    """Save all SQLite data to JSON backup file for crash recovery."""
+    backup_path = _backup_path(project_dir)
+    all_data = adapter.read_all()
+
+    backup = {
+        "domain": domain,
+        "last_completed_day": completed_day.isoformat(),
+        "tables": {},
+        "schema": {},
+    }
+
+    for name, df in all_data.items():
+        if name.startswith("_"):
+            continue
+        if df.is_empty():
+            continue
+        backup["schema"][name] = {col: str(dtype) for col, dtype in df.schema.items()}
+        backup["tables"][name] = df.write_json()
+
+    backup_path.parent.mkdir(parents=True, exist_ok=True)
+    backup_path.write_text(json.dumps(backup, indent=2, default=str))
+
+
+def load_backup(project_dir: Path, adapter: SQLiteAdapter) -> date | None:
+    """Restore SQLite data from JSON backup file. Returns last completed day if successful."""
+    backup_path = _backup_path(project_dir)
+    if not backup_path.exists():
+        return None
+
+    try:
+        backup = json.loads(backup_path.read_text())
+    except Exception:
+        return None
+
+    from io import StringIO
+
+    tables = backup.get("tables", {})
+    schema = backup.get("schema", {})
+
+    for name, json_str in tables.items():
+        try:
+            df = pl.read_json(StringIO(json_str))
+            if name in schema:
+                df = _apply_schema_from_backup(df, schema[name])
+            adapter.write({name: df})
+        except Exception:
+            continue
+
+    last_day = backup.get("last_completed_day")
+    if last_day:
+        try:
+            return date.fromisoformat(last_day)
+        except Exception:
+            pass
+    return None
+
+
+def _apply_schema_from_backup(df: pl.DataFrame, schema: dict) -> pl.DataFrame:
+    """Apply stored schema to restore correct types from JSON backup."""
+    date_cols = []
+    datetime_cols = {}
+    scalar_casts = {}
+
+    for col, dtype_str in schema.items():
+        if col not in df.columns:
+            continue
+        lower = dtype_str.lower()
+        if lower == "date":
+            date_cols.append(col)
+        elif lower.startswith("datetime"):
+            datetime_cols[col] = dtype_str
+        elif lower.startswith("int"):
+            scalar_casts[col] = pl.Int64
+        elif lower.startswith("float"):
+            scalar_casts[col] = pl.Float64
+        elif lower == "boolean":
+            scalar_casts[col] = pl.Boolean
+        elif lower == "string":
+            scalar_casts[col] = pl.String
+
+    if date_cols:
+        df = df.with_columns([pl.col(c).str.to_date() for c in date_cols])
+    for col, dtype_str in datetime_cols.items():
+        df = df.with_columns(pl.col(col).str.to_datetime())
+    if scalar_casts:
+        try:
+            df = df.cast(scalar_casts)
+        except Exception:
+            pass
+
+    return df
 
 
 def _prepare_project(project_dir: Path, domain: str, seed: int) -> "Project":
@@ -235,6 +334,13 @@ def run_retail_day(project_dir: Path, target_date: date, seed: int = 42, config_
     checkpoint = load_checkpoint(project_dir)
     is_first_day = checkpoint is None
 
+    if is_first_day:
+        restored_day = load_backup(project_dir, adapter)
+        if restored_day is not None:
+            checkpoint = restored_day
+            is_first_day = False
+            print(f"  Restored from backup: resuming after {restored_day.isoformat()}")
+
     executor = RetailExecutor(config=config, reader=adapter, writer=adapter)
 
     run = create_run(
@@ -250,6 +356,7 @@ def run_retail_day(project_dir: Path, target_date: date, seed: int = 42, config_
 
     _export_daily_data(adapter, project_dir, "retail", target_date, is_first_day)
     save_checkpoint(project_dir, target_date)
+    save_backup(project_dir, adapter, "retail", target_date)
     _mark_loaded(project_dir, target_date)
 
 
@@ -268,6 +375,13 @@ def run_healthcare_day(project_dir: Path, target_date: date, seed: int = 42, con
     checkpoint = load_checkpoint(project_dir)
     is_first_day = checkpoint is None
 
+    if is_first_day:
+        restored_day = load_backup(project_dir, adapter)
+        if restored_day is not None:
+            checkpoint = restored_day
+            is_first_day = False
+            print(f"  Restored from backup: resuming after {restored_day.isoformat()}")
+
     executor = HealthcareExecutor(config=config, reader=adapter, writer=adapter)
 
     run = create_run(
@@ -283,6 +397,7 @@ def run_healthcare_day(project_dir: Path, target_date: date, seed: int = 42, con
 
     _export_daily_data(adapter, project_dir, "healthcare", target_date, is_first_day)
     save_checkpoint(project_dir, target_date)
+    save_backup(project_dir, adapter, "healthcare", target_date)
     _mark_loaded(project_dir, target_date)
 
 
