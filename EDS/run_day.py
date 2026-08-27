@@ -30,7 +30,7 @@ from eds.platform.time.clock import create_clock
 
 INTERNAL_DIR = ".internal"
 CHECKPOINT_FILE = "daily_checkpoint.json"
-BACKUP_FILE = "backup.json"
+BACKUP_FILE = "backup.json.gz"
 LOADED_MARKER = ".loaded"
 
 DATE_COLUMN_PREFERENCES = (
@@ -101,7 +101,8 @@ def _backup_path(project_dir: Path) -> Path:
 
 
 def save_backup(project_dir: Path, adapter: SQLiteAdapter, domain: str, completed_day: date) -> None:
-    """Save backup metadata and last entry of each table for crash recovery."""
+    """Save all SQLite data to compressed JSON backup file for crash recovery."""
+    import gzip
     from datetime import datetime, timezone
     backup_path = _backup_path(project_dir)
     all_data = adapter.read_all()
@@ -110,7 +111,7 @@ def save_backup(project_dir: Path, adapter: SQLiteAdapter, domain: str, complete
         "domain": domain,
         "last_completed_day": completed_day.isoformat(),
         "timestamp": datetime.now(timezone.utc).isoformat(),
-        "last_entries": {},
+        "tables": {},
         "schema": {},
     }
 
@@ -120,25 +121,37 @@ def save_backup(project_dir: Path, adapter: SQLiteAdapter, domain: str, complete
         if df.is_empty():
             continue
         backup["schema"][name] = {col: str(dtype) for col, dtype in df.schema.items()}
-        last_row = df.tail(1).to_dicts()
-        if last_row:
-            backup["last_entries"][name] = last_row[0]
+        backup["tables"][name] = df.to_dicts()
 
     backup_path.parent.mkdir(parents=True, exist_ok=True)
-    with open(backup_path, "w", encoding="utf-8") as f:
-        json.dump(backup, f, indent=2, default=str)
+    with gzip.open(backup_path, "wt", encoding="utf-8") as f:
+        json.dump(backup, f, default=str)
 
 
 def load_backup(project_dir: Path, adapter: SQLiteAdapter) -> date | None:
-    """Read backup file and return last completed day for crash recovery."""
+    """Restore SQLite data from compressed JSON backup file. Returns last completed day."""
+    import gzip
     backup_path = _backup_path(project_dir)
     if not backup_path.exists():
         return None
 
     try:
-        backup = json.loads(backup_path.read_text())
+        with gzip.open(backup_path, "rt", encoding="utf-8") as f:
+            backup = json.load(f)
     except Exception:
         return None
+
+    tables = backup.get("tables", {})
+    schema = backup.get("schema", {})
+
+    for name, rows in tables.items():
+        try:
+            df = pl.DataFrame(rows)
+            if name in schema:
+                df = _apply_schema_from_backup(df, schema[name])
+            adapter.write({name: df})
+        except Exception:
+            continue
 
     last_day = backup.get("last_completed_day")
     if last_day:
@@ -147,6 +160,42 @@ def load_backup(project_dir: Path, adapter: SQLiteAdapter) -> date | None:
         except Exception:
             pass
     return None
+
+
+def _apply_schema_from_backup(df: pl.DataFrame, schema: dict) -> pl.DataFrame:
+    """Apply stored schema to restore correct types from backup."""
+    date_cols = []
+    datetime_cols = []
+    scalar_casts = {}
+
+    for col, dtype_str in schema.items():
+        if col not in df.columns:
+            continue
+        lower = dtype_str.lower()
+        if lower == "date":
+            date_cols.append(col)
+        elif lower.startswith("datetime"):
+            datetime_cols.append(col)
+        elif lower.startswith("int"):
+            scalar_casts[col] = pl.Int64
+        elif lower.startswith("float"):
+            scalar_casts[col] = pl.Float64
+        elif lower == "boolean":
+            scalar_casts[col] = pl.Boolean
+        elif lower == "string":
+            scalar_casts[col] = pl.String
+
+    if date_cols:
+        df = df.with_columns([pl.col(c).str.to_date() for c in date_cols])
+    if datetime_cols:
+        df = df.with_columns([pl.col(c).str.to_datetime() for c in datetime_cols])
+    if scalar_casts:
+        try:
+            df = df.cast(scalar_casts)
+        except Exception:
+            pass
+
+    return df
 
 
 
