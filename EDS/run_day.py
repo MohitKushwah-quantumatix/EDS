@@ -101,14 +101,16 @@ def _backup_path(project_dir: Path) -> Path:
 
 
 def save_backup(project_dir: Path, adapter: SQLiteAdapter, domain: str, completed_day: date) -> None:
-    """Save all SQLite data to JSON backup file for crash recovery."""
+    """Save backup metadata and last entry of each table for crash recovery."""
+    from datetime import datetime, timezone
     backup_path = _backup_path(project_dir)
     all_data = adapter.read_all()
 
     backup = {
         "domain": domain,
         "last_completed_day": completed_day.isoformat(),
-        "tables": {},
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "last_entries": {},
         "schema": {},
     }
 
@@ -118,15 +120,17 @@ def save_backup(project_dir: Path, adapter: SQLiteAdapter, domain: str, complete
         if df.is_empty():
             continue
         backup["schema"][name] = {col: str(dtype) for col, dtype in df.schema.items()}
-        backup["tables"][name] = df.write_json()
+        last_row = df.tail(1).to_dicts()
+        if last_row:
+            backup["last_entries"][name] = last_row[0]
 
     backup_path.parent.mkdir(parents=True, exist_ok=True)
     with open(backup_path, "w", encoding="utf-8") as f:
-        json.dump(backup, f, default=str)
+        json.dump(backup, f, indent=2, default=str)
 
 
 def load_backup(project_dir: Path, adapter: SQLiteAdapter) -> date | None:
-    """Restore SQLite data from JSON backup file. Returns last completed day if successful."""
+    """Read backup file and return last completed day for crash recovery."""
     backup_path = _backup_path(project_dir)
     if not backup_path.exists():
         return None
@@ -135,20 +139,6 @@ def load_backup(project_dir: Path, adapter: SQLiteAdapter) -> date | None:
         backup = json.loads(backup_path.read_text())
     except Exception:
         return None
-
-    from io import StringIO
-
-    tables = backup.get("tables", {})
-    schema = backup.get("schema", {})
-
-    for name, json_str in tables.items():
-        try:
-            df = pl.read_json(StringIO(json_str))
-            if name in schema:
-                df = _apply_schema_from_backup(df, schema[name])
-            adapter.write({name: df})
-        except Exception:
-            continue
 
     last_day = backup.get("last_completed_day")
     if last_day:
@@ -159,40 +149,6 @@ def load_backup(project_dir: Path, adapter: SQLiteAdapter) -> date | None:
     return None
 
 
-def _apply_schema_from_backup(df: pl.DataFrame, schema: dict) -> pl.DataFrame:
-    """Apply stored schema to restore correct types from JSON backup."""
-    date_cols = []
-    datetime_cols = {}
-    scalar_casts = {}
-
-    for col, dtype_str in schema.items():
-        if col not in df.columns:
-            continue
-        lower = dtype_str.lower()
-        if lower == "date":
-            date_cols.append(col)
-        elif lower.startswith("datetime"):
-            datetime_cols[col] = dtype_str
-        elif lower.startswith("int"):
-            scalar_casts[col] = pl.Int64
-        elif lower.startswith("float"):
-            scalar_casts[col] = pl.Float64
-        elif lower == "boolean":
-            scalar_casts[col] = pl.Boolean
-        elif lower == "string":
-            scalar_casts[col] = pl.String
-
-    if date_cols:
-        df = df.with_columns([pl.col(c).str.to_date() for c in date_cols])
-    for col, dtype_str in datetime_cols.items():
-        df = df.with_columns(pl.col(col).str.to_datetime())
-    if scalar_casts:
-        try:
-            df = df.cast(scalar_casts)
-        except Exception:
-            pass
-
-    return df
 
 
 def _prepare_project(project_dir: Path, domain: str, seed: int) -> "Project":
