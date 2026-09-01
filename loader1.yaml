@@ -12,14 +12,14 @@
 
 source:
   kind: local_fs
-  path: C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output         # required -- directory containing dataset files + schema.json
+  path: ./output          # required -- directory containing dataset files + schema.json
   # format: parquet       # optional -- parquet (default) | csv | json | ndjson | excel | avro | orc
 
 target:
   kind: postgres
   host: localhost           # required
-  database: eds_db2          # required
-  user: postgres          # required
+  database: eds_db          # required
+  user: eds_loader          # required
   password_env: EDS_PG_PASSWORD  # env-var holding the password (preferred)
   # password: ""                 # inline password (not recommended for production)
   port: 5432                # optional -- default: 5432
@@ -37,10 +37,6 @@ tables: []                  # empty = load every dataset in schema.json
 enforce_constraints: true   # apply PK / FK / UNIQUE constraints on the target (where supported)
 schema_required: true       # set to false if there is no schema.json at the source
                             # (datasets will be auto-discovered from *.parquet files)
-schema_path: C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\schema.json             # optional -- explicit path to schema.json when it lives in a
-#   /path/to/schema.json    # different directory from the source Parquet files.
-#                           # Example: source.path points to ./output/ but schema.json
-#                           # is one level up at ./schema.json — set schema_path: ./schema.json
 
 # Load mode:
 #   full        (default) — complete replace every run: DROP + CREATE + INSERT.
@@ -48,7 +44,7 @@ schema_path: C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\schema.json         
 #   append      — insert-only: never drops or updates existing rows.
 #                 Use when source files contain ONLY today's new rows and you
 #                 want the target DB to grow continuously, day by day.
-load_mode: append             # full | incremental | append
+load_mode: full             # full | incremental | append
 
 # ---------------------------------------------------------------------------
 # Incremental load options (only used when load_mode: incremental)
@@ -135,17 +131,17 @@ parallelism: 1              # number of datasets to load concurrently (default: 
 # to register the scheduled task on Windows Task Scheduler or Linux crontab.
 #
 # style 1: simple (no cron knowledge needed)
-schedule:
-  time: "12:15"              # HH:MM in 24-hour format
-  timezone: Asia/Kolkata     # IANA timezone name
-  frequency: daily           # daily | every_other_day | weekly | monthly
+# schedule:
+#   time: "02:00"              # HH:MM in 24-hour format
+#   timezone: Asia/Kolkata     # IANA timezone name
+#   frequency: daily           # daily | every_other_day | weekly | monthly
 #   # on_day: Monday           # required when frequency: weekly
 #   # on_date: 1               # required when frequency: monthly (1-28)
 #
 # style 2: full cron expression (advanced)
 # schedule:
-#  cron: "0 12 * * *"          # 5-field cron expression
-#  timezone: Asia/Kolkata
+#   cron: "0 2 * * *"          # 5-field cron expression
+#   timezone: Asia/Kolkata
 #
 # date range (optional — omit to run indefinitely)
 #   start_date: "2026-09-01"   # YYYY-MM-DD — do not run before this date
@@ -161,6 +157,6 @@ schedule:
 #     - "2026-10-24"
 #
 # retry if the run fails (optional)
-  retry_on_failure: true
-  retry_after_minutes: 5
-  max_retries: 3
+#   retry_on_failure: true
+#   retry_after_minutes: 30
+#   max_retries: 2

@@ -68,9 +68,20 @@ _EXIT_LOAD_ERROR = 3
 # Shared output helpers
 # ---------------------------------------------------------------------------
 
-_CHECK = "✓"
-_CROSS = "✗"
-_INFO  = "·"
+import sys as _sys
+
+def _safe_symbol(unicode_sym: str, ascii_fallback: str) -> str:
+    """Return unicode_sym if the terminal can encode it, else ascii_fallback."""
+    enc = getattr(_sys.stdout, "encoding", "utf-8") or "utf-8"
+    try:
+        unicode_sym.encode(enc)
+        return unicode_sym
+    except (UnicodeEncodeError, LookupError):
+        return ascii_fallback
+
+_CHECK = _safe_symbol("✓", "OK")
+_CROSS = _safe_symbol("✗", "X")
+_INFO  = _safe_symbol("·", "-")
 
 
 def _ok(msg: str) -> None:
@@ -915,7 +926,9 @@ def schedule_cmd(
 
         # Runtime guard check
         ok, reason = should_run_today(sched)
-        typer.echo(f"\n  Today's run:  {'✓ Will run' if ok else '⊘ ' + reason}")
+        _WILL_RUN = _safe_symbol("✓", "OK")
+        _SKIP_SYM = _safe_symbol("⊘", "SKIP")
+        typer.echo(f"\n  Today's run:  {_WILL_RUN + ' Will run' if ok else _SKIP_SYM + ' ' + reason}")
         typer.echo("")
         raise typer.Exit()
 

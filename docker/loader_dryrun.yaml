@@ -1,0 +1,46 @@
+source:
+  kind: local_fs
+  path: /app/output
+  format: parquet
+
+# schema.json is at project root, not inside output/
+schema_path: /app/schema.json
+schema_required: true
+
+target:
+  kind: local_fs
+  path: /app/loader_test_output
+
+load_mode: full
+
+# Only load tables that the generator actually produces as Parquet files.
+# (schema.json lists more tables than the generator outputs — these are excluded.)
+tables:
+  - admissions
+  - appointments
+  - billing_codes
+  - cities
+  - countries
+  - departments
+  - diagnoses
+  - diagnosis_codes
+  - encounters
+  - facilities
+  - immunizations
+  - insurance_plans
+  - lab_results
+  - medication_administration
+  - medications
+  - medications_prescribed
+  - patient_addresses
+  - patient_emergency_contacts
+  - patients
+  - procedure_codes
+  - procedures
+  - providers
+  - radiology_reports
+  - referrals
+  - room_types
+  - specialties
+  - states
+  - vitals

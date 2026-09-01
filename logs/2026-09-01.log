@@ -1,0 +1,431 @@
+2026-09-01 13:34:45,644  INFO      eds_loader.cli.main  eds-loader run invoked (config=loader.yaml, dry_run=False)
+2026-09-01 13:34:45,651  INFO      eds_loader.cli.main  Config loaded: source=local_fs target=postgres tables=(all) enforce_constraints=True schema_required=True
+2026-09-01 13:34:45,653  ERROR     eds_loader.loader  Load failed (attempt 1/1): schema_path not found: C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\schema.json
+Check that the path is correct and the file exists.
+2026-09-01 13:34:45,653  ERROR     eds_loader.cli.main  Load failed after 0.0s: schema_path not found: C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\schema.json
+Check that the path is correct and the file exists.
+2026-09-01 13:36:41,689  INFO      eds_loader.cli.main  eds-loader run invoked (config=loader.yaml, dry_run=False)
+2026-09-01 13:36:41,695  INFO      eds_loader.cli.main  Config loaded: source=local_fs target=postgres tables=(all) enforce_constraints=True schema_required=True
+2026-09-01 13:36:41,696  INFO      eds_loader.loader  Reading schema.json from explicit schema_path: C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\schema.json
+2026-09-01 13:36:41,760  INFO      eds_loader.connectors.local_fs  Read countries: 1 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\countries.parquet
+2026-09-01 13:36:41,796  INFO      eds_loader.connectors.local_fs  Read states: 51 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\states.parquet
+2026-09-01 13:36:41,814  INFO      eds_loader.connectors.local_fs  Read cities: 255 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\cities.parquet
+2026-09-01 13:36:41,830  INFO      eds_loader.connectors.local_fs  Read payment_methods: 13 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\payment_methods.parquet
+2026-09-01 13:36:41,843  INFO      eds_loader.connectors.local_fs  Read shipping_methods: 9 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\shipping_methods.parquet
+2026-09-01 13:36:41,861  INFO      eds_loader.connectors.local_fs  Read tax_codes: 7 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\tax_codes.parquet
+2026-09-01 13:36:41,874  INFO      eds_loader.connectors.local_fs  Read coupon_types: 8 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\coupon_types.parquet
+2026-09-01 13:36:41,886  INFO      eds_loader.connectors.local_fs  Read return_reasons: 5 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\return_reasons.parquet
+2026-09-01 13:36:41,907  INFO      eds_loader.connectors.local_fs  Read suppliers: 25 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\suppliers.parquet
+2026-09-01 13:36:41,916  INFO      eds_loader.connectors.local_fs  Read warehouses: 10 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\warehouses.parquet
+2026-09-01 13:36:41,932  INFO      eds_loader.connectors.local_fs  Read categories: 168 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\categories.parquet
+2026-09-01 13:36:41,962  INFO      eds_loader.connectors.local_fs  Read brands: 50 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\brands.parquet
+2026-09-01 13:36:41,982  INFO      eds_loader.connectors.local_fs  Read products: 1000 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\products.parquet
+2026-09-01 13:36:41,998  INFO      eds_loader.connectors.local_fs  Read inventory: 3000 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\inventory.parquet
+2026-09-01 13:36:42,019  INFO      eds_loader.connectors.local_fs  Read customers: 1000 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\customers.parquet
+2026-09-01 13:36:42,034  INFO      eds_loader.connectors.local_fs  Read customer_addresses: 1495 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\customer_addresses.parquet
+2026-09-01 13:36:42,047  INFO      eds_loader.connectors.local_fs  Read customer_preferences: 1000 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\customer_preferences.parquet
+2026-09-01 13:36:42,066  INFO      eds_loader.connectors.local_fs  Read customer_loyalty: 1000 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\customer_loyalty.parquet
+2026-09-01 13:36:42,081  INFO      eds_loader.connectors.local_fs  Read customer_personas: 1000 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\customer_personas.parquet
+2026-09-01 13:36:42,099  INFO      eds_loader.connectors.local_fs  Read sessions: 2350 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\sessions.parquet
+2026-09-01 13:36:42,116  INFO      eds_loader.connectors.local_fs  Read category_views: 11656 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\category_views.parquet
+2026-09-01 13:36:42,134  INFO      eds_loader.connectors.local_fs  Read search_history: 4823 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\search_history.parquet
+2026-09-01 13:36:42,152  INFO      eds_loader.connectors.local_fs  Read product_views: 36392 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\product_views.parquet
+2026-09-01 13:36:42,167  INFO      eds_loader.connectors.local_fs  Read wishlists: 456 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\wishlists.parquet
+2026-09-01 13:36:42,186  INFO      eds_loader.connectors.local_fs  Read shopping_carts: 343 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\shopping_carts.parquet
+2026-09-01 13:36:42,201  INFO      eds_loader.connectors.local_fs  Read cart_items: 639 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\cart_items.parquet
+2026-09-01 13:36:42,214  INFO      eds_loader.connectors.local_fs  Read checkout: 128 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\checkout.parquet
+2026-09-01 13:36:42,228  INFO      eds_loader.connectors.local_fs  Read orders: 20 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\orders.parquet
+2026-09-01 13:36:42,245  INFO      eds_loader.connectors.local_fs  Read order_lines: 32 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\order_lines.parquet
+2026-09-01 13:36:42,264  INFO      eds_loader.connectors.local_fs  Read order_status_history: 29 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\order_status_history.parquet
+2026-09-01 13:36:42,277  INFO      eds_loader.connectors.local_fs  Read payments: 20 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\payments.parquet
+2026-09-01 13:36:42,294  INFO      eds_loader.connectors.local_fs  Read payment_status_history: 35 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\payment_status_history.parquet
+2026-09-01 13:36:42,312  INFO      eds_loader.connectors.local_fs  Read shipments: 15 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\shipments.parquet
+2026-09-01 13:36:42,328  INFO      eds_loader.connectors.local_fs  Read shipment_items: 26 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\shipment_items.parquet
+2026-09-01 13:36:42,342  INFO      eds_loader.connectors.local_fs  Read shipment_status_history: 22 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\shipment_status_history.parquet
+2026-09-01 13:36:42,362  INFO      eds_loader.connectors.local_fs  Read returns: 0 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\returns.parquet
+2026-09-01 13:36:42,378  INFO      eds_loader.connectors.local_fs  Read return_items: 0 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\return_items.parquet
+2026-09-01 13:36:42,393  INFO      eds_loader.connectors.local_fs  Read return_status_history: 0 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\return_status_history.parquet
+2026-09-01 13:36:42,412  INFO      eds_loader.connectors.local_fs  Read reviews: 0 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\reviews.parquet
+2026-09-01 13:36:42,412  INFO      eds_loader.loader  Read 39 dataset(s) from source for append
+2026-09-01 13:36:42,488  INFO      eds_loader.connectors._sql_base  Connected to postgres@localhost:5432/eds_db2 for append
+2026-09-01 13:36:42,579  INFO      eds_loader.connectors._sql_base  [countries] appended 1 row(s) in 0.09s
+2026-09-01 13:36:42,583  INFO      eds_loader.connectors._sql_base  [states] appended 51 row(s) in 0.00s
+2026-09-01 13:36:42,590  INFO      eds_loader.connectors._sql_base  [cities] appended 255 row(s) in 0.01s
+2026-09-01 13:36:42,594  INFO      eds_loader.connectors._sql_base  [payment_methods] appended 13 row(s) in 0.00s
+2026-09-01 13:36:42,597  INFO      eds_loader.connectors._sql_base  [shipping_methods] appended 9 row(s) in 0.00s
+2026-09-01 13:36:42,601  INFO      eds_loader.connectors._sql_base  [tax_codes] appended 7 row(s) in 0.00s
+2026-09-01 13:36:42,605  INFO      eds_loader.connectors._sql_base  [coupon_types] appended 8 row(s) in 0.00s
+2026-09-01 13:36:42,608  INFO      eds_loader.connectors._sql_base  [return_reasons] appended 5 row(s) in 0.00s
+2026-09-01 13:36:42,612  INFO      eds_loader.connectors._sql_base  [suppliers] appended 25 row(s) in 0.00s
+2026-09-01 13:36:42,615  INFO      eds_loader.connectors._sql_base  [warehouses] appended 10 row(s) in 0.00s
+2026-09-01 13:36:42,621  INFO      eds_loader.connectors._sql_base  [categories] appended 168 row(s) in 0.01s
+2026-09-01 13:36:42,625  INFO      eds_loader.connectors._sql_base  [brands] appended 50 row(s) in 0.00s
+2026-09-01 13:36:42,649  INFO      eds_loader.connectors._sql_base  [products] appended 1000 row(s) in 0.02s
+2026-09-01 13:36:42,709  INFO      eds_loader.connectors._sql_base  [inventory] appended 3000 row(s) in 0.06s
+2026-09-01 13:36:42,733  INFO      eds_loader.connectors._sql_base  [customers] appended 1000 row(s) in 0.02s
+2026-09-01 13:36:42,765  INFO      eds_loader.connectors._sql_base  [customer_addresses] appended 1495 row(s) in 0.03s
+2026-09-01 13:36:42,786  INFO      eds_loader.connectors._sql_base  [customer_preferences] appended 1000 row(s) in 0.02s
+2026-09-01 13:36:42,808  INFO      eds_loader.connectors._sql_base  [customer_loyalty] appended 1000 row(s) in 0.02s
+2026-09-01 13:36:42,832  INFO      eds_loader.connectors._sql_base  [customer_personas] appended 1000 row(s) in 0.02s
+2026-09-01 13:36:42,883  INFO      eds_loader.connectors._sql_base  [sessions] appended 2350 row(s) in 0.05s
+2026-09-01 13:36:43,102  INFO      eds_loader.connectors._sql_base  [category_views] appended 11656 row(s) in 0.22s
+2026-09-01 13:36:43,195  INFO      eds_loader.connectors._sql_base  [search_history] appended 4823 row(s) in 0.09s
+2026-09-01 13:36:43,869  INFO      eds_loader.connectors._sql_base  [product_views] appended 36392 row(s) in 0.67s
+2026-09-01 13:36:43,880  INFO      eds_loader.connectors._sql_base  [wishlists] appended 456 row(s) in 0.01s
+2026-09-01 13:36:43,891  INFO      eds_loader.connectors._sql_base  [shopping_carts] appended 343 row(s) in 0.01s
+2026-09-01 13:36:43,906  INFO      eds_loader.connectors._sql_base  [cart_items] appended 639 row(s) in 0.01s
+2026-09-01 13:36:43,911  INFO      eds_loader.connectors._sql_base  [checkout] appended 128 row(s) in 0.01s
+2026-09-01 13:36:43,916  INFO      eds_loader.connectors._sql_base  [orders] appended 20 row(s) in 0.00s
+2026-09-01 13:36:43,918  INFO      eds_loader.connectors._sql_base  [order_lines] appended 32 row(s) in 0.00s
+2026-09-01 13:36:43,922  INFO      eds_loader.connectors._sql_base  [order_status_history] appended 29 row(s) in 0.00s
+2026-09-01 13:36:43,925  INFO      eds_loader.connectors._sql_base  [payments] appended 20 row(s) in 0.00s
+2026-09-01 13:36:43,928  INFO      eds_loader.connectors._sql_base  [payment_status_history] appended 35 row(s) in 0.00s
+2026-09-01 13:36:43,932  INFO      eds_loader.connectors._sql_base  [shipments] appended 15 row(s) in 0.00s
+2026-09-01 13:36:43,935  INFO      eds_loader.connectors._sql_base  [shipment_items] appended 26 row(s) in 0.00s
+2026-09-01 13:36:43,938  INFO      eds_loader.connectors._sql_base  [shipment_status_history] appended 22 row(s) in 0.00s
+2026-09-01 13:36:43,941  INFO      eds_loader.connectors._sql_base  [returns] appended 0 row(s) in 0.00s
+2026-09-01 13:36:43,943  INFO      eds_loader.connectors._sql_base  [return_items] appended 0 row(s) in 0.00s
+2026-09-01 13:36:43,947  INFO      eds_loader.connectors._sql_base  [return_status_history] appended 0 row(s) in 0.00s
+2026-09-01 13:36:43,951  INFO      eds_loader.connectors._sql_base  [reviews] appended 0 row(s) in 0.00s
+2026-09-01 13:36:43,951  INFO      eds_loader.loader  Append load complete: 67083 row(s) inserted across 39 dataset(s)
+2026-09-01 13:36:43,952  INFO      eds_loader.cli.main  Run complete: 67083 row(s) across 39 table(s) in 2.3s
+2026-09-01 14:54:28,240  INFO      eds_loader.cli.main  eds-loader run invoked (config=C:\Users\Mohit Patel\Downloads\EDS\loader.yaml, dry_run=False)
+2026-09-01 14:54:28,248  INFO      eds_loader.cli.main  Config loaded: source=local_fs target=postgres tables=(all) enforce_constraints=True schema_required=True
+2026-09-01 14:54:28,249  INFO      eds_loader.loader  Reading schema.json from explicit schema_path: C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\schema.json
+2026-09-01 14:54:28,256  INFO      eds_loader.connectors.local_fs  Read countries: 1 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\countries.parquet
+2026-09-01 14:54:28,259  INFO      eds_loader.connectors.local_fs  Read states: 51 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\states.parquet
+2026-09-01 14:54:28,279  INFO      eds_loader.connectors.local_fs  Read cities: 255 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\cities.parquet
+2026-09-01 14:54:28,282  INFO      eds_loader.connectors.local_fs  Read payment_methods: 13 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\payment_methods.parquet
+2026-09-01 14:54:28,285  INFO      eds_loader.connectors.local_fs  Read shipping_methods: 9 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\shipping_methods.parquet
+2026-09-01 14:54:28,289  INFO      eds_loader.connectors.local_fs  Read tax_codes: 7 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\tax_codes.parquet
+2026-09-01 14:54:28,292  INFO      eds_loader.connectors.local_fs  Read coupon_types: 8 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\coupon_types.parquet
+2026-09-01 14:54:28,295  INFO      eds_loader.connectors.local_fs  Read return_reasons: 5 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\return_reasons.parquet
+2026-09-01 14:54:28,298  INFO      eds_loader.connectors.local_fs  Read suppliers: 25 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\suppliers.parquet
+2026-09-01 14:54:28,300  INFO      eds_loader.connectors.local_fs  Read warehouses: 10 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\warehouses.parquet
+2026-09-01 14:54:28,304  INFO      eds_loader.connectors.local_fs  Read categories: 168 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\categories.parquet
+2026-09-01 14:54:28,306  INFO      eds_loader.connectors.local_fs  Read brands: 50 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\brands.parquet
+2026-09-01 14:54:28,326  INFO      eds_loader.connectors.local_fs  Read products: 1000 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\products.parquet
+2026-09-01 14:54:28,349  INFO      eds_loader.connectors.local_fs  Read inventory: 3000 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\inventory.parquet
+2026-09-01 14:54:28,371  INFO      eds_loader.connectors.local_fs  Read customers: 5 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\customers.parquet
+2026-09-01 14:54:28,385  INFO      eds_loader.connectors.local_fs  Read customer_addresses: 1509 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\customer_addresses.parquet
+2026-09-01 14:54:28,405  INFO      eds_loader.connectors.local_fs  Read customer_preferences: 1010 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\customer_preferences.parquet
+2026-09-01 14:54:28,426  INFO      eds_loader.connectors.local_fs  Read customer_loyalty: 5 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\customer_loyalty.parquet
+2026-09-01 14:54:28,443  INFO      eds_loader.connectors.local_fs  Read customer_personas: 5 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\customer_personas.parquet
+2026-09-01 14:54:28,464  INFO      eds_loader.connectors.local_fs  Read sessions: 19 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\sessions.parquet
+2026-09-01 14:54:28,481  INFO      eds_loader.connectors.local_fs  Read category_views: 103 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\category_views.parquet
+2026-09-01 14:54:28,495  INFO      eds_loader.connectors.local_fs  Read search_history: 35 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\search_history.parquet
+2026-09-01 14:54:28,511  INFO      eds_loader.connectors.local_fs  Read product_views: 336 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\product_views.parquet
+2026-09-01 14:54:28,529  INFO      eds_loader.connectors.local_fs  Read wishlists: 0 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\wishlists.parquet
+2026-09-01 14:54:28,545  INFO      eds_loader.connectors.local_fs  Read shopping_carts: 2 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\shopping_carts.parquet
+2026-09-01 14:54:28,564  INFO      eds_loader.connectors.local_fs  Read cart_items: 3 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\cart_items.parquet
+2026-09-01 14:54:28,580  INFO      eds_loader.connectors.local_fs  Read checkout: 1 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\checkout.parquet
+2026-09-01 14:54:28,596  INFO      eds_loader.connectors.local_fs  Read orders: 19 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\orders.parquet
+2026-09-01 14:54:28,614  INFO      eds_loader.connectors.local_fs  Read order_lines: 37 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\order_lines.parquet
+2026-09-01 14:54:28,631  INFO      eds_loader.connectors.local_fs  Read order_status_history: 48 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\order_status_history.parquet
+2026-09-01 14:54:28,650  INFO      eds_loader.connectors.local_fs  Read payments: 19 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\payments.parquet
+2026-09-01 14:54:28,666  INFO      eds_loader.connectors.local_fs  Read payment_status_history: 37 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\payment_status_history.parquet
+2026-09-01 14:54:28,680  INFO      eds_loader.connectors.local_fs  Read shipments: 18 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\shipments.parquet
+2026-09-01 14:54:28,733  INFO      eds_loader.connectors.local_fs  Read shipment_items: 36 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\shipment_items.parquet
+2026-09-01 14:54:28,750  INFO      eds_loader.connectors.local_fs  Read shipment_status_history: 56 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\shipment_status_history.parquet
+2026-09-01 14:54:28,754  INFO      eds_loader.connectors.local_fs  Read returns: 0 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\returns.parquet
+2026-09-01 14:54:28,757  INFO      eds_loader.connectors.local_fs  Read return_items: 0 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\return_items.parquet
+2026-09-01 14:54:28,771  INFO      eds_loader.connectors.local_fs  Read return_status_history: 0 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\return_status_history.parquet
+2026-09-01 14:54:28,774  INFO      eds_loader.connectors.local_fs  Read reviews: 0 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\reviews.parquet
+2026-09-01 14:54:28,774  INFO      eds_loader.loader  Read 39 dataset(s) from source for append
+2026-09-01 14:54:28,813  INFO      eds_loader.connectors._sql_base  Connected to postgres@localhost:5432/eds_db2 for append
+2026-09-01 14:54:28,818  INFO      eds_loader.connectors._sql_base  [countries] appended 1 row(s) in 0.00s
+2026-09-01 14:54:28,820  INFO      eds_loader.connectors._sql_base  [states] appended 51 row(s) in 0.00s
+2026-09-01 14:54:28,831  INFO      eds_loader.connectors._sql_base  [cities] appended 255 row(s) in 0.01s
+2026-09-01 14:54:28,834  INFO      eds_loader.connectors._sql_base  [payment_methods] appended 13 row(s) in 0.00s
+2026-09-01 14:54:28,836  INFO      eds_loader.connectors._sql_base  [shipping_methods] appended 9 row(s) in 0.00s
+2026-09-01 14:54:28,838  INFO      eds_loader.connectors._sql_base  [tax_codes] appended 7 row(s) in 0.00s
+2026-09-01 14:54:28,840  INFO      eds_loader.connectors._sql_base  [coupon_types] appended 8 row(s) in 0.00s
+2026-09-01 14:54:28,842  INFO      eds_loader.connectors._sql_base  [return_reasons] appended 5 row(s) in 0.00s
+2026-09-01 14:54:28,843  INFO      eds_loader.connectors._sql_base  [suppliers] appended 25 row(s) in 0.00s
+2026-09-01 14:54:28,845  INFO      eds_loader.connectors._sql_base  [warehouses] appended 10 row(s) in 0.00s
+2026-09-01 14:54:28,854  INFO      eds_loader.connectors._sql_base  [categories] appended 168 row(s) in 0.01s
+2026-09-01 14:54:28,857  INFO      eds_loader.connectors._sql_base  [brands] appended 50 row(s) in 0.00s
+2026-09-01 14:54:28,876  INFO      eds_loader.connectors._sql_base  [products] appended 1000 row(s) in 0.02s
+2026-09-01 14:54:28,931  INFO      eds_loader.connectors._sql_base  [inventory] appended 3000 row(s) in 0.05s
+2026-09-01 14:54:28,941  INFO      eds_loader.connectors._sql_base  [customers] appended 5 row(s) in 0.01s
+2026-09-01 14:54:28,972  INFO      eds_loader.connectors._sql_base  [customer_addresses] appended 1509 row(s) in 0.03s
+2026-09-01 14:54:28,989  INFO      eds_loader.connectors._sql_base  [customer_preferences] appended 1010 row(s) in 0.02s
+2026-09-01 14:54:28,997  INFO      eds_loader.connectors._sql_base  [customer_loyalty] appended 5 row(s) in 0.01s
+2026-09-01 14:54:29,005  INFO      eds_loader.connectors._sql_base  [customer_personas] appended 5 row(s) in 0.01s
+2026-09-01 14:54:29,022  INFO      eds_loader.connectors._sql_base  [sessions] appended 19 row(s) in 0.02s
+2026-09-01 14:54:29,037  INFO      eds_loader.connectors._sql_base  [category_views] appended 103 row(s) in 0.02s
+2026-09-01 14:54:29,054  INFO      eds_loader.connectors._sql_base  [search_history] appended 35 row(s) in 0.02s
+2026-09-01 14:54:29,073  INFO      eds_loader.connectors._sql_base  [product_views] appended 336 row(s) in 0.02s
+2026-09-01 14:54:29,073  INFO      eds_loader.connectors._sql_base  [wishlists] appended 0 row(s) in 0.00s
+2026-09-01 14:54:29,076  INFO      eds_loader.connectors._sql_base  [shopping_carts] appended 2 row(s) in 0.00s
+2026-09-01 14:54:29,083  INFO      eds_loader.connectors._sql_base  [cart_items] appended 3 row(s) in 0.01s
+2026-09-01 14:54:29,094  INFO      eds_loader.connectors._sql_base  [checkout] appended 1 row(s) in 0.01s
+2026-09-01 14:54:29,096  INFO      eds_loader.connectors._sql_base  [orders] appended 19 row(s) in 0.00s
+2026-09-01 14:54:29,098  INFO      eds_loader.connectors._sql_base  [order_lines] appended 37 row(s) in 0.00s
+2026-09-01 14:54:29,100  INFO      eds_loader.connectors._sql_base  [order_status_history] appended 48 row(s) in 0.00s
+2026-09-01 14:54:29,103  INFO      eds_loader.connectors._sql_base  [payments] appended 19 row(s) in 0.00s
+2026-09-01 14:54:29,106  INFO      eds_loader.connectors._sql_base  [payment_status_history] appended 37 row(s) in 0.00s
+2026-09-01 14:54:29,109  INFO      eds_loader.connectors._sql_base  [shipments] appended 18 row(s) in 0.00s
+2026-09-01 14:54:29,111  INFO      eds_loader.connectors._sql_base  [shipment_items] appended 36 row(s) in 0.00s
+2026-09-01 14:54:29,114  INFO      eds_loader.connectors._sql_base  [shipment_status_history] appended 56 row(s) in 0.00s
+2026-09-01 14:54:29,115  INFO      eds_loader.connectors._sql_base  [returns] appended 0 row(s) in 0.00s
+2026-09-01 14:54:29,115  INFO      eds_loader.connectors._sql_base  [return_items] appended 0 row(s) in 0.00s
+2026-09-01 14:54:29,116  INFO      eds_loader.connectors._sql_base  [return_status_history] appended 0 row(s) in 0.00s
+2026-09-01 14:54:29,116  INFO      eds_loader.connectors._sql_base  [reviews] appended 0 row(s) in 0.00s
+2026-09-01 14:54:29,116  INFO      eds_loader.loader  Append load complete: 7905 row(s) inserted across 39 dataset(s)
+2026-09-01 14:54:29,117  INFO      eds_loader.cli.main  Run complete: 7905 row(s) across 39 table(s) in 0.9s
+2026-09-01 14:54:34,707  INFO      eds_loader.cli.main  eds-loader run invoked (config=C:\Users\Mohit Patel\Downloads\EDS\loader.yaml, dry_run=False)
+2026-09-01 14:54:34,714  INFO      eds_loader.cli.main  Config loaded: source=local_fs target=postgres tables=(all) enforce_constraints=True schema_required=True
+2026-09-01 14:54:34,715  INFO      eds_loader.loader  Reading schema.json from explicit schema_path: C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\schema.json
+2026-09-01 14:54:34,719  INFO      eds_loader.connectors.local_fs  Read countries: 1 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\countries.parquet
+2026-09-01 14:54:34,720  INFO      eds_loader.connectors.local_fs  Read states: 51 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\states.parquet
+2026-09-01 14:54:34,721  INFO      eds_loader.connectors.local_fs  Read cities: 255 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\cities.parquet
+2026-09-01 14:54:34,721  INFO      eds_loader.connectors.local_fs  Read payment_methods: 13 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\payment_methods.parquet
+2026-09-01 14:54:34,722  INFO      eds_loader.connectors.local_fs  Read shipping_methods: 9 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\shipping_methods.parquet
+2026-09-01 14:54:34,723  INFO      eds_loader.connectors.local_fs  Read tax_codes: 7 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\tax_codes.parquet
+2026-09-01 14:54:34,724  INFO      eds_loader.connectors.local_fs  Read coupon_types: 8 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\coupon_types.parquet
+2026-09-01 14:54:34,725  INFO      eds_loader.connectors.local_fs  Read return_reasons: 5 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\return_reasons.parquet
+2026-09-01 14:54:34,726  INFO      eds_loader.connectors.local_fs  Read suppliers: 25 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\suppliers.parquet
+2026-09-01 14:54:34,727  INFO      eds_loader.connectors.local_fs  Read warehouses: 10 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\warehouses.parquet
+2026-09-01 14:54:34,728  INFO      eds_loader.connectors.local_fs  Read categories: 168 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\categories.parquet
+2026-09-01 14:54:34,729  INFO      eds_loader.connectors.local_fs  Read brands: 50 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\brands.parquet
+2026-09-01 14:54:34,730  INFO      eds_loader.connectors.local_fs  Read products: 1000 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\products.parquet
+2026-09-01 14:54:34,731  INFO      eds_loader.connectors.local_fs  Read inventory: 3000 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\inventory.parquet
+2026-09-01 14:54:34,731  INFO      eds_loader.connectors.local_fs  Read customers: 5 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\customers.parquet
+2026-09-01 14:54:34,732  INFO      eds_loader.connectors.local_fs  Read customer_addresses: 1509 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\customer_addresses.parquet
+2026-09-01 14:54:34,733  INFO      eds_loader.connectors.local_fs  Read customer_preferences: 1010 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\customer_preferences.parquet
+2026-09-01 14:54:34,734  INFO      eds_loader.connectors.local_fs  Read customer_loyalty: 5 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\customer_loyalty.parquet
+2026-09-01 14:54:34,735  INFO      eds_loader.connectors.local_fs  Read customer_personas: 5 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\customer_personas.parquet
+2026-09-01 14:54:34,736  INFO      eds_loader.connectors.local_fs  Read sessions: 19 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\sessions.parquet
+2026-09-01 14:54:34,737  INFO      eds_loader.connectors.local_fs  Read category_views: 103 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\category_views.parquet
+2026-09-01 14:54:34,737  INFO      eds_loader.connectors.local_fs  Read search_history: 35 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\search_history.parquet
+2026-09-01 14:54:34,738  INFO      eds_loader.connectors.local_fs  Read product_views: 336 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\product_views.parquet
+2026-09-01 14:54:34,739  INFO      eds_loader.connectors.local_fs  Read wishlists: 0 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\wishlists.parquet
+2026-09-01 14:54:34,739  INFO      eds_loader.connectors.local_fs  Read shopping_carts: 2 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\shopping_carts.parquet
+2026-09-01 14:54:34,741  INFO      eds_loader.connectors.local_fs  Read cart_items: 3 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\cart_items.parquet
+2026-09-01 14:54:34,742  INFO      eds_loader.connectors.local_fs  Read checkout: 1 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\checkout.parquet
+2026-09-01 14:54:34,743  INFO      eds_loader.connectors.local_fs  Read orders: 19 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\orders.parquet
+2026-09-01 14:54:34,744  INFO      eds_loader.connectors.local_fs  Read order_lines: 37 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\order_lines.parquet
+2026-09-01 14:54:34,745  INFO      eds_loader.connectors.local_fs  Read order_status_history: 48 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\order_status_history.parquet
+2026-09-01 14:54:34,745  INFO      eds_loader.connectors.local_fs  Read payments: 19 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\payments.parquet
+2026-09-01 14:54:34,746  INFO      eds_loader.connectors.local_fs  Read payment_status_history: 37 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\payment_status_history.parquet
+2026-09-01 14:54:34,747  INFO      eds_loader.connectors.local_fs  Read shipments: 18 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\shipments.parquet
+2026-09-01 14:54:34,747  INFO      eds_loader.connectors.local_fs  Read shipment_items: 36 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\shipment_items.parquet
+2026-09-01 14:54:34,748  INFO      eds_loader.connectors.local_fs  Read shipment_status_history: 56 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\shipment_status_history.parquet
+2026-09-01 14:54:34,749  INFO      eds_loader.connectors.local_fs  Read returns: 0 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\returns.parquet
+2026-09-01 14:54:34,749  INFO      eds_loader.connectors.local_fs  Read return_items: 0 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\return_items.parquet
+2026-09-01 14:54:34,750  INFO      eds_loader.connectors.local_fs  Read return_status_history: 0 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\return_status_history.parquet
+2026-09-01 14:54:34,751  INFO      eds_loader.connectors.local_fs  Read reviews: 0 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\reviews.parquet
+2026-09-01 14:54:34,751  INFO      eds_loader.loader  Read 39 dataset(s) from source for append
+2026-09-01 14:54:34,793  INFO      eds_loader.connectors._sql_base  Connected to postgres@localhost:5432/eds_db2 for append
+2026-09-01 14:54:34,796  INFO      eds_loader.connectors._sql_base  [countries] appended 1 row(s) in 0.00s
+2026-09-01 14:54:34,799  INFO      eds_loader.connectors._sql_base  [states] appended 51 row(s) in 0.00s
+2026-09-01 14:54:34,806  INFO      eds_loader.connectors._sql_base  [cities] appended 255 row(s) in 0.01s
+2026-09-01 14:54:34,808  INFO      eds_loader.connectors._sql_base  [payment_methods] appended 13 row(s) in 0.00s
+2026-09-01 14:54:34,809  INFO      eds_loader.connectors._sql_base  [shipping_methods] appended 9 row(s) in 0.00s
+2026-09-01 14:54:34,811  INFO      eds_loader.connectors._sql_base  [tax_codes] appended 7 row(s) in 0.00s
+2026-09-01 14:54:34,813  INFO      eds_loader.connectors._sql_base  [coupon_types] appended 8 row(s) in 0.00s
+2026-09-01 14:54:34,814  INFO      eds_loader.connectors._sql_base  [return_reasons] appended 5 row(s) in 0.00s
+2026-09-01 14:54:34,816  INFO      eds_loader.connectors._sql_base  [suppliers] appended 25 row(s) in 0.00s
+2026-09-01 14:54:34,820  INFO      eds_loader.connectors._sql_base  [warehouses] appended 10 row(s) in 0.00s
+2026-09-01 14:54:34,824  INFO      eds_loader.connectors._sql_base  [categories] appended 168 row(s) in 0.00s
+2026-09-01 14:54:34,835  INFO      eds_loader.connectors._sql_base  [brands] appended 50 row(s) in 0.01s
+2026-09-01 14:54:34,856  INFO      eds_loader.connectors._sql_base  [products] appended 1000 row(s) in 0.02s
+2026-09-01 14:54:34,908  INFO      eds_loader.connectors._sql_base  [inventory] appended 3000 row(s) in 0.05s
+2026-09-01 14:54:34,911  INFO      eds_loader.connectors._sql_base  [customers] appended 5 row(s) in 0.00s
+2026-09-01 14:54:34,940  INFO      eds_loader.connectors._sql_base  [customer_addresses] appended 1509 row(s) in 0.03s
+2026-09-01 14:54:34,959  INFO      eds_loader.connectors._sql_base  [customer_preferences] appended 1010 row(s) in 0.02s
+2026-09-01 14:54:34,961  INFO      eds_loader.connectors._sql_base  [customer_loyalty] appended 5 row(s) in 0.00s
+2026-09-01 14:54:34,963  INFO      eds_loader.connectors._sql_base  [customer_personas] appended 5 row(s) in 0.00s
+2026-09-01 14:54:34,965  INFO      eds_loader.connectors._sql_base  [sessions] appended 19 row(s) in 0.00s
+2026-09-01 14:54:34,968  INFO      eds_loader.connectors._sql_base  [category_views] appended 103 row(s) in 0.00s
+2026-09-01 14:54:34,970  INFO      eds_loader.connectors._sql_base  [search_history] appended 35 row(s) in 0.00s
+2026-09-01 14:54:34,977  INFO      eds_loader.connectors._sql_base  [product_views] appended 336 row(s) in 0.01s
+2026-09-01 14:54:34,977  INFO      eds_loader.connectors._sql_base  [wishlists] appended 0 row(s) in 0.00s
+2026-09-01 14:54:34,980  INFO      eds_loader.connectors._sql_base  [shopping_carts] appended 2 row(s) in 0.00s
+2026-09-01 14:54:34,982  INFO      eds_loader.connectors._sql_base  [cart_items] appended 3 row(s) in 0.00s
+2026-09-01 14:54:34,984  INFO      eds_loader.connectors._sql_base  [checkout] appended 1 row(s) in 0.00s
+2026-09-01 14:54:34,986  INFO      eds_loader.connectors._sql_base  [orders] appended 19 row(s) in 0.00s
+2026-09-01 14:54:34,989  INFO      eds_loader.connectors._sql_base  [order_lines] appended 37 row(s) in 0.00s
+2026-09-01 14:54:34,992  INFO      eds_loader.connectors._sql_base  [order_status_history] appended 48 row(s) in 0.00s
+2026-09-01 14:54:34,995  INFO      eds_loader.connectors._sql_base  [payments] appended 19 row(s) in 0.00s
+2026-09-01 14:54:34,998  INFO      eds_loader.connectors._sql_base  [payment_status_history] appended 37 row(s) in 0.00s
+2026-09-01 14:54:35,000  INFO      eds_loader.connectors._sql_base  [shipments] appended 18 row(s) in 0.00s
+2026-09-01 14:54:35,002  INFO      eds_loader.connectors._sql_base  [shipment_items] appended 36 row(s) in 0.00s
+2026-09-01 14:54:35,004  INFO      eds_loader.connectors._sql_base  [shipment_status_history] appended 56 row(s) in 0.00s
+2026-09-01 14:54:35,004  INFO      eds_loader.connectors._sql_base  [returns] appended 0 row(s) in 0.00s
+2026-09-01 14:54:35,005  INFO      eds_loader.connectors._sql_base  [return_items] appended 0 row(s) in 0.00s
+2026-09-01 14:54:35,006  INFO      eds_loader.connectors._sql_base  [return_status_history] appended 0 row(s) in 0.00s
+2026-09-01 14:54:35,006  INFO      eds_loader.connectors._sql_base  [reviews] appended 0 row(s) in 0.00s
+2026-09-01 14:54:35,006  INFO      eds_loader.loader  Append load complete: 7905 row(s) inserted across 39 dataset(s)
+2026-09-01 14:54:35,007  INFO      eds_loader.cli.main  Run complete: 7905 row(s) across 39 table(s) in 0.3s
+2026-09-01 14:56:28,063  INFO      eds_loader.cli.main  eds-loader run invoked (config=C:\Users\Mohit Patel\Downloads\EDS\loader.yaml, dry_run=False)
+2026-09-01 14:56:28,070  INFO      eds_loader.cli.main  Config loaded: source=local_fs target=postgres tables=(all) enforce_constraints=True schema_required=True
+2026-09-01 14:56:28,071  INFO      eds_loader.loader  Reading schema.json from explicit schema_path: C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\schema.json
+2026-09-01 14:56:28,075  INFO      eds_loader.connectors.local_fs  Read countries: 1 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\countries.parquet
+2026-09-01 14:56:28,076  INFO      eds_loader.connectors.local_fs  Read states: 51 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\states.parquet
+2026-09-01 14:56:28,077  INFO      eds_loader.connectors.local_fs  Read cities: 255 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\cities.parquet
+2026-09-01 14:56:28,078  INFO      eds_loader.connectors.local_fs  Read payment_methods: 13 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\payment_methods.parquet
+2026-09-01 14:56:28,078  INFO      eds_loader.connectors.local_fs  Read shipping_methods: 9 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\shipping_methods.parquet
+2026-09-01 14:56:28,079  INFO      eds_loader.connectors.local_fs  Read tax_codes: 7 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\tax_codes.parquet
+2026-09-01 14:56:28,080  INFO      eds_loader.connectors.local_fs  Read coupon_types: 8 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\coupon_types.parquet
+2026-09-01 14:56:28,080  INFO      eds_loader.connectors.local_fs  Read return_reasons: 5 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\return_reasons.parquet
+2026-09-01 14:56:28,081  INFO      eds_loader.connectors.local_fs  Read suppliers: 25 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\suppliers.parquet
+2026-09-01 14:56:28,082  INFO      eds_loader.connectors.local_fs  Read warehouses: 10 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\warehouses.parquet
+2026-09-01 14:56:28,083  INFO      eds_loader.connectors.local_fs  Read categories: 168 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\categories.parquet
+2026-09-01 14:56:28,084  INFO      eds_loader.connectors.local_fs  Read brands: 50 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\brands.parquet
+2026-09-01 14:56:28,085  INFO      eds_loader.connectors.local_fs  Read products: 1000 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\products.parquet
+2026-09-01 14:56:28,086  INFO      eds_loader.connectors.local_fs  Read inventory: 3000 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\inventory.parquet
+2026-09-01 14:56:28,087  INFO      eds_loader.connectors.local_fs  Read customers: 5 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\customers.parquet
+2026-09-01 14:56:28,088  INFO      eds_loader.connectors.local_fs  Read customer_addresses: 1509 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\customer_addresses.parquet
+2026-09-01 14:56:28,089  INFO      eds_loader.connectors.local_fs  Read customer_preferences: 1010 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\customer_preferences.parquet
+2026-09-01 14:56:28,090  INFO      eds_loader.connectors.local_fs  Read customer_loyalty: 5 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\customer_loyalty.parquet
+2026-09-01 14:56:28,091  INFO      eds_loader.connectors.local_fs  Read customer_personas: 5 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\customer_personas.parquet
+2026-09-01 14:56:28,092  INFO      eds_loader.connectors.local_fs  Read sessions: 19 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\sessions.parquet
+2026-09-01 14:56:28,093  INFO      eds_loader.connectors.local_fs  Read category_views: 103 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\category_views.parquet
+2026-09-01 14:56:28,094  INFO      eds_loader.connectors.local_fs  Read search_history: 35 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\search_history.parquet
+2026-09-01 14:56:28,095  INFO      eds_loader.connectors.local_fs  Read product_views: 336 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\product_views.parquet
+2026-09-01 14:56:28,095  INFO      eds_loader.connectors.local_fs  Read wishlists: 0 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\wishlists.parquet
+2026-09-01 14:56:28,096  INFO      eds_loader.connectors.local_fs  Read shopping_carts: 2 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\shopping_carts.parquet
+2026-09-01 14:56:28,097  INFO      eds_loader.connectors.local_fs  Read cart_items: 3 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\cart_items.parquet
+2026-09-01 14:56:28,097  INFO      eds_loader.connectors.local_fs  Read checkout: 1 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\checkout.parquet
+2026-09-01 14:56:28,098  INFO      eds_loader.connectors.local_fs  Read orders: 19 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\orders.parquet
+2026-09-01 14:56:28,099  INFO      eds_loader.connectors.local_fs  Read order_lines: 37 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\order_lines.parquet
+2026-09-01 14:56:28,099  INFO      eds_loader.connectors.local_fs  Read order_status_history: 48 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\order_status_history.parquet
+2026-09-01 14:56:28,100  INFO      eds_loader.connectors.local_fs  Read payments: 19 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\payments.parquet
+2026-09-01 14:56:28,101  INFO      eds_loader.connectors.local_fs  Read payment_status_history: 37 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\payment_status_history.parquet
+2026-09-01 14:56:28,102  INFO      eds_loader.connectors.local_fs  Read shipments: 18 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\shipments.parquet
+2026-09-01 14:56:28,102  INFO      eds_loader.connectors.local_fs  Read shipment_items: 36 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\shipment_items.parquet
+2026-09-01 14:56:28,103  INFO      eds_loader.connectors.local_fs  Read shipment_status_history: 56 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\shipment_status_history.parquet
+2026-09-01 14:56:28,104  INFO      eds_loader.connectors.local_fs  Read returns: 0 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\returns.parquet
+2026-09-01 14:56:28,105  INFO      eds_loader.connectors.local_fs  Read return_items: 0 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\return_items.parquet
+2026-09-01 14:56:28,105  INFO      eds_loader.connectors.local_fs  Read return_status_history: 0 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\return_status_history.parquet
+2026-09-01 14:56:28,106  INFO      eds_loader.connectors.local_fs  Read reviews: 0 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\reviews.parquet
+2026-09-01 14:56:28,106  INFO      eds_loader.loader  Read 39 dataset(s) from source for append
+2026-09-01 14:56:28,139  INFO      eds_loader.connectors._sql_base  Connected to postgres@localhost:5432/eds_db2 for append
+2026-09-01 14:56:28,142  INFO      eds_loader.connectors._sql_base  [countries] appended 1 row(s) in 0.00s
+2026-09-01 14:56:28,150  INFO      eds_loader.connectors._sql_base  [states] appended 51 row(s) in 0.01s
+2026-09-01 14:56:28,160  INFO      eds_loader.connectors._sql_base  [cities] appended 255 row(s) in 0.01s
+2026-09-01 14:56:28,162  INFO      eds_loader.connectors._sql_base  [payment_methods] appended 13 row(s) in 0.00s
+2026-09-01 14:56:28,164  INFO      eds_loader.connectors._sql_base  [shipping_methods] appended 9 row(s) in 0.00s
+2026-09-01 14:56:28,165  INFO      eds_loader.connectors._sql_base  [tax_codes] appended 7 row(s) in 0.00s
+2026-09-01 14:56:28,166  INFO      eds_loader.connectors._sql_base  [coupon_types] appended 8 row(s) in 0.00s
+2026-09-01 14:56:28,167  INFO      eds_loader.connectors._sql_base  [return_reasons] appended 5 row(s) in 0.00s
+2026-09-01 14:56:28,174  INFO      eds_loader.connectors._sql_base  [suppliers] appended 25 row(s) in 0.01s
+2026-09-01 14:56:28,176  INFO      eds_loader.connectors._sql_base  [warehouses] appended 10 row(s) in 0.00s
+2026-09-01 14:56:28,184  INFO      eds_loader.connectors._sql_base  [categories] appended 168 row(s) in 0.01s
+2026-09-01 14:56:28,191  INFO      eds_loader.connectors._sql_base  [brands] appended 50 row(s) in 0.01s
+2026-09-01 14:56:28,213  INFO      eds_loader.connectors._sql_base  [products] appended 1000 row(s) in 0.02s
+2026-09-01 14:56:28,264  INFO      eds_loader.connectors._sql_base  [inventory] appended 3000 row(s) in 0.05s
+2026-09-01 14:56:28,267  INFO      eds_loader.connectors._sql_base  [customers] appended 5 row(s) in 0.00s
+2026-09-01 14:56:28,296  INFO      eds_loader.connectors._sql_base  [customer_addresses] appended 1509 row(s) in 0.03s
+2026-09-01 14:56:28,314  INFO      eds_loader.connectors._sql_base  [customer_preferences] appended 1010 row(s) in 0.02s
+2026-09-01 14:56:28,316  INFO      eds_loader.connectors._sql_base  [customer_loyalty] appended 5 row(s) in 0.00s
+2026-09-01 14:56:28,317  INFO      eds_loader.connectors._sql_base  [customer_personas] appended 5 row(s) in 0.00s
+2026-09-01 14:56:28,319  INFO      eds_loader.connectors._sql_base  [sessions] appended 19 row(s) in 0.00s
+2026-09-01 14:56:28,324  INFO      eds_loader.connectors._sql_base  [category_views] appended 103 row(s) in 0.00s
+2026-09-01 14:56:28,326  INFO      eds_loader.connectors._sql_base  [search_history] appended 35 row(s) in 0.00s
+2026-09-01 14:56:28,333  INFO      eds_loader.connectors._sql_base  [product_views] appended 336 row(s) in 0.01s
+2026-09-01 14:56:28,334  INFO      eds_loader.connectors._sql_base  [wishlists] appended 0 row(s) in 0.00s
+2026-09-01 14:56:28,335  INFO      eds_loader.connectors._sql_base  [shopping_carts] appended 2 row(s) in 0.00s
+2026-09-01 14:56:28,337  INFO      eds_loader.connectors._sql_base  [cart_items] appended 3 row(s) in 0.00s
+2026-09-01 14:56:28,339  INFO      eds_loader.connectors._sql_base  [checkout] appended 1 row(s) in 0.00s
+2026-09-01 14:56:28,347  INFO      eds_loader.connectors._sql_base  [orders] appended 19 row(s) in 0.01s
+2026-09-01 14:56:28,355  INFO      eds_loader.connectors._sql_base  [order_lines] appended 37 row(s) in 0.01s
+2026-09-01 14:56:28,363  INFO      eds_loader.connectors._sql_base  [order_status_history] appended 48 row(s) in 0.01s
+2026-09-01 14:56:28,370  INFO      eds_loader.connectors._sql_base  [payments] appended 19 row(s) in 0.01s
+2026-09-01 14:56:28,377  INFO      eds_loader.connectors._sql_base  [payment_status_history] appended 37 row(s) in 0.01s
+2026-09-01 14:56:28,380  INFO      eds_loader.connectors._sql_base  [shipments] appended 18 row(s) in 0.00s
+2026-09-01 14:56:28,382  INFO      eds_loader.connectors._sql_base  [shipment_items] appended 36 row(s) in 0.00s
+2026-09-01 14:56:28,390  INFO      eds_loader.connectors._sql_base  [shipment_status_history] appended 56 row(s) in 0.01s
+2026-09-01 14:56:28,390  INFO      eds_loader.connectors._sql_base  [returns] appended 0 row(s) in 0.00s
+2026-09-01 14:56:28,391  INFO      eds_loader.connectors._sql_base  [return_items] appended 0 row(s) in 0.00s
+2026-09-01 14:56:28,391  INFO      eds_loader.connectors._sql_base  [return_status_history] appended 0 row(s) in 0.00s
+2026-09-01 14:56:28,392  INFO      eds_loader.connectors._sql_base  [reviews] appended 0 row(s) in 0.00s
+2026-09-01 14:56:28,392  INFO      eds_loader.loader  Append load complete: 7905 row(s) inserted across 39 dataset(s)
+2026-09-01 14:56:28,392  INFO      eds_loader.cli.main  Run complete: 7905 row(s) across 39 table(s) in 0.3s
+2026-09-01 14:58:27,940  INFO      eds_loader.cli.main  eds-loader run invoked (config=C:\Users\Mohit Patel\Downloads\EDS\loader.yaml, dry_run=False)
+2026-09-01 14:58:27,948  INFO      eds_loader.cli.main  Config loaded: source=local_fs target=postgres tables=(all) enforce_constraints=True schema_required=True
+2026-09-01 14:58:27,949  INFO      eds_loader.loader  Reading schema.json from explicit schema_path: C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\schema.json
+2026-09-01 14:58:27,952  INFO      eds_loader.connectors.local_fs  Read countries: 1 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\countries.parquet
+2026-09-01 14:58:27,953  INFO      eds_loader.connectors.local_fs  Read states: 51 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\states.parquet
+2026-09-01 14:58:27,954  INFO      eds_loader.connectors.local_fs  Read cities: 255 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\cities.parquet
+2026-09-01 14:58:27,955  INFO      eds_loader.connectors.local_fs  Read payment_methods: 13 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\payment_methods.parquet
+2026-09-01 14:58:27,956  INFO      eds_loader.connectors.local_fs  Read shipping_methods: 9 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\shipping_methods.parquet
+2026-09-01 14:58:27,957  INFO      eds_loader.connectors.local_fs  Read tax_codes: 7 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\tax_codes.parquet
+2026-09-01 14:58:27,958  INFO      eds_loader.connectors.local_fs  Read coupon_types: 8 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\coupon_types.parquet
+2026-09-01 14:58:27,958  INFO      eds_loader.connectors.local_fs  Read return_reasons: 5 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\return_reasons.parquet
+2026-09-01 14:58:27,959  INFO      eds_loader.connectors.local_fs  Read suppliers: 25 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\suppliers.parquet
+2026-09-01 14:58:27,960  INFO      eds_loader.connectors.local_fs  Read warehouses: 10 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\warehouses.parquet
+2026-09-01 14:58:27,961  INFO      eds_loader.connectors.local_fs  Read categories: 168 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\categories.parquet
+2026-09-01 14:58:27,962  INFO      eds_loader.connectors.local_fs  Read brands: 50 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\brands.parquet
+2026-09-01 14:58:27,963  INFO      eds_loader.connectors.local_fs  Read products: 1000 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\products.parquet
+2026-09-01 14:58:27,964  INFO      eds_loader.connectors.local_fs  Read inventory: 3000 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\inventory.parquet
+2026-09-01 14:58:27,965  INFO      eds_loader.connectors.local_fs  Read customers: 5 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\customers.parquet
+2026-09-01 14:58:27,966  INFO      eds_loader.connectors.local_fs  Read customer_addresses: 1509 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\customer_addresses.parquet
+2026-09-01 14:58:27,967  INFO      eds_loader.connectors.local_fs  Read customer_preferences: 1010 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\customer_preferences.parquet
+2026-09-01 14:58:27,968  INFO      eds_loader.connectors.local_fs  Read customer_loyalty: 5 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\customer_loyalty.parquet
+2026-09-01 14:58:27,968  INFO      eds_loader.connectors.local_fs  Read customer_personas: 5 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\customer_personas.parquet
+2026-09-01 14:58:27,969  INFO      eds_loader.connectors.local_fs  Read sessions: 19 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\sessions.parquet
+2026-09-01 14:58:27,970  INFO      eds_loader.connectors.local_fs  Read category_views: 103 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\category_views.parquet
+2026-09-01 14:58:27,971  INFO      eds_loader.connectors.local_fs  Read search_history: 35 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\search_history.parquet
+2026-09-01 14:58:27,972  INFO      eds_loader.connectors.local_fs  Read product_views: 336 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\product_views.parquet
+2026-09-01 14:58:27,972  INFO      eds_loader.connectors.local_fs  Read wishlists: 0 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\wishlists.parquet
+2026-09-01 14:58:27,973  INFO      eds_loader.connectors.local_fs  Read shopping_carts: 2 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\shopping_carts.parquet
+2026-09-01 14:58:27,974  INFO      eds_loader.connectors.local_fs  Read cart_items: 3 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\cart_items.parquet
+2026-09-01 14:58:27,975  INFO      eds_loader.connectors.local_fs  Read checkout: 1 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\checkout.parquet
+2026-09-01 14:58:27,975  INFO      eds_loader.connectors.local_fs  Read orders: 19 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\orders.parquet
+2026-09-01 14:58:27,976  INFO      eds_loader.connectors.local_fs  Read order_lines: 37 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\order_lines.parquet
+2026-09-01 14:58:27,977  INFO      eds_loader.connectors.local_fs  Read order_status_history: 48 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\order_status_history.parquet
+2026-09-01 14:58:27,978  INFO      eds_loader.connectors.local_fs  Read payments: 19 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\payments.parquet
+2026-09-01 14:58:27,979  INFO      eds_loader.connectors.local_fs  Read payment_status_history: 37 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\payment_status_history.parquet
+2026-09-01 14:58:27,979  INFO      eds_loader.connectors.local_fs  Read shipments: 18 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\shipments.parquet
+2026-09-01 14:58:27,980  INFO      eds_loader.connectors.local_fs  Read shipment_items: 36 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\shipment_items.parquet
+2026-09-01 14:58:27,981  INFO      eds_loader.connectors.local_fs  Read shipment_status_history: 56 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\shipment_status_history.parquet
+2026-09-01 14:58:27,982  INFO      eds_loader.connectors.local_fs  Read returns: 0 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\returns.parquet
+2026-09-01 14:58:27,982  INFO      eds_loader.connectors.local_fs  Read return_items: 0 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\return_items.parquet
+2026-09-01 14:58:27,983  INFO      eds_loader.connectors.local_fs  Read return_status_history: 0 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\return_status_history.parquet
+2026-09-01 14:58:27,984  INFO      eds_loader.connectors.local_fs  Read reviews: 0 row(s) from C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\output\reviews.parquet
+2026-09-01 14:58:27,984  INFO      eds_loader.loader  Read 39 dataset(s) from source for append
+2026-09-01 14:58:28,025  INFO      eds_loader.connectors._sql_base  Connected to postgres@localhost:5432/eds_db2 for append
+2026-09-01 14:58:28,028  INFO      eds_loader.connectors._sql_base  [countries] appended 1 row(s) in 0.00s
+2026-09-01 14:58:28,030  INFO      eds_loader.connectors._sql_base  [states] appended 51 row(s) in 0.00s
+2026-09-01 14:58:28,036  INFO      eds_loader.connectors._sql_base  [cities] appended 255 row(s) in 0.01s
+2026-09-01 14:58:28,038  INFO      eds_loader.connectors._sql_base  [payment_methods] appended 13 row(s) in 0.00s
+2026-09-01 14:58:28,040  INFO      eds_loader.connectors._sql_base  [shipping_methods] appended 9 row(s) in 0.00s
+2026-09-01 14:58:28,042  INFO      eds_loader.connectors._sql_base  [tax_codes] appended 7 row(s) in 0.00s
+2026-09-01 14:58:28,044  INFO      eds_loader.connectors._sql_base  [coupon_types] appended 8 row(s) in 0.00s
+2026-09-01 14:58:28,045  INFO      eds_loader.connectors._sql_base  [return_reasons] appended 5 row(s) in 0.00s
+2026-09-01 14:58:28,047  INFO      eds_loader.connectors._sql_base  [suppliers] appended 25 row(s) in 0.00s
+2026-09-01 14:58:28,049  INFO      eds_loader.connectors._sql_base  [warehouses] appended 10 row(s) in 0.00s
+2026-09-01 14:58:28,053  INFO      eds_loader.connectors._sql_base  [categories] appended 168 row(s) in 0.00s
+2026-09-01 14:58:28,055  INFO      eds_loader.connectors._sql_base  [brands] appended 50 row(s) in 0.00s
+2026-09-01 14:58:28,075  INFO      eds_loader.connectors._sql_base  [products] appended 1000 row(s) in 0.02s
+2026-09-01 14:58:28,126  INFO      eds_loader.connectors._sql_base  [inventory] appended 3000 row(s) in 0.05s
+2026-09-01 14:58:28,128  INFO      eds_loader.connectors._sql_base  [customers] appended 5 row(s) in 0.00s
+2026-09-01 14:58:28,161  INFO      eds_loader.connectors._sql_base  [customer_addresses] appended 1509 row(s) in 0.03s
+2026-09-01 14:58:28,179  INFO      eds_loader.connectors._sql_base  [customer_preferences] appended 1010 row(s) in 0.02s
+2026-09-01 14:58:28,181  INFO      eds_loader.connectors._sql_base  [customer_loyalty] appended 5 row(s) in 0.00s
+2026-09-01 14:58:28,189  INFO      eds_loader.connectors._sql_base  [customer_personas] appended 5 row(s) in 0.01s
+2026-09-01 14:58:28,199  INFO      eds_loader.connectors._sql_base  [sessions] appended 19 row(s) in 0.01s
+2026-09-01 14:58:28,209  INFO      eds_loader.connectors._sql_base  [category_views] appended 103 row(s) in 0.01s
+2026-09-01 14:58:28,220  INFO      eds_loader.connectors._sql_base  [search_history] appended 35 row(s) in 0.01s
+2026-09-01 14:58:28,232  INFO      eds_loader.connectors._sql_base  [product_views] appended 336 row(s) in 0.01s
+2026-09-01 14:58:28,233  INFO      eds_loader.connectors._sql_base  [wishlists] appended 0 row(s) in 0.00s
+2026-09-01 14:58:28,235  INFO      eds_loader.connectors._sql_base  [shopping_carts] appended 2 row(s) in 0.00s
+2026-09-01 14:58:28,236  INFO      eds_loader.connectors._sql_base  [cart_items] appended 3 row(s) in 0.00s
+2026-09-01 14:58:28,238  INFO      eds_loader.connectors._sql_base  [checkout] appended 1 row(s) in 0.00s
+2026-09-01 14:58:28,247  INFO      eds_loader.connectors._sql_base  [orders] appended 19 row(s) in 0.01s
+2026-09-01 14:58:28,249  INFO      eds_loader.connectors._sql_base  [order_lines] appended 37 row(s) in 0.00s
+2026-09-01 14:58:28,251  INFO      eds_loader.connectors._sql_base  [order_status_history] appended 48 row(s) in 0.00s
+2026-09-01 14:58:28,252  INFO      eds_loader.connectors._sql_base  [payments] appended 19 row(s) in 0.00s
+2026-09-01 14:58:28,259  INFO      eds_loader.connectors._sql_base  [payment_status_history] appended 37 row(s) in 0.01s
+2026-09-01 14:58:28,261  INFO      eds_loader.connectors._sql_base  [shipments] appended 18 row(s) in 0.00s
+2026-09-01 14:58:28,263  INFO      eds_loader.connectors._sql_base  [shipment_items] appended 36 row(s) in 0.00s
+2026-09-01 14:58:28,265  INFO      eds_loader.connectors._sql_base  [shipment_status_history] appended 56 row(s) in 0.00s
+2026-09-01 14:58:28,266  INFO      eds_loader.connectors._sql_base  [returns] appended 0 row(s) in 0.00s
+2026-09-01 14:58:28,266  INFO      eds_loader.connectors._sql_base  [return_items] appended 0 row(s) in 0.00s
+2026-09-01 14:58:28,266  INFO      eds_loader.connectors._sql_base  [return_status_history] appended 0 row(s) in 0.00s
+2026-09-01 14:58:28,267  INFO      eds_loader.connectors._sql_base  [reviews] appended 0 row(s) in 0.00s
+2026-09-01 14:58:28,267  INFO      eds_loader.loader  Append load complete: 7905 row(s) inserted across 39 dataset(s)
+2026-09-01 14:58:28,267  INFO      eds_loader.cli.main  Run complete: 7905 row(s) across 39 table(s) in 0.3s

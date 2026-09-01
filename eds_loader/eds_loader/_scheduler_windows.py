@@ -48,10 +48,11 @@ def _cron_to_task_trigger(cron: str, timezone: str) -> str:
     """Convert a 5-field cron expression to a PowerShell trigger block.
 
     Supported patterns:
-      - ``M H * * *``         → daily at H:M
-      - ``M H */N * *``       → every N days (repetition trigger)
-      - ``M H * * DOW``       → weekly on day DOW
-      - ``M H DOM * *``       → monthly on day DOM
+      - ``*/N * * * *``      → every N minutes (repetition trigger)
+      - ``M H * * *``        → daily at H:M
+      - ``M H */N * *``      → every N days (repetition trigger)
+      - ``M H * * DOW``      → weekly on day DOW
+      - ``M H DOM * *``      → monthly on day DOM
 
     Returns a PowerShell expression that evaluates to a ScheduledTaskTrigger.
     """
@@ -60,10 +61,32 @@ def _cron_to_task_trigger(cron: str, timezone: str) -> str:
         raise ValueError(f"Expected 5-field cron expression, got: {cron!r}")
 
     minute, hour, dom, month, dow = parts
-    h, m = int(hour), int(minute)
+
+    # ── Every-N-minutes pattern  (e.g. */2 * * * *) ──────────────────────────
+    if minute.startswith("*/") and hour == "*" and dom == "*":
+        n = int(minute[2:])
+        # Use Get-Date so the first run fires at next interval from NOW,
+        # not from midnight. RepetitionDuration of 1 day renews at midnight.
+        return (
+            f"$t = New-ScheduledTaskTrigger -Once -At (Get-Date) "
+            f"-RepetitionInterval (New-TimeSpan -Minutes {n}) "
+            f"-RepetitionDuration (New-TimeSpan -Days 9999); $t"
+        )
+
+    # ── Resolve hour and minute (may be '*' for wildcard → default to 0) ─────
+    try:
+        h = int(hour) if hour != "*" else 0
+        m = int(minute) if minute != "*" else 0
+    except ValueError as exc:
+        raise ValueError(
+            f"Unsupported cron expression {cron!r}: {exc}. "
+            "Supported patterns: '*/N * * * *' (every N min), "
+            "'M H * * *' (daily), 'M H */N * *' (every N days), "
+            "'M H * * DOW' (weekly), 'M H DOM * *' (monthly)."
+        ) from exc
     time_str = f"{h:02d}:{m:02d}:00"
 
-    # Every N days pattern  (e.g. */2)
+    # ── Every N days pattern  (e.g. */2) ─────────────────────────────────────
     if dom.startswith("*/") and dow == "*":
         n = int(dom[2:])
         return (
@@ -72,9 +95,8 @@ def _cron_to_task_trigger(cron: str, timezone: str) -> str:
             f"$t.DaysInterval = {n}; $t"
         )
 
-    # Weekly  (e.g. * * * * 1)
+    # ── Weekly  (e.g. * * * * 1) ─────────────────────────────────────────────
     if dom == "*" and dow != "*":
-        # PowerShell day-of-week names
         dow_map = {
             "0": "Sunday", "1": "Monday", "2": "Tuesday",
             "3": "Wednesday", "4": "Thursday", "5": "Friday", "6": "Saturday",
@@ -83,12 +105,13 @@ def _cron_to_task_trigger(cron: str, timezone: str) -> str:
         day_name = dow_map.get(dow, "Monday")
         return f"New-ScheduledTaskTrigger -Weekly -WeeksInterval 1 -DaysOfWeek {day_name} -At '{time_str}'"
 
-    # Monthly  (e.g. 1 2 15 * *)
+    # ── Monthly  (e.g. 1 2 15 * *) ───────────────────────────────────────────
     if dom != "*" and dow == "*":
         return f"New-ScheduledTaskTrigger -Monthly -DaysOfMonth {int(dom)} -At '{time_str}'"
 
-    # Daily (default)
+    # ── Daily (default) ───────────────────────────────────────────────────────
     return f"New-ScheduledTaskTrigger -Daily -At '{time_str}'"
+
 
 
 # ---------------------------------------------------------------------------
@@ -108,7 +131,26 @@ def register(
         cron:        5-field cron expression.
         timezone:    IANA timezone (informational; Windows uses local time zone).
         config_path: Absolute path to the loader YAML file.
+
+    Raises:
+        RuntimeError: If the process is not running as Administrator, or if
+            PowerShell fails to register the task.
     """
+    # ── Admin check — Register-ScheduledTask requires elevated privileges ──
+    admin_check = _run_ps(
+        "([Security.Principal.WindowsPrincipal]"
+        "[Security.Principal.WindowsIdentity]::GetCurrent())"
+        ".IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)",
+        check=False,
+    )
+    if admin_check.stdout.strip().lower() != "true":
+        raise RuntimeError(
+            "Administrator privileges required to register a Windows Scheduled Task.\n"
+            "Please re-run this command from an Administrator PowerShell prompt:\n"
+            "  Right-click PowerShell → 'Run as administrator', then run:\n"
+            "  eds-loader schedule -c loader.yaml"
+        )
+
     # Resolve the eds-loader executable
     eds_loader_exe = _find_eds_loader()
 
@@ -116,12 +158,50 @@ def register(
     config_path_str = str(config_path).replace("'", "''")  # escape for PS string
     task_name_esc = task_name.replace("'", "''")
     working_dir = str(config_path.parent).replace("'", "''")
+    logs_dir = str(config_path.parent / "logs").replace("'", "''")
+
+    # Build a wrapper script path alongside the config file
+    wrapper_path = config_path.parent / ".eds_loader_task.ps1"
+    wrapper_path_esc = str(wrapper_path).replace("'", "''")
+
+    # Write the wrapper PowerShell script — it:
+    #   1. Re-loads user env vars (including password vars) from registry
+    #   2. Calls eds-loader with the absolute config path
+    #   3. Logs all output to logs/<date>.log for easy debugging
+    wrapper_script = f"""\
+# Auto-generated by eds-loader schedule — do not edit manually.
+# Re-apply user-level environment variables so passwords are available.
+$userEnv = [System.Environment]::GetEnvironmentVariables('User')
+foreach ($key in $userEnv.Keys) {{
+    if (-not [System.Environment]::GetEnvironmentVariable($key, 'Process')) {{
+        [System.Environment]::SetEnvironmentVariable($key, $userEnv[$key], 'Process')
+    }}
+}}
+
+$logsDir = '{logs_dir}'
+if (-not (Test-Path $logsDir)) {{ New-Item -ItemType Directory -Path $logsDir | Out-Null }}
+$datePart = (Get-Date).ToString('yyyy-MM-dd')
+$logFile = "$logsDir\$datePart.task.log"
+
+$timestamp = Get-Date -Format 'yyyy-MM-dd HH:mm:ss'
+Add-Content -Path $logFile -Value "[$timestamp] eds-loader scheduled run starting..."
+
+& '{eds_loader_exe}' run -c '{config_path_str}' 2>&1 | Tee-Object -Append -FilePath $logFile
+
+$exitCode = $LASTEXITCODE
+$timestamp = Get-Date -Format 'yyyy-MM-dd HH:mm:ss'
+Add-Content -Path $logFile -Value "[$timestamp] eds-loader exited with code: $exitCode"
+exit $exitCode
+"""
+    wrapper_path.write_text(wrapper_script, encoding="utf-8")
 
     ps_script = f"""
+$ErrorActionPreference = 'Stop'
+$tn = [Management.Automation.WildcardPattern]::Escape('{task_name_esc}')
 $trigger = {trigger_expr}
 $action  = New-ScheduledTaskAction `
-    -Execute '{eds_loader_exe}' `
-    -Argument 'run -c \\"{config_path_str}\\"' `
+    -Execute 'powershell.exe' `
+    -Argument '-NonInteractive -ExecutionPolicy Bypass -File "{wrapper_path_esc}"' `
     -WorkingDirectory '{working_dir}'
 $settings = New-ScheduledTaskSettingsSet `
     -ExecutionTimeLimit (New-TimeSpan -Hours 4) `
@@ -130,7 +210,7 @@ $settings = New-ScheduledTaskSettingsSet `
     -MultipleInstances IgnoreNew
 
 # Unregister if already exists (idempotent update)
-Unregister-ScheduledTask -TaskName '{task_name_esc}' -Confirm:$false -ErrorAction SilentlyContinue
+Unregister-ScheduledTask -TaskName $tn -Confirm:$false -ErrorAction SilentlyContinue
 
 Register-ScheduledTask `
     -TaskName '{task_name_esc}' `
@@ -149,12 +229,14 @@ def remove(task_name: str) -> None:
     """Unregister a scheduled task by name."""
     task_name_esc = task_name.replace("'", "''")
     ps_script = f"""
-$t = Get-ScheduledTask -TaskName '{task_name_esc}' -ErrorAction SilentlyContinue
+# Escape wildcard chars so '[' in task name is treated as literal
+$tn = [Management.Automation.WildcardPattern]::Escape('{task_name_esc}')
+$t = Get-ScheduledTask -TaskName $tn -ErrorAction SilentlyContinue
 if ($null -eq $t) {{
     Write-Error "Task not found: {task_name_esc}"
     exit 1
 }}
-Unregister-ScheduledTask -TaskName '{task_name_esc}' -Confirm:$false
+Unregister-ScheduledTask -TaskName $tn -Confirm:$false
 Write-Host "OK"
 """
     _run_ps(ps_script)
@@ -164,12 +246,13 @@ def pause(task_name: str) -> None:
     """Disable the scheduled task without removing it."""
     task_name_esc = task_name.replace("'", "''")
     ps_script = f"""
-$t = Get-ScheduledTask -TaskName '{task_name_esc}' -ErrorAction SilentlyContinue
+$tn = [Management.Automation.WildcardPattern]::Escape('{task_name_esc}')
+$t = Get-ScheduledTask -TaskName $tn -ErrorAction SilentlyContinue
 if ($null -eq $t) {{
     Write-Error "Task not found: {task_name_esc}"
     exit 1
 }}
-Disable-ScheduledTask -TaskName '{task_name_esc}' | Out-Null
+Disable-ScheduledTask -TaskName $tn | Out-Null
 Write-Host "OK"
 """
     _run_ps(ps_script)
@@ -179,12 +262,13 @@ def resume(task_name: str) -> None:
     """Re-enable a disabled scheduled task."""
     task_name_esc = task_name.replace("'", "''")
     ps_script = f"""
-$t = Get-ScheduledTask -TaskName '{task_name_esc}' -ErrorAction SilentlyContinue
+$tn = [Management.Automation.WildcardPattern]::Escape('{task_name_esc}')
+$t = Get-ScheduledTask -TaskName $tn -ErrorAction SilentlyContinue
 if ($null -eq $t) {{
     Write-Error "Task not found: {task_name_esc}"
     exit 1
 }}
-Enable-ScheduledTask -TaskName '{task_name_esc}' | Out-Null
+Enable-ScheduledTask -TaskName $tn | Out-Null
 Write-Host "OK"
 """
     _run_ps(ps_script)
@@ -194,12 +278,14 @@ def status(task_name: str) -> ScheduleStatus:
     """Return the current status of a scheduled task."""
     task_name_esc = task_name.replace("'", "''")
     ps_script = f"""
-$t = Get-ScheduledTask -TaskName '{task_name_esc}' -ErrorAction SilentlyContinue
+# Escape wildcard chars ([ ] * ?) so task name is matched literally
+$tn = [Management.Automation.WildcardPattern]::Escape('{task_name_esc}')
+$t = Get-ScheduledTask -TaskName $tn -ErrorAction SilentlyContinue
 if ($null -eq $t) {{
     Write-Output '{{"found": false}}'
     exit 0
 }}
-$info = Get-ScheduledTaskInfo -TaskName '{task_name_esc}' -ErrorAction SilentlyContinue
+$info = Get-ScheduledTaskInfo -TaskName $tn -ErrorAction SilentlyContinue
 $obj = @{{
     found       = $true
     state       = $t.State.ToString()

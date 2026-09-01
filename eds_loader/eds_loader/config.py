@@ -374,6 +374,15 @@ class LoaderConfig(BaseModel):
             "is automatically disabled (no schema metadata to forward)."
         ),
     )
+    schema_path: str | None = Field(
+        default=None,
+        description=(
+            "Optional explicit path to schema.json.  When set, schema.json is read "
+            "from this path instead of the source connector's default location. "
+            "Useful when Parquet files and schema.json live in different directories "
+            "(e.g. source path points to output/ but schema.json is one level up)."
+        ),
+    )
     load_mode: Literal["full", "incremental", "append"] = Field(
         default="full",
         description=(

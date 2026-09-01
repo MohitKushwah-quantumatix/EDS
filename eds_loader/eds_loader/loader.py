@@ -72,6 +72,36 @@ __all__ = ["load", "LoadResult"]
 logger = get_logger(__name__)
 
 
+def _read_schema_metadata(config: "LoaderConfig", source: Any) -> dict[str, Any]:
+    """Read schema.json, honouring ``config.schema_path`` if set.
+
+    Priority:
+    1. ``schema_path`` in config → read directly from that explicit file path.
+    2. Fallback → call ``source.read_schema_metadata()`` (connector's default).
+
+    Args:
+        config: The loader config.
+        source: The source connector instance.
+
+    Returns:
+        Parsed schema dict (table name → column map).
+    """
+    if config.schema_path:
+        import json
+        p = Path(config.schema_path)
+        if not p.is_file():
+            raise LoadError(
+                f"schema_path not found: {p}\n"
+                "Check that the path is correct and the file exists."
+            )
+        logger.info("Reading schema.json from explicit schema_path: %s", p)
+        try:
+            return json.loads(p.read_text(encoding="utf-8"))
+        except Exception as exc:
+            raise LoadError(f"Cannot read schema.json at {p}: {exc}") from exc
+    return source.read_schema_metadata()
+
+
 @dataclass
 class LoadResult:
     """Summary of a completed loader run."""
@@ -255,7 +285,7 @@ def _load_impl(config: LoaderConfig) -> LoadResult:
 
     schema_metadata: dict[str, Any] = {}
     if config.schema_required:
-        schema_metadata = source.read_schema_metadata()
+        schema_metadata = _read_schema_metadata(config, source)
 
     names_to_load: list[str] | None
     if config.tables:
@@ -343,10 +373,16 @@ def _incremental_load_impl(
 
     schema_metadata: dict[str, Any] = {}
     if config.schema_required:
-        schema_metadata = source.read_schema_metadata()
+        schema_metadata = _read_schema_metadata(config, source)
 
     names_to_load: list[str] | None
     if config.tables:
+        if schema_metadata:
+            unknown = [t for t in config.tables if t not in schema_metadata]
+            if unknown:
+                raise ConfigError(
+                    f"Table(s) not found in schema.json: {', '.join(unknown)}."
+                )
         names_to_load = list(config.tables)
     else:
         names_to_load = list(schema_metadata) if schema_metadata else None
@@ -472,7 +508,7 @@ def _append_load_impl(config: LoaderConfig) -> LoadResult:
 
     schema_metadata: dict[str, Any] = {}
     if config.schema_required:
-        schema_metadata = source.read_schema_metadata()
+        schema_metadata = _read_schema_metadata(config, source)
 
     names_to_load: list[str] | None
     if config.tables:
@@ -528,9 +564,6 @@ def _apply_delete_mode(
     changed: dict[str, Any],
 ) -> None:
     """Apply soft or hard deletes for rows removed from source."""
-    import polars as pl
-    import datetime as _dt
-
     for name, df in changed.items():
         schema_entry = schema_metadata.get(name, {})
         pk_col: str | None = schema_entry.get("primary_key")
