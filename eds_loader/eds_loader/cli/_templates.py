@@ -228,6 +228,10 @@ tables: []                  # empty = load every dataset in schema.json
 enforce_constraints: true   # apply PK / FK / UNIQUE constraints on the target (where supported)
 schema_required: true       # set to false if there is no schema.json at the source
                             # (datasets will be auto-discovered from *.parquet files)
+# schema_path:              # optional -- explicit path to schema.json when it lives in a
+#   /path/to/schema.json    # different directory from the source Parquet files.
+#                           # Example: source.path points to ./output/ but schema.json
+#                           # is one level up at ./schema.json — set schema_path: ./schema.json
 
 # Load mode:
 #   full        (default) — complete replace every run: DROP + CREATE + INSERT.

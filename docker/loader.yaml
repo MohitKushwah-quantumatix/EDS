@@ -14,6 +14,10 @@ source:
   path: /app/output             # shared volume where eds-generator writes Parquet files
   format: parquet
 
+# schema.json lives one level up from output/ (at the project root).
+# schema_path lets us point to it explicitly without changing source.path.
+schema_path: /app/schema.json
+
 target:
   kind: postgres
   host: postgres                # Docker service name — NOT localhost
@@ -34,6 +38,41 @@ schema_required: true
 #                 (use this when generator produces only NEW rows each day)
 # ---------------------------------------------------------------------------
 load_mode: append               # recommended for daily pipeline: DB grows continuously
+
+# ---------------------------------------------------------------------------
+# Tables to load — only tables the generator actually produces as Parquet.
+# (schema.json has extra entries; this list keeps the loader from failing
+#  when it looks for a file that doesn't exist.)
+# ---------------------------------------------------------------------------
+tables:
+  - admissions
+  - appointments
+  - billing_codes
+  - cities
+  - countries
+  - departments
+  - diagnoses
+  - diagnosis_codes
+  - encounters
+  - facilities
+  - immunizations
+  - insurance_plans
+  - lab_results
+  - medication_administration
+  - medications
+  - medications_prescribed
+  - patient_addresses
+  - patient_emergency_contacts
+  - patients
+  - procedure_codes
+  - procedures
+  - providers
+  - radiology_reports
+  - referrals
+  - room_types
+  - specialties
+  - states
+  - vitals
 
 # ---------------------------------------------------------------------------
 # Observability
