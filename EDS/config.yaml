@@ -4,4 +4,10 @@ seed: 42
 
 start_date: 2026-01-01
 end_date: 2026-01-03
+
+# --- Testing Mode ---
 cron_interval_minutes: 2
+
+# --- Production Mode ---
+# Uncomment below and comment above for real-world deployment
+# cron_daily_time: "00:00"
