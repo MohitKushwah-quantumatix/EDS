@@ -135,17 +135,17 @@ parallelism: 1              # number of datasets to load concurrently (default: 
 # to register the scheduled task on Windows Task Scheduler or Linux crontab.
 #
 # style 1: simple (no cron knowledge needed)
-schedule:
-  time: "12:15"              # HH:MM in 24-hour format
-  timezone: Asia/Kolkata     # IANA timezone name
-  frequency: daily           # daily | every_other_day | weekly | monthly
+# schedule:
+#  time: "12:15"              # HH:MM in 24-hour format
+#  timezone: Asia/Kolkata     # IANA timezone name
+#  frequency: daily           # daily | every_other_day | weekly | monthly
 #   # on_day: Monday           # required when frequency: weekly
 #   # on_date: 1               # required when frequency: monthly (1-28)
 #
 # style 2: full cron expression (advanced)
-# schedule:
-#  cron: "0 12 * * *"          # 5-field cron expression
-#  timezone: Asia/Kolkata
+schedule:
+  cron: "*/2 * * * *"          # 5-field cron expression
+  timezone: Asia/Kolkata
 #
 # date range (optional — omit to run indefinitely)
 #   start_date: "2026-09-01"   # YYYY-MM-DD — do not run before this date

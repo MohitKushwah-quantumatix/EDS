@@ -184,13 +184,17 @@ $datePart = (Get-Date).ToString('yyyy-MM-dd')
 $logFile = "$logsDir\$datePart.task.log"
 
 $timestamp = Get-Date -Format 'yyyy-MM-dd HH:mm:ss'
-Add-Content -Path $logFile -Value "[$timestamp] eds-loader scheduled run starting..."
+Add-Content -Path $logFile -Value "[$timestamp] eds-loader scheduled run starting..." -Encoding UTF8
 
-& '{eds_loader_exe}' run -c '{config_path_str}' 2>&1 | Tee-Object -Append -FilePath $logFile
+& '{eds_loader_exe}' run -c '{config_path_str}' 2>&1 | ForEach-Object {{
+    $line = $_ | Out-String
+    Add-Content -Path $logFile -Value $line.TrimEnd() -Encoding UTF8
+    Write-Host $line.TrimEnd()
+}}
 
 $exitCode = $LASTEXITCODE
 $timestamp = Get-Date -Format 'yyyy-MM-dd HH:mm:ss'
-Add-Content -Path $logFile -Value "[$timestamp] eds-loader exited with code: $exitCode"
+Add-Content -Path $logFile -Value "[$timestamp] eds-loader exited with code: $exitCode" -Encoding UTF8
 exit $exitCode
 """
     wrapper_path.write_text(wrapper_script, encoding="utf-8")

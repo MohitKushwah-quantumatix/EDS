@@ -429,3 +429,33 @@ Check that the path is correct and the file exists.
 2026-09-01 14:58:28,267  INFO      eds_loader.connectors._sql_base  [reviews] appended 0 row(s) in 0.00s
 2026-09-01 14:58:28,267  INFO      eds_loader.loader  Append load complete: 7905 row(s) inserted across 39 dataset(s)
 2026-09-01 14:58:28,267  INFO      eds_loader.cli.main  Run complete: 7905 row(s) across 39 table(s) in 0.3s
+2026-09-01 16:03:30,712  INFO      eds_loader.cli.main  eds-loader run invoked (config=C:\Users\Mohit Patel\Downloads\EDS\loader.yaml, dry_run=False)
+2026-09-01 16:03:30,722  INFO      eds_loader.cli.main  Config loaded: source=local_fs target=postgres tables=(all) enforce_constraints=True schema_required=True
+2026-09-01 16:03:30,724  ERROR     eds_loader.loader  Load failed (attempt 1/1): schema_path not found: C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\schema.json
+Check that the path is correct and the file exists.
+2026-09-01 16:03:30,724  ERROR     eds_loader.cli.main  Load failed after 0.0s: schema_path not found: C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\schema.json
+Check that the path is correct and the file exists.
+2026-09-01 16:05:30,679  INFO      eds_loader.cli.main  eds-loader run invoked (config=C:\Users\Mohit Patel\Downloads\EDS\loader.yaml, dry_run=False)
+2026-09-01 16:05:30,686  INFO      eds_loader.cli.main  Config loaded: source=local_fs target=postgres tables=(all) enforce_constraints=True schema_required=True
+2026-09-01 16:05:30,688  ERROR     eds_loader.loader  Load failed (attempt 1/1): schema_path not found: C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\schema.json
+Check that the path is correct and the file exists.
+2026-09-01 16:05:30,688  ERROR     eds_loader.cli.main  Load failed after 0.0s: schema_path not found: C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\schema.json
+Check that the path is correct and the file exists.
+2026-09-01 16:07:30,634  INFO      eds_loader.cli.main  eds-loader run invoked (config=C:\Users\Mohit Patel\Downloads\EDS\loader.yaml, dry_run=False)
+2026-09-01 16:07:30,642  INFO      eds_loader.cli.main  Config loaded: source=local_fs target=postgres tables=(all) enforce_constraints=True schema_required=True
+2026-09-01 16:07:30,643  ERROR     eds_loader.loader  Load failed (attempt 1/1): schema_path not found: C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\schema.json
+Check that the path is correct and the file exists.
+2026-09-01 16:07:30,643  ERROR     eds_loader.cli.main  Load failed after 0.0s: schema_path not found: C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\schema.json
+Check that the path is correct and the file exists.
+2026-09-01 16:09:30,902  INFO      eds_loader.cli.main  eds-loader run invoked (config=C:\Users\Mohit Patel\Downloads\EDS\loader.yaml, dry_run=False)
+2026-09-01 16:09:30,909  INFO      eds_loader.cli.main  Config loaded: source=local_fs target=postgres tables=(all) enforce_constraints=True schema_required=True
+2026-09-01 16:09:30,910  ERROR     eds_loader.loader  Load failed (attempt 1/1): schema_path not found: C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\schema.json
+Check that the path is correct and the file exists.
+2026-09-01 16:09:30,911  ERROR     eds_loader.cli.main  Load failed after 0.0s: schema_path not found: C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\schema.json
+Check that the path is correct and the file exists.
+2026-09-01 16:18:54,890  INFO      eds_loader.cli.main  eds-loader run invoked (config=C:\Users\Mohit Patel\Downloads\EDS\loader.yaml, dry_run=False)
+2026-09-01 16:18:54,896  INFO      eds_loader.cli.main  Config loaded: source=local_fs target=postgres tables=(all) enforce_constraints=True schema_required=True
+2026-09-01 16:18:54,897  ERROR     eds_loader.loader  Load failed (attempt 1/1): schema_path not found: C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\schema.json
+Check that the path is correct and the file exists.
+2026-09-01 16:18:54,898  ERROR     eds_loader.cli.main  Load failed after 0.0s: schema_path not found: C:\Users\Mohit Patel\Downloads\EDS\EDS\my-shop\schema.json
+Check that the path is correct and the file exists.
