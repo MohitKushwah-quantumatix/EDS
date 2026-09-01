@@ -89,6 +89,7 @@ CUSTOMER_PREFERENCES = Dataset(
         "preferred_language": pl.String(),
         "preferred_currency": pl.String(),
         "timezone": pl.String(),
+        "created_at": pl.Datetime("us"),
     },
     primary_key="preference_id",
     foreign_keys=(ForeignKey("customer_id", "customers", "customer_id"),),

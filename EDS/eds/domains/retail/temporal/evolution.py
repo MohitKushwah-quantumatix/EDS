@@ -271,6 +271,8 @@ def _registered_today(
     frames["customers"] = _joined_today(frames["customers"], today)
     frames["customers"] = _globally_unique(frames["customers"], history.get("customers"))
     frames["customer_loyalty"] = _enrolled_today(frames["customer_loyalty"], today)
+    frames["customer_addresses"] = _set_created_today(frames["customer_addresses"], today)
+    frames["customer_preferences"] = _set_created_today(frames["customer_preferences"], today)
     return frames
 
 
@@ -313,6 +315,24 @@ def _enrolled_today(loyalty: pl.DataFrame, today: date) -> pl.DataFrame:
     return loyalty.with_columns(
         pl.lit(today).cast(pl.Date).alias("enrollment_date"),
         pl.lit(0, dtype=pl.Int64).alias("points_balance"),
+    )
+
+
+def _set_created_today(df: pl.DataFrame, today: date) -> pl.DataFrame:
+    """Set a cohort's created_at to today, preserving the time-of-day component.
+
+    Args:
+        df: The generated cohort.
+        today: The business date.
+
+    Returns:
+        The rows with created_at set to today, keeping the original time of day.
+    """
+    if "created_at" not in df.columns:
+        return df
+    time_of_day = pl.col("created_at") - pl.col("created_at").dt.truncate("1d")
+    return df.with_columns(
+        (pl.lit(today).cast(pl.Datetime("us")) + time_of_day).alias("created_at")
     )
 
 

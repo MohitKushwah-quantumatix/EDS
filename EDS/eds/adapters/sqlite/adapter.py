@@ -141,9 +141,10 @@ class SQLiteAdapter:
     def _apply_stored_schema(self, df: pl.DataFrame, schema: dict[str, str]) -> pl.DataFrame:
         """Apply a stored schema to a DataFrame read from SQLite.
 
-        Date and datetime columns are converted from strings using
-        ``str.to_date()`` and ``str.to_datetime()`` to handle SQLite's
-        loose typing. Other types are cast directly.
+        Date and datetime columns are converted from strings or integers
+        using ``str.to_date()``, ``str.to_datetime()``, or ``cast()`` to
+        handle SQLite's loose typing. SQLAlchemy may store datetimes as
+        TEXT on some platforms and as INTEGER microseconds on others.
         """
         date_cols: list[pl.Expr] = []
         datetime_cols: list[pl.Expr] = []
@@ -156,8 +157,11 @@ class SQLiteAdapter:
             target_dtype = self._coerce_dtype(dtype_str)
             if target_dtype == pl.Date and current_dtype == pl.String:
                 date_cols.append(pl.col(col).str.to_date())
-            elif target_dtype == pl.Datetime and current_dtype == pl.String:
-                datetime_cols.append(pl.col(col).str.to_datetime())
+            elif target_dtype == pl.Datetime:
+                if current_dtype == pl.String:
+                    datetime_cols.append(pl.col(col).str.to_datetime())
+                elif current_dtype in (pl.Int64, pl.Int32):
+                    datetime_cols.append(pl.col(col).cast(pl.Datetime("us")))
             elif target_dtype != current_dtype:
                 scalar_casts[col] = target_dtype
 

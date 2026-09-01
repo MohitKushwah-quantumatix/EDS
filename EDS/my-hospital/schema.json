@@ -178,7 +178,8 @@
     "relationship": "String",
     "phone_number": "String",
     "email": "String",
-    "is_primary": "Boolean"
+    "is_primary": "Boolean",
+    "created_at": "Datetime(time_unit='us', time_zone=None)"
   },
   "encounters": {
     "encounter_id": "Int64",

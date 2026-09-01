@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
+from datetime import datetime
 
 import polars as pl
 
@@ -31,6 +32,7 @@ def generate_patient_emergency_contacts(
             "phone_number": pl.String(),
             "email": pl.String(),
             "is_primary": pl.Boolean(),
+            "created_at": pl.Datetime("us"),
         })
 
     n = len(patients)
@@ -45,6 +47,7 @@ def generate_patient_emergency_contacts(
             "phone_number": str(f"+91987654321{i % 10}"),
             "email": str(f"contact{i + 1}@example.com"),
             "is_primary": True,
+            "created_at": datetime.strptime(pat["registration_date"].isoformat(), "%Y-%m-%d"),
         })
 
     return pl.DataFrame(rows)

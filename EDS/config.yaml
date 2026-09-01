@@ -1,5 +1,5 @@
-domain: retail
-project_dir: my-shop
+domain: healthcare
+project_dir: my-hospital
 seed: 42
 
 start_date: 2026-01-01

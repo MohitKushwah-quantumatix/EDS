@@ -8,6 +8,7 @@ the timezone comes from that same city.
 from __future__ import annotations
 
 from collections.abc import Iterator
+from datetime import datetime, time, timedelta
 from typing import Final
 
 import polars as pl
@@ -46,6 +47,7 @@ def iter_preference_batches(
     rng = make_rng(seed, "customer_preferences")
     home_cities = assign_home_cities(config, geography, seed)
 
+    created: list[datetime] = []
     for id_range in customer_id_batches(config):
         preference_ids: list[int] = []
         customer_ids: list[int] = []
@@ -69,6 +71,13 @@ def iter_preference_batches(
             languages.append(geography.language_for_city(city_index))
             currencies.append(geography.currency_for_city(city_index))
             timezones.append(geography.timezones[city_index])
+            created.append(
+                datetime.combine(
+                    config.earliest_registration_date
+                    + timedelta(days=rng.randrange((config.reference_date - config.earliest_registration_date).days + 1)),
+                    time(rng.randrange(24), rng.randrange(60)),
+                )
+            )
 
         yield build_frame(
             CUSTOMER_PREFERENCES,
@@ -81,6 +90,7 @@ def iter_preference_batches(
                 "preferred_language": languages,
                 "preferred_currency": currencies,
                 "timezone": timezones,
+                "created_at": created,
             },
         )
 

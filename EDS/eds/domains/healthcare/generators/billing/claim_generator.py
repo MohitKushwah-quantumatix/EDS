@@ -44,7 +44,7 @@ def generate_claims(
                 "status": rng.choice(claim_statuses),
                 "submitted_date": submitted_date,
                 "processed_date": processed_date,
-                "created_at": datetime.strptime(processed_date, "%Y-%m-%d"),
+                "created_at": datetime.combine(submitted_date, datetime.min.time()),
             })
             claim_id += 1
 

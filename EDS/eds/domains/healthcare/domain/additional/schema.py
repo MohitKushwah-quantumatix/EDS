@@ -170,6 +170,7 @@ PATIENT_EMERGENCY_CONTACTS = Dataset(
         "phone_number": pl.String(),
         "email": pl.String(),
         "is_primary": pl.Boolean(),
+        "created_at": pl.Datetime("us"),
     },
     primary_key="contact_id",
     foreign_keys=(

@@ -61,7 +61,7 @@ MASTER_DATA_TABLES = {
     "retail": {
         "countries", "states", "cities", "products", "brands",
         "suppliers", "warehouses", "categories", "coupon_types",
-        "customer_addresses", "customer_preferences", "inventory",
+        "inventory",
         "payment_methods", "return_reasons", "shipping_methods",
         "tax_codes",
     },
@@ -69,6 +69,7 @@ MASTER_DATA_TABLES = {
         "countries", "states", "cities", "departments", "specialties",
         "insurance_plans", "room_types", "medications", "diagnosis_codes",
         "procedure_codes", "billing_codes", "facilities", "providers",
+        "provider_departments", "provider_specialties",
     },
 }
 

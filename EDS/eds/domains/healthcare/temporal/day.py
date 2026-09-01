@@ -193,6 +193,7 @@ def _generate_patient_additional(
                 "phone_number": pl.String(),
                 "email": pl.String(),
                 "is_primary": pl.Boolean(),
+                "created_at": pl.Datetime("us"),
             }),
         }
 
