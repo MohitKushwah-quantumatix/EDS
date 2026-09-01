@@ -1,0 +1,48 @@
+# =============================================================================
+# loader.yaml — EDS Loader config for Docker deployment
+# =============================================================================
+# This file is mounted into the loader container at /config/loader.yaml
+# It reads from the shared output volume and writes to PostgreSQL.
+#
+# Inside the container:
+#   - Source path: /app/output   (mounted from the shared_output Docker volume)
+#   - DB host:     postgres      (the service name in docker-compose.yml)
+# =============================================================================
+
+source:
+  kind: local_fs
+  path: /app/output             # shared volume where eds-generator writes Parquet files
+  format: parquet
+
+target:
+  kind: postgres
+  host: postgres                # Docker service name — NOT localhost
+  port: 5432
+  database: eds_db
+  user: eds
+  password_env: DB_PASSWORD     # read from environment variable (set in .env)
+  schema: public
+
+schema_required: true
+
+# ---------------------------------------------------------------------------
+# Load mode — choose based on your pipeline design:
+#
+#   full        → drop and recreate tables every run (simplest, no history)
+#   incremental → hash-based change detection, only upsert changed datasets
+#   append      → insert-only, never deletes — DB grows day by day
+#                 (use this when generator produces only NEW rows each day)
+# ---------------------------------------------------------------------------
+load_mode: append               # recommended for daily pipeline: DB grows continuously
+
+# ---------------------------------------------------------------------------
+# Observability
+# ---------------------------------------------------------------------------
+metrics_file: /app/logs/run_metrics.json    # written after every run
+run_log_file: /app/logs/run_history.jsonl   # append-only run log
+
+# ---------------------------------------------------------------------------
+# Reliability
+# ---------------------------------------------------------------------------
+retry_count: 2                  # retry up to 2 times if load fails
+retry_delay: 30                 # wait 30 seconds between retries

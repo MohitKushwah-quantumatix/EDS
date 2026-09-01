@@ -1,0 +1,61 @@
+# EDS Generator — .dockerignore
+# Files and folders that must NOT be copied into the image.
+# This keeps the image lean and avoids leaking sensitive or generated data.
+
+# ── Virtual environments (huge, not needed — pip reinstalls inside) ──────────
+.venv/
+venv/
+env/
+
+# ── Python cache (not needed in production) ──────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# ── Generated simulation output (must NOT be baked into image) ───────────────
+# Output is mounted as a volume at runtime — never baked in.
+output/
+*.parquet
+*.duckdb
+my-shop/
+my-hospital/
+test-date-range/
+
+# ── Build artifacts ───────────────────────────────────────────────────────────
+build/
+dist/
+*.egg-info/
+*.egg
+
+# ── Development and testing files ─────────────────────────────────────────────
+eds/tests/
+pytest.ini
+ruff.toml
+.editorconfig
+
+# ── Documentation ─────────────────────────────────────────────────────────────
+docs/
+*.md
+*.txt
+*.html
+
+# ── IDE and OS files ──────────────────────────────────────────────────────────
+.idea/
+.vscode/
+.claude/
+.git/
+.gitignore
+*.swp
+.DS_Store
+Thumbs.db
+
+# ── Crash and temp files ──────────────────────────────────────────────────────
+*.stackdump
+tempCodeRunnerFile.py
+
+# ── Cron runner (managed on host, not inside container) ──────────────────────
+cron_runner.py
+cron_config.json

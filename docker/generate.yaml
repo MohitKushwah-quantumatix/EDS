@@ -1,0 +1,54 @@
+# =============================================================================
+# generate.yaml — EDS Generator Config
+# =============================================================================
+# Single config file that controls all data generation.
+# Pass this to:
+#   python generate.py --config generate.yaml
+#   docker run ... eds-generator:latest python generate.py --config /config/generate.yaml
+# =============================================================================
+
+# ---------------------------------------------------------------------------
+# REQUIRED SETTINGS
+# ---------------------------------------------------------------------------
+
+# Which domain to simulate.
+# Options: retail | healthcare
+domain: healthcare
+
+# Date range to generate data for.
+# Format: YYYY-MM-DD
+start_date: 2026-08-31
+end_date:   2026-09-25
+
+# How to generate:
+#   daily  → one day at a time, maintains checkpoint, safe to restart
+#   batch  → all days at once in a single run (faster, no checkpoint)
+mode: daily
+
+# ---------------------------------------------------------------------------
+# OPTIONAL SETTINGS
+# ---------------------------------------------------------------------------
+
+# Output folder where Parquet files and schema.json are written.
+# Defaults:
+#   retail     → my-shop
+#   healthcare → my-hospital
+# In Docker, this must match your -v mount path.
+project_dir: my-hospital
+
+# Random seed. Same seed = same data every time. Change to get different data.
+seed: 42
+
+# ---------------------------------------------------------------------------
+# CUSTOM DOMAIN CONFIGS (Advanced)
+# ---------------------------------------------------------------------------
+# Point to a directory containing your custom YAML config files.
+# This lets you override department counts, patient counts, etc.
+# WITHOUT rebuilding the Docker image.
+#
+# In Docker, mount your folder as a volume and set this path:
+#   -v ./my-configs:/config/domain-configs
+#   domain_config_dir: /config/domain-configs
+#
+# Leave commented out to use the built-in defaults.
+# domain_config_dir: /config/domain-configs
