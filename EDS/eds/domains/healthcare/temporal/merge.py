@@ -28,6 +28,7 @@ from typing import Mapping
 
 import polars as pl
 
+from eds.domains.healthcare.temporal.datasets import healthcare_dataset
 from eds.domains.healthcare.temporal.temporality import Temporality, temporality_of
 
 __all__ = ["merge_dataset", "merge_history"]
@@ -50,13 +51,19 @@ def merge_dataset(
     if history is None or history.is_empty():
         return produced
     if kind is Temporality.APPEND_ONLY:
-        return pl.concat([history, produced], how="vertical")
+        if produced.is_empty():
+            return history
+        return pl.concat([history, produced.select(history.columns)], how="vertical")
     if kind is Temporality.MUTABLE_SNAPSHOT:
         return produced
     if kind is Temporality.STATIC:
         return history
     if kind is Temporality.SLOWLY_CHANGING:
-        return pl.concat([history, produced], how="vertical")
+        if produced.is_empty():
+            return history
+        key = healthcare_dataset(name).primary_key
+        kept = history.join(produced.select(key), on=key, how="anti")
+        return pl.concat([kept, produced.select(history.columns)], how="vertical").sort(key)
     raise ValueError(f"Unknown temporality: {kind}")
 
 

@@ -44,7 +44,6 @@ def run_cron_scheduler(config: dict[str, Any]) -> None:
     domain = config["domain"]
     start_date = config["start_date"]
     end_date = config["end_date"]
-    interval_minutes = config.get("cron_interval_minutes", 5)
     seed = config.get("seed", 42)
     project_dir = Path(config.get("project_dir", f"my-{domain}"))
     
@@ -52,6 +51,9 @@ def run_cron_scheduler(config: dict[str, Any]) -> None:
         start_date = date.fromisoformat(start_date)
     if isinstance(end_date, str):
         end_date = date.fromisoformat(end_date)
+    
+    interval_minutes = config.get("cron_interval_minutes", 5)
+    daily_time = config.get("cron_daily_time")
     
     total_days = (end_date - start_date).days + 1
     
@@ -71,9 +73,13 @@ def run_cron_scheduler(config: dict[str, Any]) -> None:
         target_date = start_date + timedelta(days=i)
         
         if i > current_day:
-            wait_seconds = interval_minutes * 60
+            if daily_time:
+                wait_seconds = _wait_until_daily_time(daily_time)
+                print(f"Waiting until next scheduled run at {daily_time}...")
+            else:
+                wait_seconds = interval_minutes * 60
+                print(f"Waiting {interval_minutes} minutes until next run...")
             next_sim_date = start_date + timedelta(days=i)
-            print(f"Waiting {interval_minutes} minutes until next run...")
             print(f"Next run scheduled at: {next_sim_date.isoformat()}")
             time.sleep(wait_seconds)
         
@@ -85,6 +91,19 @@ def run_cron_scheduler(config: dict[str, Any]) -> None:
     
     print(f"\nAll {total_days} days completed successfully!")
     print(f"Simulation period: {start_date.isoformat()} to {end_date.isoformat()}")
+
+
+def _wait_until_daily_time(daily_time: str) -> int:
+    """Calculate seconds to wait until the next occurrence of daily_time (HH:MM in 24h format)."""
+    now = datetime.now()
+    hour, minute = map(int, daily_time.split(":"))
+    target = now.replace(hour=hour, minute=minute, second=0, microsecond=0)
+    
+    if now >= target:
+        target += timedelta(days=1)
+    
+    wait_seconds = int((target - now).total_seconds())
+    return max(wait_seconds, 0)
 
 
 def main() -> None:
