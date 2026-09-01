@@ -1,0 +1,77 @@
+# =============================================================================
+# docker-compose.yml — Full EDS Pipeline
+# =============================================================================
+# Runs the complete pipeline:
+#   1. eds-generator  → generates synthetic Parquet data into ./shared-output
+#   2. eds-loader     → reads ./shared-output and loads it into PostgreSQL
+#   3. postgres       → the target database
+#
+# USAGE:
+#   docker compose up               # run full pipeline
+#   docker compose up postgres      # start only the database
+#   docker compose run generator    # run generator manually
+#   docker compose run loader run -c /config/loader.yaml  # run loader manually
+# =============================================================================
+
+version: "3.9"
+
+services:
+
+  # ── PostgreSQL — Target Database ──────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: eds-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-eds}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-eds_password}
+      POSTGRES_DB: ${POSTGRES_DB:-eds_db}
+    ports:
+      - "5432:5432"           # accessible on your host at localhost:5432
+    volumes:
+      - postgres_data:/var/lib/postgresql/data   # persist DB across restarts
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-eds}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # ── EDS Generator — Synthetic Data Production ─────────────────────────────
+  generator:
+    build:
+      context: ../../EDS          # path to EDS generator source
+      dockerfile: ../docker/eds-generator/Dockerfile
+    image: eds-generator:latest
+    container_name: eds-generator
+    volumes:
+      - shared_output:/app/my-shop      # retail output written here
+      - shared_output:/app/my-hospital  # healthcare output written here
+    environment:
+      - PYTHONUNBUFFERED=1
+    # Default: generate one day of retail data for today.
+    # Override at runtime: docker compose run generator python run_day.py --domain retail --date 2026-01-01
+    command: python run_day.py --domain retail --date 2026-01-01
+
+  # ── EDS Loader — Load Parquet into PostgreSQL ─────────────────────────────
+  loader:
+    build:
+      context: ../../eds_loader       # path to eds_loader source
+      dockerfile: ../docker/eds-loader/Dockerfile
+    image: eds-loader:latest
+    container_name: eds-loader
+    depends_on:
+      postgres:
+        condition: service_healthy    # wait for DB to be ready before loading
+    volumes:
+      - shared_output:/app/output     # reads what generator wrote
+      - ./loader.yaml:/config/loader.yaml   # your config file
+      - loader_logs:/app/logs         # logs and state file persist here
+    environment:
+      # DB password — never hardcode. Set in .env file (see .env.example)
+      - DB_PASSWORD=${POSTGRES_PASSWORD:-eds_password}
+    command: run -c /config/loader.yaml
+
+volumes:
+  postgres_data:     # persistent database storage
+  shared_output:     # shared between generator and loader
+  loader_logs:       # loader logs and incremental state file

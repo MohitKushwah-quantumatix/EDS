@@ -1,0 +1,52 @@
+# EDS Loader — .dockerignore
+# Files and folders that must NOT be copied into the image.
+
+# ── Virtual environments ──────────────────────────────────────────────────────
+.venv/
+venv/
+env/
+
+# ── Python cache ──────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# ── Config files (injected at runtime via volume mount — never baked in) ──────
+*.yaml
+*.yml
+*.env
+.env*
+
+# ── Logs and state (mounted at runtime) ───────────────────────────────────────
+logs/
+rejected/
+*.log
+*.jsonl
+.eds_loader_state.json
+.loader_state.json
+run_metrics.json
+
+# ── Tests (not needed in production image) ────────────────────────────────────
+tests/
+
+# ── Build artifacts ───────────────────────────────────────────────────────────
+build/
+dist/
+*.egg-info/
+*.egg
+
+# ── Documentation ─────────────────────────────────────────────────────────────
+*.md
+docs/
+
+# ── IDE and OS files ──────────────────────────────────────────────────────────
+.idea/
+.vscode/
+.git/
+.gitignore
+*.swp
+.DS_Store
+Thumbs.db

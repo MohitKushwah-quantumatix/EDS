@@ -1,0 +1,6 @@
+domain: healthcare
+mode: daily
+start_date: 2026-08-31
+end_date:   2026-09-01
+project_dir: my-hospital
+seed: 42
