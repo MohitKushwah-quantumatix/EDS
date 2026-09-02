@@ -16,6 +16,10 @@ Usage:
 
 from __future__ import annotations
 
+import os
+import subprocess
+import sys
+import tempfile
 import threading
 import time
 from datetime import date, datetime, timedelta
@@ -351,13 +355,103 @@ def _wait_until_daily_time(daily_time: str, now: datetime | None = None) -> int:
     return max(wait_seconds, 0)
 
 
+_CRON_MARKER = "# EDS cron_runner auto-generated - do not edit manually"
+
+
+def _get_cron_command(daily_time: str) -> str:
+    script_dir = Path(__file__).parent.resolve()
+    python_exe = sys.executable
+    log_file = script_dir.parent / "cron.log"
+    return f"cd {script_dir} && {python_exe} cron_runner.py >> {log_file} 2>&1"
+
+
+def _cron_job_exists() -> bool:
+    try:
+        result = subprocess.run(["crontab", "-l"], capture_output=True, text=True)
+        return _CRON_MARKER in result.stdout
+    except Exception:
+        return False
+
+
+def _install_cron_job(daily_time: str) -> None:
+    hour, minute = daily_time.split(":")
+    cron_cmd = _get_cron_command(daily_time)
+    cron_entry = f"{minute} {hour} * * * {cron_cmd} {_CRON_MARKER}"
+
+    try:
+        result = subprocess.run(["crontab", "-l"], capture_output=True, text=True)
+        existing = result.stdout if result.returncode == 0 else ""
+    except Exception:
+        existing = ""
+
+    new_crontab = existing.rstrip() + "\n" + cron_entry + "\n"
+
+    with tempfile.NamedTemporaryFile(mode="w", delete=False, suffix=".crontab") as f:
+        f.write(new_crontab)
+        tmp_path = f.name
+
+    subprocess.run(["crontab", tmp_path], check=True)
+    os.unlink(tmp_path)
+    print(f"[cron] Installed daily cron job at {daily_time}")
+
+
+def _remove_cron_job() -> None:
+    try:
+        result = subprocess.run(["crontab", "-l"], capture_output=True, text=True)
+        if result.returncode != 0:
+            return
+        lines = result.stdout.splitlines()
+        new_lines = [line for line in lines if _CRON_MARKER not in line]
+        new_crontab = "\n".join(new_lines)
+        if not new_crontab.endswith("\n") and new_crontab:
+            new_crontab += "\n"
+
+        with tempfile.NamedTemporaryFile(mode="w", delete=False, suffix=".crontab") as f:
+            f.write(new_crontab)
+            tmp_path = f.name
+
+        subprocess.run(["crontab", tmp_path], check=True)
+        os.unlink(tmp_path)
+        print("[cron] Removed EDS cron job (all days completed)")
+    except Exception as e:
+        print(f"[cron] Warning: could not remove cron job: {e}")
+
+
+def _all_domains_complete(config: dict[str, Any]) -> bool:
+    domain_configs = _normalize_domain_configs(config)
+    for dc in domain_configs:
+        dname = dc["domain"]
+        dpath = Path(dc.get("project_dir", f"my-{dname}"))
+        d_start, d_end, _, _ = _parse_date_range(dc)
+        checkpoint = load_checkpoint(dpath)
+        if checkpoint is None:
+            return False
+        total_days = (d_end - d_start).days + 1
+        current_day = (checkpoint - d_start).days + 1
+        if current_day < total_days:
+            return False
+    return True
+
+
 def main() -> None:
     config = load_config()
+
+    daily_time = config.get("cron_daily_time")
+    if not daily_time:
+        domains = config.get("domains")
+        if domains:
+            daily_time = domains[0].get("cron_daily_time")
+
+    if daily_time and not _cron_job_exists():
+        _install_cron_job(daily_time)
 
     if config.get("domains"):
         run_multi_domain(config)
     else:
         run_cron_scheduler(config)
+
+    if daily_time and _all_domains_complete(config):
+        _remove_cron_job()
 
 
 if __name__ == "__main__":
