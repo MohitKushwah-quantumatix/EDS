@@ -1,0 +1,181 @@
+2026-09-01 17:29:40,346  INFO      eds_loader.cli.main  eds-loader run invoked (config=loader.yaml, dry_run=False)
+2026-09-01 17:29:40,347  ERROR     eds_loader.cli.main  Config parse failed: Config file not found: loader.yaml
+2026-09-01 17:30:03,860  INFO      eds_loader.cli.main  eds-loader run invoked (config=loader.yaml, dry_run=False)
+2026-09-01 17:30:03,861  ERROR     eds_loader.cli.main  Config parse failed: Config file not found: loader.yaml
+2026-09-01 17:31:16,080  INFO      eds_loader.cli.main  eds-loader run invoked (config=/home/mohit/eds/loader.yaml, dry_run=False)
+2026-09-01 17:31:16,086  INFO      eds_loader.cli.main  Config loaded: source=local_fs target=postgres tables=(all) enforce_constraints=True schema_required=True
+2026-09-01 17:31:16,089  ERROR     eds_loader.cli.main  Configuration error: Connector 'postgres' requires packages that are not installed: psycopg.
+Fix: pip install eds-loader[postgres]
+2026-09-01 17:32:55,191  INFO      eds_loader.cli.main  eds-loader run invoked (config=/home/mohit/eds/loader.yaml, dry_run=False)
+2026-09-01 17:32:55,197  INFO      eds_loader.cli.main  Config loaded: source=local_fs target=mssql tables=(all) enforce_constraints=True schema_required=True
+2026-09-01 17:32:55,198  ERROR     eds_loader.cli.main  Configuration error: Connector 'mssql' requires packages that are not installed: pyodbc.
+Fix: pip install eds-loader[mssql]
+2026-09-01 17:33:28,892  INFO      eds_loader.cli.main  eds-loader run invoked (config=/home/mohit/eds/loader.yaml, dry_run=False)
+2026-09-01 17:33:28,898  INFO      eds_loader.cli.main  Config loaded: source=local_fs target=mssql tables=(all) enforce_constraints=True schema_required=True
+2026-09-01 17:33:28,899  INFO      eds_loader.loader  Reading schema.json from explicit schema_path: /home/mohit/eds/EDS/my-hospital/schema.json
+2026-09-01 17:33:28,903  INFO      eds_loader.connectors.local_fs  Read countries: 1 row(s) from /home/mohit/eds/EDS/my-hospital/output/countries.parquet
+2026-09-01 17:33:28,905  INFO      eds_loader.connectors.local_fs  Read states: 20 row(s) from /home/mohit/eds/EDS/my-hospital/output/states.parquet
+2026-09-01 17:33:28,906  INFO      eds_loader.connectors.local_fs  Read cities: 20 row(s) from /home/mohit/eds/EDS/my-hospital/output/cities.parquet
+2026-09-01 17:33:28,907  INFO      eds_loader.connectors.local_fs  Read departments: 15 row(s) from /home/mohit/eds/EDS/my-hospital/output/departments.parquet
+2026-09-01 17:33:28,907  INFO      eds_loader.connectors.local_fs  Read specialties: 20 row(s) from /home/mohit/eds/EDS/my-hospital/output/specialties.parquet
+2026-09-01 17:33:28,908  INFO      eds_loader.connectors.local_fs  Read insurance_plans: 10 row(s) from /home/mohit/eds/EDS/my-hospital/output/insurance_plans.parquet
+2026-09-01 17:33:28,909  INFO      eds_loader.connectors.local_fs  Read room_types: 5 row(s) from /home/mohit/eds/EDS/my-hospital/output/room_types.parquet
+2026-09-01 17:33:28,911  INFO      eds_loader.connectors.local_fs  Read medications: 50 row(s) from /home/mohit/eds/EDS/my-hospital/output/medications.parquet
+2026-09-01 17:33:28,912  INFO      eds_loader.connectors.local_fs  Read diagnosis_codes: 50 row(s) from /home/mohit/eds/EDS/my-hospital/output/diagnosis_codes.parquet
+2026-09-01 17:33:28,913  INFO      eds_loader.connectors.local_fs  Read procedure_codes: 30 row(s) from /home/mohit/eds/EDS/my-hospital/output/procedure_codes.parquet
+2026-09-01 17:33:28,914  INFO      eds_loader.connectors.local_fs  Read billing_codes: 15 row(s) from /home/mohit/eds/EDS/my-hospital/output/billing_codes.parquet
+2026-09-01 17:33:28,915  INFO      eds_loader.connectors.local_fs  Read facilities: 8 row(s) from /home/mohit/eds/EDS/my-hospital/output/facilities.parquet
+2026-09-01 17:33:28,916  INFO      eds_loader.connectors.local_fs  Read providers: 50 row(s) from /home/mohit/eds/EDS/my-hospital/output/providers.parquet
+2026-09-01 17:33:28,917  INFO      eds_loader.connectors.local_fs  Read provider_departments: 95 row(s) from /home/mohit/eds/EDS/my-hospital/output/provider_departments.parquet
+2026-09-01 17:33:28,919  INFO      eds_loader.connectors.local_fs  Read provider_specialties: 104 row(s) from /home/mohit/eds/EDS/my-hospital/output/provider_specialties.parquet
+2026-09-01 17:33:28,922  INFO      eds_loader.connectors.local_fs  Read patients: 5 row(s) from /home/mohit/eds/EDS/my-hospital/output/patients.parquet
+2026-09-01 17:33:28,923  INFO      eds_loader.connectors.local_fs  Read patient_addresses: 9 row(s) from /home/mohit/eds/EDS/my-hospital/output/patient_addresses.parquet
+2026-09-01 17:33:28,924  INFO      eds_loader.connectors.local_fs  Read patient_insurance: 3 row(s) from /home/mohit/eds/EDS/my-hospital/output/patient_insurance.parquet
+2026-09-01 17:33:28,925  INFO      eds_loader.connectors.local_fs  Read patient_allergies: 2 row(s) from /home/mohit/eds/EDS/my-hospital/output/patient_allergies.parquet
+2026-09-01 17:33:28,926  INFO      eds_loader.connectors.local_fs  Read immunizations: 5 row(s) from /home/mohit/eds/EDS/my-hospital/output/immunizations.parquet
+2026-09-01 17:33:28,927  INFO      eds_loader.connectors.local_fs  Read patient_emergency_contacts: 5 row(s) from /home/mohit/eds/EDS/my-hospital/output/patient_emergency_contacts.parquet
+2026-09-01 17:33:28,928  INFO      eds_loader.connectors.local_fs  Read encounters: 127 row(s) from /home/mohit/eds/EDS/my-hospital/output/encounters.parquet
+2026-09-01 17:33:28,930  INFO      eds_loader.connectors.local_fs  Read appointments: 97 row(s) from /home/mohit/eds/EDS/my-hospital/output/appointments.parquet
+2026-09-01 17:33:28,933  INFO      eds_loader.connectors.local_fs  Read vitals: 114 row(s) from /home/mohit/eds/EDS/my-hospital/output/vitals.parquet
+2026-09-01 17:33:28,934  INFO      eds_loader.connectors.local_fs  Read medications_prescribed: 149 row(s) from /home/mohit/eds/EDS/my-hospital/output/medications_prescribed.parquet
+2026-09-01 17:33:28,936  INFO      eds_loader.connectors.local_fs  Read diagnoses: 191 row(s) from /home/mohit/eds/EDS/my-hospital/output/diagnoses.parquet
+2026-09-01 17:33:28,937  INFO      eds_loader.connectors.local_fs  Read procedures: 98 row(s) from /home/mohit/eds/EDS/my-hospital/output/procedures.parquet
+2026-09-01 17:33:28,940  INFO      eds_loader.connectors.local_fs  Read billing: 784 row(s) from /home/mohit/eds/EDS/my-hospital/output/billing.parquet
+2026-09-01 17:33:28,942  INFO      eds_loader.connectors.local_fs  Read claims: 616 row(s) from /home/mohit/eds/EDS/my-hospital/output/claims.parquet
+2026-09-01 17:33:28,945  INFO      eds_loader.connectors.local_fs  Read lab_results: 127 row(s) from /home/mohit/eds/EDS/my-hospital/output/lab_results.parquet
+2026-09-01 17:33:28,948  INFO      eds_loader.connectors.local_fs  Read radiology_reports: 127 row(s) from /home/mohit/eds/EDS/my-hospital/output/radiology_reports.parquet
+2026-09-01 17:33:28,950  INFO      eds_loader.connectors.local_fs  Read medication_administration: 127 row(s) from /home/mohit/eds/EDS/my-hospital/output/medication_administration.parquet
+2026-09-01 17:33:28,951  INFO      eds_loader.connectors.local_fs  Read admissions: 127 row(s) from /home/mohit/eds/EDS/my-hospital/output/admissions.parquet
+2026-09-01 17:33:28,952  INFO      eds_loader.connectors.local_fs  Read discharge_summaries: 400 row(s) from /home/mohit/eds/EDS/my-hospital/output/discharge_summaries.parquet
+2026-09-01 17:33:28,953  INFO      eds_loader.connectors.local_fs  Read referrals: 127 row(s) from /home/mohit/eds/EDS/my-hospital/output/referrals.parquet
+2026-09-01 17:33:28,954  INFO      eds_loader.loader  Read 35 dataset(s) from source for append
+2026-09-01 17:33:28,956  ERROR     eds_loader.loader  Load failed (attempt 1/1): Cannot connect to MSSQL at SA@localhost:1433/healthcare: ('01000', "[01000] [unixODBC][Driver Manager]Can't open lib 'ODBC Driver 17 for SQL Server' : file not found (0) (SQLDriverConnect)")
+If this is a driver error, confirm 'ODBC Driver 17 for SQL Server' is installed (list installed drivers with `python -c "import pyodbc; print(pyodbc.drivers())"`).
+2026-09-01 17:33:28,956  ERROR     eds_loader.cli.main  Load failed after 0.1s: Cannot connect to MSSQL at SA@localhost:1433/healthcare: ('01000', "[01000] [unixODBC][Driver Manager]Can't open lib 'ODBC Driver 17 for SQL Server' : file not found (0) (SQLDriverConnect)")
+If this is a driver error, confirm 'ODBC Driver 17 for SQL Server' is installed (list installed drivers with `python -c "import pyodbc; print(pyodbc.drivers())"`).
+2026-09-01 17:41:30,962  INFO      eds_loader.cli.main  eds-loader run invoked (config=/home/mohit/eds/eds_loader/loader.yaml, dry_run=False)
+2026-09-01 17:41:30,968  INFO      eds_loader.cli.main  Config loaded: source=local_fs target=mssql tables=(all) enforce_constraints=True schema_required=True
+2026-09-01 17:41:30,968  ERROR     eds_loader.loader  Load failed (attempt 1/1): schema.json not found at output/schema.json.
+Run `eds generate <stage>` to produce it alongside the Parquet files, or check that the source path is correct.
+2026-09-01 17:41:30,968  ERROR     eds_loader.cli.main  Load failed after 0.0s: schema.json not found at output/schema.json.
+Run `eds generate <stage>` to produce it alongside the Parquet files, or check that the source path is correct.
+2026-09-01 17:50:14,113  INFO      eds_loader.cli.main  eds-loader run invoked (config=/home/mohit/eds/eds_loader/loader.yaml, dry_run=False)
+2026-09-01 17:50:14,119  INFO      eds_loader.cli.main  Config loaded: source=local_fs target=mssql tables=(all) enforce_constraints=True schema_required=True
+2026-09-01 17:50:14,120  INFO      eds_loader.loader  Reading schema.json from explicit schema_path: /home/mohit/eds/EDS/my-hospital/schema.json
+2026-09-01 17:50:14,124  INFO      eds_loader.connectors.local_fs  Read countries: 1 row(s) from /home/mohit/eds/EDS/my-hospital/output/countries.parquet
+2026-09-01 17:50:14,126  INFO      eds_loader.connectors.local_fs  Read states: 20 row(s) from /home/mohit/eds/EDS/my-hospital/output/states.parquet
+2026-09-01 17:50:14,127  INFO      eds_loader.connectors.local_fs  Read cities: 20 row(s) from /home/mohit/eds/EDS/my-hospital/output/cities.parquet
+2026-09-01 17:50:14,128  INFO      eds_loader.connectors.local_fs  Read departments: 15 row(s) from /home/mohit/eds/EDS/my-hospital/output/departments.parquet
+2026-09-01 17:50:14,129  INFO      eds_loader.connectors.local_fs  Read specialties: 20 row(s) from /home/mohit/eds/EDS/my-hospital/output/specialties.parquet
+2026-09-01 17:50:14,130  INFO      eds_loader.connectors.local_fs  Read insurance_plans: 10 row(s) from /home/mohit/eds/EDS/my-hospital/output/insurance_plans.parquet
+2026-09-01 17:50:14,131  INFO      eds_loader.connectors.local_fs  Read room_types: 5 row(s) from /home/mohit/eds/EDS/my-hospital/output/room_types.parquet
+2026-09-01 17:50:14,132  INFO      eds_loader.connectors.local_fs  Read medications: 50 row(s) from /home/mohit/eds/EDS/my-hospital/output/medications.parquet
+2026-09-01 17:50:14,133  INFO      eds_loader.connectors.local_fs  Read diagnosis_codes: 50 row(s) from /home/mohit/eds/EDS/my-hospital/output/diagnosis_codes.parquet
+2026-09-01 17:50:14,135  INFO      eds_loader.connectors.local_fs  Read procedure_codes: 30 row(s) from /home/mohit/eds/EDS/my-hospital/output/procedure_codes.parquet
+2026-09-01 17:50:14,136  INFO      eds_loader.connectors.local_fs  Read billing_codes: 15 row(s) from /home/mohit/eds/EDS/my-hospital/output/billing_codes.parquet
+2026-09-01 17:50:14,137  INFO      eds_loader.connectors.local_fs  Read facilities: 8 row(s) from /home/mohit/eds/EDS/my-hospital/output/facilities.parquet
+2026-09-01 17:50:14,139  INFO      eds_loader.connectors.local_fs  Read providers: 50 row(s) from /home/mohit/eds/EDS/my-hospital/output/providers.parquet
+2026-09-01 17:50:14,140  INFO      eds_loader.connectors.local_fs  Read provider_departments: 95 row(s) from /home/mohit/eds/EDS/my-hospital/output/provider_departments.parquet
+2026-09-01 17:50:14,143  INFO      eds_loader.connectors.local_fs  Read provider_specialties: 104 row(s) from /home/mohit/eds/EDS/my-hospital/output/provider_specialties.parquet
+2026-09-01 17:50:14,145  INFO      eds_loader.connectors.local_fs  Read patients: 5 row(s) from /home/mohit/eds/EDS/my-hospital/output/patients.parquet
+2026-09-01 17:50:14,147  INFO      eds_loader.connectors.local_fs  Read patient_addresses: 9 row(s) from /home/mohit/eds/EDS/my-hospital/output/patient_addresses.parquet
+2026-09-01 17:50:14,148  INFO      eds_loader.connectors.local_fs  Read patient_insurance: 3 row(s) from /home/mohit/eds/EDS/my-hospital/output/patient_insurance.parquet
+2026-09-01 17:50:14,149  INFO      eds_loader.connectors.local_fs  Read patient_allergies: 2 row(s) from /home/mohit/eds/EDS/my-hospital/output/patient_allergies.parquet
+2026-09-01 17:50:14,150  INFO      eds_loader.connectors.local_fs  Read immunizations: 5 row(s) from /home/mohit/eds/EDS/my-hospital/output/immunizations.parquet
+2026-09-01 17:50:14,151  INFO      eds_loader.connectors.local_fs  Read patient_emergency_contacts: 5 row(s) from /home/mohit/eds/EDS/my-hospital/output/patient_emergency_contacts.parquet
+2026-09-01 17:50:14,154  INFO      eds_loader.connectors.local_fs  Read encounters: 127 row(s) from /home/mohit/eds/EDS/my-hospital/output/encounters.parquet
+2026-09-01 17:50:14,156  INFO      eds_loader.connectors.local_fs  Read appointments: 97 row(s) from /home/mohit/eds/EDS/my-hospital/output/appointments.parquet
+2026-09-01 17:50:14,157  INFO      eds_loader.connectors.local_fs  Read vitals: 114 row(s) from /home/mohit/eds/EDS/my-hospital/output/vitals.parquet
+2026-09-01 17:50:14,158  INFO      eds_loader.connectors.local_fs  Read medications_prescribed: 149 row(s) from /home/mohit/eds/EDS/my-hospital/output/medications_prescribed.parquet
+2026-09-01 17:50:14,159  INFO      eds_loader.connectors.local_fs  Read diagnoses: 191 row(s) from /home/mohit/eds/EDS/my-hospital/output/diagnoses.parquet
+2026-09-01 17:50:14,160  INFO      eds_loader.connectors.local_fs  Read procedures: 98 row(s) from /home/mohit/eds/EDS/my-hospital/output/procedures.parquet
+2026-09-01 17:50:14,162  INFO      eds_loader.connectors.local_fs  Read billing: 784 row(s) from /home/mohit/eds/EDS/my-hospital/output/billing.parquet
+2026-09-01 17:50:14,163  INFO      eds_loader.connectors.local_fs  Read claims: 616 row(s) from /home/mohit/eds/EDS/my-hospital/output/claims.parquet
+2026-09-01 17:50:14,164  INFO      eds_loader.connectors.local_fs  Read lab_results: 127 row(s) from /home/mohit/eds/EDS/my-hospital/output/lab_results.parquet
+2026-09-01 17:50:14,165  INFO      eds_loader.connectors.local_fs  Read radiology_reports: 127 row(s) from /home/mohit/eds/EDS/my-hospital/output/radiology_reports.parquet
+2026-09-01 17:50:14,167  INFO      eds_loader.connectors.local_fs  Read medication_administration: 127 row(s) from /home/mohit/eds/EDS/my-hospital/output/medication_administration.parquet
+2026-09-01 17:50:14,168  INFO      eds_loader.connectors.local_fs  Read admissions: 127 row(s) from /home/mohit/eds/EDS/my-hospital/output/admissions.parquet
+2026-09-01 17:50:14,169  INFO      eds_loader.connectors.local_fs  Read discharge_summaries: 400 row(s) from /home/mohit/eds/EDS/my-hospital/output/discharge_summaries.parquet
+2026-09-01 17:50:14,170  INFO      eds_loader.connectors.local_fs  Read referrals: 127 row(s) from /home/mohit/eds/EDS/my-hospital/output/referrals.parquet
+2026-09-01 17:50:14,170  INFO      eds_loader.loader  Read 35 dataset(s) from source for append
+2026-09-01 17:50:14,187  ERROR     eds_loader.loader  Load failed (attempt 1/1): Cannot connect to MSSQL at SA@localhost:1433/healthcare: ('08001', '[08001] [Microsoft][ODBC Driver 18 for SQL Server]SSL Provider: [error:0A000086:SSL routines::certificate verify failed:self-signed certificate] (-1) (SQLDriverConnect)')
+If this is a driver error, confirm 'ODBC Driver 18 for SQL Server' is installed (list installed drivers with `python -c "import pyodbc; print(pyodbc.drivers())"`).
+2026-09-01 17:50:14,188  ERROR     eds_loader.cli.main  Load failed after 0.1s: Cannot connect to MSSQL at SA@localhost:1433/healthcare: ('08001', '[08001] [Microsoft][ODBC Driver 18 for SQL Server]SSL Provider: [error:0A000086:SSL routines::certificate verify failed:self-signed certificate] (-1) (SQLDriverConnect)')
+If this is a driver error, confirm 'ODBC Driver 18 for SQL Server' is installed (list installed drivers with `python -c "import pyodbc; print(pyodbc.drivers())"`).
+2026-09-01 17:53:32,584  INFO      eds_loader.cli.main  eds-loader run invoked (config=/home/mohit/eds/eds_loader/loader.yaml, dry_run=False)
+2026-09-01 17:53:32,591  INFO      eds_loader.cli.main  Config loaded: source=local_fs target=mssql tables=(all) enforce_constraints=True schema_required=True
+2026-09-01 17:53:32,592  INFO      eds_loader.loader  Reading schema.json from explicit schema_path: /home/mohit/eds/EDS/my-hospital/schema.json
+2026-09-01 17:53:32,596  INFO      eds_loader.connectors.local_fs  Read countries: 1 row(s) from /home/mohit/eds/EDS/my-hospital/output/countries.parquet
+2026-09-01 17:53:32,597  INFO      eds_loader.connectors.local_fs  Read states: 20 row(s) from /home/mohit/eds/EDS/my-hospital/output/states.parquet
+2026-09-01 17:53:32,598  INFO      eds_loader.connectors.local_fs  Read cities: 20 row(s) from /home/mohit/eds/EDS/my-hospital/output/cities.parquet
+2026-09-01 17:53:32,598  INFO      eds_loader.connectors.local_fs  Read departments: 15 row(s) from /home/mohit/eds/EDS/my-hospital/output/departments.parquet
+2026-09-01 17:53:32,599  INFO      eds_loader.connectors.local_fs  Read specialties: 20 row(s) from /home/mohit/eds/EDS/my-hospital/output/specialties.parquet
+2026-09-01 17:53:32,600  INFO      eds_loader.connectors.local_fs  Read insurance_plans: 10 row(s) from /home/mohit/eds/EDS/my-hospital/output/insurance_plans.parquet
+2026-09-01 17:53:32,600  INFO      eds_loader.connectors.local_fs  Read room_types: 5 row(s) from /home/mohit/eds/EDS/my-hospital/output/room_types.parquet
+2026-09-01 17:53:32,601  INFO      eds_loader.connectors.local_fs  Read medications: 50 row(s) from /home/mohit/eds/EDS/my-hospital/output/medications.parquet
+2026-09-01 17:53:32,601  INFO      eds_loader.connectors.local_fs  Read diagnosis_codes: 50 row(s) from /home/mohit/eds/EDS/my-hospital/output/diagnosis_codes.parquet
+2026-09-01 17:53:32,602  INFO      eds_loader.connectors.local_fs  Read procedure_codes: 30 row(s) from /home/mohit/eds/EDS/my-hospital/output/procedure_codes.parquet
+2026-09-01 17:53:32,603  INFO      eds_loader.connectors.local_fs  Read billing_codes: 15 row(s) from /home/mohit/eds/EDS/my-hospital/output/billing_codes.parquet
+2026-09-01 17:53:32,605  INFO      eds_loader.connectors.local_fs  Read facilities: 8 row(s) from /home/mohit/eds/EDS/my-hospital/output/facilities.parquet
+2026-09-01 17:53:32,607  INFO      eds_loader.connectors.local_fs  Read providers: 50 row(s) from /home/mohit/eds/EDS/my-hospital/output/providers.parquet
+2026-09-01 17:53:32,609  INFO      eds_loader.connectors.local_fs  Read provider_departments: 95 row(s) from /home/mohit/eds/EDS/my-hospital/output/provider_departments.parquet
+2026-09-01 17:53:32,610  INFO      eds_loader.connectors.local_fs  Read provider_specialties: 104 row(s) from /home/mohit/eds/EDS/my-hospital/output/provider_specialties.parquet
+2026-09-01 17:53:32,611  INFO      eds_loader.connectors.local_fs  Read patients: 5 row(s) from /home/mohit/eds/EDS/my-hospital/output/patients.parquet
+2026-09-01 17:53:32,613  INFO      eds_loader.connectors.local_fs  Read patient_addresses: 9 row(s) from /home/mohit/eds/EDS/my-hospital/output/patient_addresses.parquet
+2026-09-01 17:53:32,616  INFO      eds_loader.connectors.local_fs  Read patient_insurance: 3 row(s) from /home/mohit/eds/EDS/my-hospital/output/patient_insurance.parquet
+2026-09-01 17:53:32,617  INFO      eds_loader.connectors.local_fs  Read patient_allergies: 2 row(s) from /home/mohit/eds/EDS/my-hospital/output/patient_allergies.parquet
+2026-09-01 17:53:32,618  INFO      eds_loader.connectors.local_fs  Read immunizations: 5 row(s) from /home/mohit/eds/EDS/my-hospital/output/immunizations.parquet
+2026-09-01 17:53:32,620  INFO      eds_loader.connectors.local_fs  Read patient_emergency_contacts: 5 row(s) from /home/mohit/eds/EDS/my-hospital/output/patient_emergency_contacts.parquet
+2026-09-01 17:53:32,622  INFO      eds_loader.connectors.local_fs  Read encounters: 127 row(s) from /home/mohit/eds/EDS/my-hospital/output/encounters.parquet
+2026-09-01 17:53:32,623  INFO      eds_loader.connectors.local_fs  Read appointments: 97 row(s) from /home/mohit/eds/EDS/my-hospital/output/appointments.parquet
+2026-09-01 17:53:32,624  INFO      eds_loader.connectors.local_fs  Read vitals: 114 row(s) from /home/mohit/eds/EDS/my-hospital/output/vitals.parquet
+2026-09-01 17:53:32,625  INFO      eds_loader.connectors.local_fs  Read medications_prescribed: 149 row(s) from /home/mohit/eds/EDS/my-hospital/output/medications_prescribed.parquet
+2026-09-01 17:53:32,626  INFO      eds_loader.connectors.local_fs  Read diagnoses: 191 row(s) from /home/mohit/eds/EDS/my-hospital/output/diagnoses.parquet
+2026-09-01 17:53:32,627  INFO      eds_loader.connectors.local_fs  Read procedures: 98 row(s) from /home/mohit/eds/EDS/my-hospital/output/procedures.parquet
+2026-09-01 17:53:32,629  INFO      eds_loader.connectors.local_fs  Read billing: 784 row(s) from /home/mohit/eds/EDS/my-hospital/output/billing.parquet
+2026-09-01 17:53:32,631  INFO      eds_loader.connectors.local_fs  Read claims: 616 row(s) from /home/mohit/eds/EDS/my-hospital/output/claims.parquet
+2026-09-01 17:53:32,633  INFO      eds_loader.connectors.local_fs  Read lab_results: 127 row(s) from /home/mohit/eds/EDS/my-hospital/output/lab_results.parquet
+2026-09-01 17:53:32,634  INFO      eds_loader.connectors.local_fs  Read radiology_reports: 127 row(s) from /home/mohit/eds/EDS/my-hospital/output/radiology_reports.parquet
+2026-09-01 17:53:32,636  INFO      eds_loader.connectors.local_fs  Read medication_administration: 127 row(s) from /home/mohit/eds/EDS/my-hospital/output/medication_administration.parquet
+2026-09-01 17:53:32,638  INFO      eds_loader.connectors.local_fs  Read admissions: 127 row(s) from /home/mohit/eds/EDS/my-hospital/output/admissions.parquet
+2026-09-01 17:53:32,639  INFO      eds_loader.connectors.local_fs  Read discharge_summaries: 400 row(s) from /home/mohit/eds/EDS/my-hospital/output/discharge_summaries.parquet
+2026-09-01 17:53:32,640  INFO      eds_loader.connectors.local_fs  Read referrals: 127 row(s) from /home/mohit/eds/EDS/my-hospital/output/referrals.parquet
+2026-09-01 17:53:32,640  INFO      eds_loader.loader  Read 35 dataset(s) from source for append
+2026-09-01 17:53:32,681  INFO      eds_loader.connectors._sql_base  Connected to SA@localhost:1433/healthcare for append
+2026-09-01 17:53:32,726  INFO      eds_loader.connectors._sql_base  [countries] appended 1 row(s) in 0.03s
+2026-09-01 17:53:32,757  INFO      eds_loader.connectors._sql_base  [states] appended 20 row(s) in 0.03s
+2026-09-01 17:53:32,787  INFO      eds_loader.connectors._sql_base  [cities] appended 20 row(s) in 0.03s
+2026-09-01 17:53:32,817  INFO      eds_loader.connectors._sql_base  [departments] appended 15 row(s) in 0.03s
+2026-09-01 17:53:32,845  INFO      eds_loader.connectors._sql_base  [specialties] appended 20 row(s) in 0.03s
+2026-09-01 17:53:32,874  INFO      eds_loader.connectors._sql_base  [insurance_plans] appended 10 row(s) in 0.03s
+2026-09-01 17:53:32,902  INFO      eds_loader.connectors._sql_base  [room_types] appended 5 row(s) in 0.03s
+2026-09-01 17:53:32,934  INFO      eds_loader.connectors._sql_base  [medications] appended 50 row(s) in 0.03s
+2026-09-01 17:53:32,964  INFO      eds_loader.connectors._sql_base  [diagnosis_codes] appended 50 row(s) in 0.03s
+2026-09-01 17:53:32,995  INFO      eds_loader.connectors._sql_base  [procedure_codes] appended 30 row(s) in 0.03s
+2026-09-01 17:53:33,024  INFO      eds_loader.connectors._sql_base  [billing_codes] appended 15 row(s) in 0.03s
+2026-09-01 17:53:33,053  INFO      eds_loader.connectors._sql_base  [facilities] appended 8 row(s) in 0.03s
+2026-09-01 17:53:33,085  INFO      eds_loader.connectors._sql_base  [providers] appended 50 row(s) in 0.03s
+2026-09-01 17:53:33,117  INFO      eds_loader.connectors._sql_base  [provider_departments] appended 95 row(s) in 0.03s
+2026-09-01 17:53:33,149  INFO      eds_loader.connectors._sql_base  [provider_specialties] appended 104 row(s) in 0.03s
+2026-09-01 17:53:33,180  INFO      eds_loader.connectors._sql_base  [patients] appended 5 row(s) in 0.03s
+2026-09-01 17:53:33,210  INFO      eds_loader.connectors._sql_base  [patient_addresses] appended 9 row(s) in 0.03s
+2026-09-01 17:53:33,239  INFO      eds_loader.connectors._sql_base  [patient_insurance] appended 3 row(s) in 0.03s
+2026-09-01 17:53:33,291  INFO      eds_loader.connectors._sql_base  [patient_allergies] appended 2 row(s) in 0.05s
+2026-09-01 17:53:33,319  INFO      eds_loader.connectors._sql_base  [immunizations] appended 5 row(s) in 0.03s
+2026-09-01 17:53:33,361  INFO      eds_loader.connectors._sql_base  [patient_emergency_contacts] appended 5 row(s) in 0.04s
+2026-09-01 17:53:33,403  INFO      eds_loader.connectors._sql_base  [encounters] appended 127 row(s) in 0.04s
+2026-09-01 17:53:33,451  INFO      eds_loader.connectors._sql_base  [appointments] appended 97 row(s) in 0.05s
+2026-09-01 17:53:33,488  INFO      eds_loader.connectors._sql_base  [vitals] appended 114 row(s) in 0.04s
+2026-09-01 17:53:33,524  INFO      eds_loader.connectors._sql_base  [medications_prescribed] appended 149 row(s) in 0.04s
+2026-09-01 17:53:33,568  INFO      eds_loader.connectors._sql_base  [diagnoses] appended 191 row(s) in 0.04s
+2026-09-01 17:53:33,615  INFO      eds_loader.connectors._sql_base  [procedures] appended 98 row(s) in 0.05s
+2026-09-01 17:53:33,710  INFO      eds_loader.connectors._sql_base  [billing] appended 784 row(s) in 0.09s
+2026-09-01 17:53:33,768  INFO      eds_loader.connectors._sql_base  [claims] appended 616 row(s) in 0.06s
+2026-09-01 17:53:33,804  INFO      eds_loader.connectors._sql_base  [lab_results] appended 127 row(s) in 0.04s
+2026-09-01 17:53:33,839  INFO      eds_loader.connectors._sql_base  [radiology_reports] appended 127 row(s) in 0.03s
+2026-09-01 17:53:33,875  INFO      eds_loader.connectors._sql_base  [medication_administration] appended 127 row(s) in 0.04s
+2026-09-01 17:53:33,910  INFO      eds_loader.connectors._sql_base  [admissions] appended 127 row(s) in 0.03s
+2026-09-01 17:53:33,960  INFO      eds_loader.connectors._sql_base  [discharge_summaries] appended 400 row(s) in 0.05s
+2026-09-01 17:53:33,993  INFO      eds_loader.connectors._sql_base  [referrals] appended 127 row(s) in 0.03s
+2026-09-01 17:53:33,993  INFO      eds_loader.loader  Append load complete: 3733 row(s) inserted across 35 dataset(s)
+2026-09-01 17:53:33,994  INFO      eds_loader.cli.main  Run complete: 3733 row(s) across 35 table(s) in 1.4s
