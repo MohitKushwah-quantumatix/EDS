@@ -265,6 +265,10 @@ class MongoDBConnector:
             ~eds_loader.exceptions.LoadError: Connection, drop, insert,
                 or index creation error.
         """
+        if not _PYMONGO_AVAILABLE:
+            raise LoadError(
+                "pymongo is not installed. Run: pip install eds-loader[mongodb]"
+            )
         db = self._db()
         logger.info(
             "Connected to MongoDB %s:%s/%s", self._host, self._port, self._database,
@@ -366,6 +370,10 @@ class MongoDBConnector:
         Raises:
             ~eds_loader.exceptions.LoadError: Connection or write failure.
         """
+        if not _PYMONGO_AVAILABLE:
+            raise LoadError(
+                "pymongo is not installed. Run: pip install eds-loader[mongodb]"
+            )
         db = self._db()
         logger.info(
             "Connected to MongoDB %s:%s/%s for upsert",
@@ -442,7 +450,7 @@ class MongoDBConnector:
                 if enforce:
                     self._create_indexes(collection, schema_entry)
 
-            except (LoadError, UpsertResult.__class__):
+            except LoadError:
                 raise
             except Exception as exc:
                 logger.error("[%s] upsert failed: %s", name, exc)
@@ -500,7 +508,7 @@ class MongoDBConnector:
                 "pymongo is not installed. Run: pip install eds-loader[mongodb]"
             )
 
-        db = self._connect()
+        db = self._db()
         enforce = bool(schema_metadata)
         results: list[AppendResult] = []
         total = len(datasets)
@@ -535,6 +543,30 @@ class MongoDBConnector:
             ))
 
         return results
+
+
+# ---------------------------------------------------------------------------
+# Helpers
+# ---------------------------------------------------------------------------
+
+def _sanitise_docs(docs: list[dict]) -> list[dict]:
+    """Cast datetime.date values to datetime.datetime for BSON compatibility.
+
+    Polars ``Date`` columns serialise to ``datetime.date`` via ``to_dicts()``.
+    pymongo / BSON only supports ``datetime.datetime``, not ``datetime.date``.
+    This helper converts every ``date`` value to midnight ``datetime``.
+    """
+    import datetime as _dt
+    result = []
+    for doc in docs:
+        new_doc = {
+            k: _dt.datetime(v.year, v.month, v.day)
+            if isinstance(v, _dt.date) and not isinstance(v, _dt.datetime)
+            else v
+            for k, v in doc.items()
+        }
+        result.append(new_doc)
+    return result
 
 
 # ---------------------------------------------------------------------------
