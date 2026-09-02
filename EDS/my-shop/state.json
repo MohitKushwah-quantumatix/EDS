@@ -1,0 +1,11 @@
+{
+  "completed_stages": [
+    "retail:master-data",
+    "retail:customers",
+    "retail:journey",
+    "retail:commerce"
+  ],
+  "current_date": "2026-01-01",
+  "last_identifiers": {},
+  "state_version": 1
+}

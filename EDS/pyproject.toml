@@ -29,6 +29,8 @@ dependencies = [
   "pyyaml>=6.0",
   "sqlalchemy>=2.0",
   "pandas>=2.0",
+  "psycopg[binary]>=3.1",
+  "pyarrow>=14.0",
 ]
 
 [project.optional-dependencies]
@@ -37,10 +39,6 @@ dev = [
   "ruff>=0.5",
   "mypy>=1.10",
   "types-PyYAML>=6.0",
-]
-postgres = [
-  "psycopg[binary]>=3.1",
-  "pyarrow>=14.0",
 ]
 
 [project.scripts]

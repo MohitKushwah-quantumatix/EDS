@@ -1,10 +1,10 @@
 {
-  "created_at": "2026-09-01T11:36:07.499916+00:00",
+  "created_at": "2026-09-02T09:01:01.026195+00:00",
   "domain": "healthcare",
   "manifest_version": 1,
   "name": "Healthcare Project",
   "platform_contract_version": 1,
   "platform_version": "0.1.0",
-  "project_id": "717798aa95434213b8ba4bf925709d89",
+  "project_id": "cb004d6e13bd465f9a86537fc30228d7",
   "seed": 42
 }

@@ -1,5 +1,5 @@
-domain: healthcare
-project_dir: my-hospital
+domain: retail
+project_dir: my-shop
 seed: 42
 
 start_date: 2026-01-01
@@ -11,3 +11,22 @@ cron_interval_minutes: 2
 # --- Production Mode ---
 # Uncomment below and comment above for real-world deployment
 # cron_daily_time: "00:00"
+
+# Multi-domain mode (optional): if present, takes priority over top-level settings.
+# Each domain runs independently with its own project_dir, checkpoint, and backup.
+domains:
+  - domain: retail
+    project_dir: my-shop
+    seed: 42
+    start_date: 2026-01-01
+    end_date: 2026-01-03
+    # cron_interval_minutes: 2
+    cron_daily_time: "14:31"
+
+  - domain: healthcare
+    project_dir: my-hospital
+    seed: 42
+    start_date: 2026-01-01
+    end_date: 2026-01-03
+    # cron_interval_minutes: 2
+    cron_daily_time: "14:31"
