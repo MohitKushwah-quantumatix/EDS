@@ -16,7 +16,7 @@ cron_interval_minutes: 1
 # Each domain runs independently with its own project_dir, checkpoint, and backup.
 domains:
   - domain: retail
-    project_dir: my-shop
+    project_dir: my-new-shop
     seed: 42
     start_date: 2026-01-01
     end_date: 2026-01-01
@@ -24,7 +24,7 @@ domains:
     # cron_daily_time: "12:00"
 
   - domain: healthcare
-    project_dir: my-hospital
+    project_dir: my-new-hospital
     seed: 42
     start_date: 2026-01-01
     end_date: 2026-01-01
