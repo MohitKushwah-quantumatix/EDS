@@ -1,0 +1,195 @@
+{
+  "version": 1,
+  "config_file": ".loader_mongodb_retail_reference_state.json",
+  "last_run": "2026-09-03T12:56:26.303931+00:00",
+  "mode": "incremental",
+  "datasets": {
+    "countries": {
+      "source_hash": "sha256:f2fd239eb092a04b011172c65ea203b1fe52af2c3f52eadd4eb3f683214f8ea9",
+      "rows_at_source": 1,
+      "rows_inserted": 1,
+      "rows_updated": 0,
+      "skipped": false,
+      "last_changed": "2026-09-03T12:56:26.303931+00:00",
+      "schema_fingerprint": {
+        "country_id": "Int64",
+        "country_code": "String",
+        "country_code_3": "String",
+        "country_name": "String",
+        "currency_code": "String",
+        "phone_code": "String",
+        "region": "String"
+      }
+    },
+    "states": {
+      "source_hash": "sha256:cf5efb5f28d6b9083540b80874bd4d1c7ef16ac6256ab1d496dd25ab14cb2765",
+      "rows_at_source": 51,
+      "rows_inserted": 51,
+      "rows_updated": 0,
+      "skipped": false,
+      "last_changed": "2026-09-03T12:56:26.303931+00:00",
+      "schema_fingerprint": {
+        "state_id": "Int64",
+        "country_id": "Int64",
+        "state_code": "String",
+        "state_name": "String"
+      }
+    },
+    "cities": {
+      "source_hash": "sha256:04eeacdf525676ae7b8e6ca47b77d6cfa65c4ed26d520729fd71c8b96313fbe5",
+      "rows_at_source": 255,
+      "rows_inserted": 255,
+      "rows_updated": 0,
+      "skipped": false,
+      "last_changed": "2026-09-03T12:56:26.303931+00:00",
+      "schema_fingerprint": {
+        "city_id": "Int64",
+        "state_id": "Int64",
+        "country_id": "Int64",
+        "city_name": "String",
+        "postal_code": "String",
+        "latitude": "Float64",
+        "longitude": "Float64",
+        "timezone": "String"
+      }
+    },
+    "products": {
+      "source_hash": "sha256:256d466473ed85b8505c8fb9b214f9a88cf4f71121dbb7f9e067c9dc54f83d4b",
+      "rows_at_source": 1000,
+      "rows_inserted": 1000,
+      "rows_updated": 0,
+      "skipped": false,
+      "last_changed": "2026-09-03T12:56:26.303931+00:00",
+      "schema_fingerprint": {
+        "product_id": "Int64",
+        "sku": "String",
+        "product_name": "String",
+        "category_id": "Int64",
+        "brand_id": "Int64",
+        "supplier_id": "Int64",
+        "tax_code_id": "Int64",
+        "unit_of_measure": "String",
+        "unit_cost": "Float64",
+        "list_price": "Float64",
+        "currency_code": "String",
+        "weight_kg": "Float64",
+        "length_cm": "Float64",
+        "width_cm": "Float64",
+        "height_cm": "Float64",
+        "status": "String",
+        "is_returnable": "Boolean"
+      }
+    },
+    "categories": {
+      "source_hash": "sha256:4003c2b8183198e7897ea9427915e6b44b66fa845a72ab4b2725a82b79bde9e0",
+      "rows_at_source": 168,
+      "rows_inserted": 168,
+      "rows_updated": 0,
+      "skipped": false,
+      "last_changed": "2026-09-03T12:56:26.303931+00:00",
+      "schema_fingerprint": {
+        "category_id": "Int64",
+        "parent_category_id": "Int64",
+        "category_code": "String",
+        "category_name": "String",
+        "category_path": "String",
+        "level": "Int64",
+        "is_leaf": "Boolean"
+      }
+    },
+    "brands": {
+      "source_hash": "sha256:5a060f61c37cc3b5945f66fbb1b9ac9501a8d7367aa1a973ce20b6d77dcb96d4",
+      "rows_at_source": 50,
+      "rows_inserted": 50,
+      "rows_updated": 0,
+      "skipped": false,
+      "last_changed": "2026-09-03T12:56:26.303931+00:00",
+      "schema_fingerprint": {
+        "brand_id": "Int64",
+        "brand_code": "String",
+        "brand_name": "String",
+        "country_id": "Int64",
+        "is_premium": "Boolean"
+      }
+    },
+    "suppliers": {
+      "source_hash": "sha256:d39bac029c2a06611b1a2731e122ec818384dd54317182470360affc1a374c1a",
+      "rows_at_source": 25,
+      "rows_inserted": 25,
+      "rows_updated": 0,
+      "skipped": false,
+      "last_changed": "2026-09-03T12:56:26.303931+00:00",
+      "schema_fingerprint": {
+        "supplier_id": "Int64",
+        "supplier_code": "String",
+        "supplier_name": "String",
+        "country_id": "Int64",
+        "city_id": "Int64",
+        "tier": "String",
+        "contact_email": "String",
+        "contact_phone": "String",
+        "lead_time_days": "Int64",
+        "reliability_score": "Float64",
+        "is_active": "Boolean"
+      }
+    },
+    "warehouses": {
+      "source_hash": "sha256:bc4fa270d2e53c768e45f9ecf7c6dbbd72459264fe8190c7af44ab0583cc69cf",
+      "rows_at_source": 10,
+      "rows_inserted": 10,
+      "rows_updated": 0,
+      "skipped": false,
+      "last_changed": "2026-09-03T12:56:26.303931+00:00",
+      "schema_fingerprint": {
+        "warehouse_id": "Int64",
+        "warehouse_code": "String",
+        "warehouse_name": "String",
+        "city_id": "Int64",
+        "state_id": "Int64",
+        "country_id": "Int64",
+        "capacity_units": "Int64",
+        "status": "String",
+        "latitude": "Float64",
+        "longitude": "Float64"
+      }
+    },
+    "inventory": {
+      "source_hash": "sha256:5b7a0ed7096397315e0ee0cc12908de315ad6c898bfad2ced5c473938cc0d422",
+      "rows_at_source": 3000,
+      "rows_inserted": 3000,
+      "rows_updated": 0,
+      "skipped": false,
+      "last_changed": "2026-09-03T12:56:26.303931+00:00",
+      "schema_fingerprint": {
+        "inventory_id": "Int64",
+        "product_id": "Int64",
+        "warehouse_id": "Int64",
+        "quantity_on_hand": "Int64",
+        "quantity_reserved": "Int64",
+        "reorder_point": "Int64",
+        "reorder_quantity": "Int64",
+        "unit_cost": "Float64"
+      }
+    },
+    "shipping_methods": {
+      "source_hash": "sha256:f6b32c48fc5e3c25eba6d8dc743b73a84e876806c3efe394f5b0d25476526624",
+      "rows_at_source": 9,
+      "rows_inserted": 9,
+      "rows_updated": 0,
+      "skipped": false,
+      "last_changed": "2026-09-03T12:56:26.303931+00:00",
+      "schema_fingerprint": {
+        "shipping_method_id": "Int64",
+        "method_code": "String",
+        "method_name": "String",
+        "carrier_name": "String",
+        "service_level": "String",
+        "min_transit_days": "Int64",
+        "max_transit_days": "Int64",
+        "base_cost": "Float64",
+        "cost_per_kg": "Float64",
+        "is_active": "Boolean"
+      }
+    }
+  }
+}

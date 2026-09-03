@@ -74,11 +74,19 @@ def _write_crontab(content: str) -> None:
 # ---------------------------------------------------------------------------
 
 def _make_cron_line(cron: str, config_path: Path) -> str:
-    """Build the two-line crontab block for this config."""
+    """Build the two-line crontab block for this config.
+
+    The cron entry uses ``cd <config_dir> &&`` before the eds-loader command
+    so that the working directory is always the folder containing the config
+    file. This ensures ``logs/<YYYY-MM-DD>.log`` is written next to the config
+    (e.g. /home/mohit/eds/eds_loader/logs/) instead of the user's home dir,
+    which is cron's default CWD.
+    """
     exe = _find_eds_loader()
+    work_dir = config_path.parent
     return (
         f"{_marker(config_path)}\n"
-        f"{cron} {exe} run -c {config_path}\n"
+        f"{cron} cd {work_dir} && {exe} run -c {config_path}\n"
     )
 
 

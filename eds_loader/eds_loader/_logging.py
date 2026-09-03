@@ -8,7 +8,7 @@ safe to import eds_loader as a library without unwanted side effects.
 
 Behaviour (fully automatic — no flags, no configuration needed):
 
-- A ``logs/`` directory is created next to the current working directory
+- A ``logs/`` directory is created relative to the current working directory
   (i.e. wherever ``eds-loader`` is invoked from) the first time logging is
   configured.
 - All events (DEBUG and above — connections, per-table DDL, row counts,

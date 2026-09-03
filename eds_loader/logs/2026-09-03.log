@@ -1,0 +1,568 @@
+2026-09-03 12:15:02,574  INFO      eds_loader.cli.main  eds-loader run invoked (config=/home/mohit/eds/eds_loader/loader_mssql_retailfin.yaml, dry_run=False)
+2026-09-03 12:15:02,580  INFO      eds_loader.cli.main  Config loaded: source=local_fs target=mssql tables=['orders', 'order_lines', 'payments', 'payment_methods', 'payment_status_history', 'returns', 'return_items', 'return_reasons', 'return_status_history', 'tax_codes', 'coupon_types', 'checkout'] enforce_constraints=True schema_required=True
+2026-09-03 12:15:02,581  INFO      eds_loader.loader  Reading schema.json from explicit schema_path: /home/mohit/eds/EDS/my-shop/schema.json
+2026-09-03 12:15:02,587  INFO      eds_loader.connectors.local_fs  Read orders: 18 row(s) from /home/mohit/eds/EDS/my-shop/output/orders.parquet
+2026-09-03 12:15:02,589  INFO      eds_loader.connectors.local_fs  Read order_lines: 35 row(s) from /home/mohit/eds/EDS/my-shop/output/order_lines.parquet
+2026-09-03 12:15:02,591  INFO      eds_loader.connectors.local_fs  Read payments: 18 row(s) from /home/mohit/eds/EDS/my-shop/output/payments.parquet
+2026-09-03 12:15:02,592  INFO      eds_loader.connectors.local_fs  Read payment_methods: 13 row(s) from /home/mohit/eds/EDS/my-shop/output/payment_methods.parquet
+2026-09-03 12:15:02,593  INFO      eds_loader.connectors.local_fs  Read payment_status_history: 34 row(s) from /home/mohit/eds/EDS/my-shop/output/payment_status_history.parquet
+2026-09-03 12:15:02,593  INFO      eds_loader.connectors.local_fs  Read returns: 0 row(s) from /home/mohit/eds/EDS/my-shop/output/returns.parquet
+2026-09-03 12:15:02,594  INFO      eds_loader.connectors.local_fs  Read return_items: 0 row(s) from /home/mohit/eds/EDS/my-shop/output/return_items.parquet
+2026-09-03 12:15:02,595  INFO      eds_loader.connectors.local_fs  Read return_reasons: 5 row(s) from /home/mohit/eds/EDS/my-shop/output/return_reasons.parquet
+2026-09-03 12:15:02,595  INFO      eds_loader.connectors.local_fs  Read return_status_history: 0 row(s) from /home/mohit/eds/EDS/my-shop/output/return_status_history.parquet
+2026-09-03 12:15:02,596  INFO      eds_loader.connectors.local_fs  Read tax_codes: 7 row(s) from /home/mohit/eds/EDS/my-shop/output/tax_codes.parquet
+2026-09-03 12:15:02,597  INFO      eds_loader.connectors.local_fs  Read coupon_types: 8 row(s) from /home/mohit/eds/EDS/my-shop/output/coupon_types.parquet
+2026-09-03 12:15:02,598  INFO      eds_loader.connectors.local_fs  Read checkout: 2 row(s) from /home/mohit/eds/EDS/my-shop/output/checkout.parquet
+2026-09-03 12:15:02,598  INFO      eds_loader.loader  Read 12 dataset(s) from source for append
+2026-09-03 12:15:02,613  INFO      eds_loader.connectors._sql_base  Connected to SA@localhost:1433/retail_finance for append
+2026-09-03 12:15:02,632  INFO      eds_loader.connectors._sql_base  [orders] appended 18 row(s) in 0.01s
+2026-09-03 12:15:02,637  INFO      eds_loader.connectors._sql_base  [order_lines] appended 35 row(s) in 0.01s
+2026-09-03 12:15:02,644  INFO      eds_loader.connectors._sql_base  [payments] appended 18 row(s) in 0.01s
+2026-09-03 12:15:02,649  INFO      eds_loader.connectors._sql_base  [payment_methods] appended 13 row(s) in 0.00s
+2026-09-03 12:15:02,657  INFO      eds_loader.connectors._sql_base  [payment_status_history] appended 34 row(s) in 0.01s
+2026-09-03 12:15:02,658  INFO      eds_loader.connectors._sql_base  [returns] appended 0 row(s) in 0.00s
+2026-09-03 12:15:02,659  INFO      eds_loader.connectors._sql_base  [return_items] appended 0 row(s) in 0.00s
+2026-09-03 12:15:02,662  INFO      eds_loader.connectors._sql_base  [return_reasons] appended 5 row(s) in 0.00s
+2026-09-03 12:15:02,664  INFO      eds_loader.connectors._sql_base  [return_status_history] appended 0 row(s) in 0.00s
+2026-09-03 12:15:02,668  INFO      eds_loader.connectors._sql_base  [tax_codes] appended 7 row(s) in 0.00s
+2026-09-03 12:15:02,673  INFO      eds_loader.connectors._sql_base  [coupon_types] appended 8 row(s) in 0.01s
+2026-09-03 12:15:02,678  INFO      eds_loader.connectors._sql_base  [checkout] appended 2 row(s) in 0.00s
+2026-09-03 12:15:02,678  INFO      eds_loader.loader  Append load complete: 140 row(s) inserted across 12 dataset(s)
+2026-09-03 12:15:02,679  INFO      eds_loader.cli.main  Run complete: 140 row(s) across 12 table(s) in 0.1s
+2026-09-03 12:16:02,445  INFO      eds_loader.cli.main  eds-loader run invoked (config=/home/mohit/eds/eds_loader/loader_mssql_healthfin.yaml, dry_run=False)
+2026-09-03 12:16:02,452  INFO      eds_loader.cli.main  Config loaded: source=local_fs target=mssql tables=['billing', 'billing_codes', 'claims', 'insurance_plans'] enforce_constraints=True schema_required=True
+2026-09-03 12:16:02,453  INFO      eds_loader.loader  Reading schema.json from explicit schema_path: /home/mohit/eds/EDS/my-hospital/schema.json
+2026-09-03 12:16:02,459  INFO      eds_loader.connectors.local_fs  Read billing: 725 row(s) from /home/mohit/eds/EDS/my-hospital/output/billing.parquet
+2026-09-03 12:16:02,460  INFO      eds_loader.connectors.local_fs  Read billing_codes: 15 row(s) from /home/mohit/eds/EDS/my-hospital/output/billing_codes.parquet
+2026-09-03 12:16:02,461  INFO      eds_loader.connectors.local_fs  Read claims: 573 row(s) from /home/mohit/eds/EDS/my-hospital/output/claims.parquet
+2026-09-03 12:16:02,462  INFO      eds_loader.connectors.local_fs  Read insurance_plans: 10 row(s) from /home/mohit/eds/EDS/my-hospital/output/insurance_plans.parquet
+2026-09-03 12:16:02,462  INFO      eds_loader.loader  Read 4 dataset(s) from source for append
+2026-09-03 12:16:02,477  INFO      eds_loader.connectors._sql_base  Connected to SA@localhost:1433/healthcare_finance for append
+2026-09-03 12:16:02,509  INFO      eds_loader.connectors._sql_base  [billing] appended 725 row(s) in 0.02s
+2026-09-03 12:16:02,515  INFO      eds_loader.connectors._sql_base  [billing_codes] appended 15 row(s) in 0.01s
+2026-09-03 12:16:02,533  INFO      eds_loader.connectors._sql_base  [claims] appended 573 row(s) in 0.02s
+2026-09-03 12:16:02,538  INFO      eds_loader.connectors._sql_base  [insurance_plans] appended 10 row(s) in 0.00s
+2026-09-03 12:16:02,538  INFO      eds_loader.loader  Append load complete: 1323 row(s) inserted across 4 dataset(s)
+2026-09-03 12:16:02,538  INFO      eds_loader.cli.main  Run complete: 1323 row(s) across 4 table(s) in 0.1s
+2026-09-03 12:17:03,293  INFO      eds_loader.cli.main  eds-loader run invoked (config=/home/mohit/eds/eds_loader/loader_mysql_healthpatient.yaml, dry_run=False)
+2026-09-03 12:17:03,299  INFO      eds_loader.cli.main  Config loaded: source=local_fs target=mysql tables=['patients', 'patient_addresses', 'patient_insurance', 'patient_allergies', 'patient_emergency_contacts', 'immunizations'] enforce_constraints=True schema_required=True
+2026-09-03 12:17:03,300  INFO      eds_loader.loader  Reading schema.json from explicit schema_path: /home/mohit/eds/EDS/my-hospital/schema.json
+2026-09-03 12:17:03,305  INFO      eds_loader.connectors.local_fs  Read patients: 5 row(s) from /home/mohit/eds/EDS/my-hospital/output/patients.parquet
+2026-09-03 12:17:03,307  INFO      eds_loader.connectors.local_fs  Read patient_addresses: 8 row(s) from /home/mohit/eds/EDS/my-hospital/output/patient_addresses.parquet
+2026-09-03 12:17:03,309  INFO      eds_loader.connectors.local_fs  Read patient_insurance: 1 row(s) from /home/mohit/eds/EDS/my-hospital/output/patient_insurance.parquet
+2026-09-03 12:17:03,310  INFO      eds_loader.connectors.local_fs  Read patient_allergies: 3 row(s) from /home/mohit/eds/EDS/my-hospital/output/patient_allergies.parquet
+2026-09-03 12:17:03,311  INFO      eds_loader.connectors.local_fs  Read patient_emergency_contacts: 5 row(s) from /home/mohit/eds/EDS/my-hospital/output/patient_emergency_contacts.parquet
+2026-09-03 12:17:03,312  INFO      eds_loader.connectors.local_fs  Read immunizations: 5 row(s) from /home/mohit/eds/EDS/my-hospital/output/immunizations.parquet
+2026-09-03 12:17:03,312  INFO      eds_loader.loader  Read 6 dataset(s) from source for append
+2026-09-03 12:17:03,340  INFO      eds_loader.connectors._sql_base  Connected to eds_user@10.20.20.106:3306/healthcare_patientdb for append
+2026-09-03 12:17:03,376  INFO      eds_loader.connectors._sql_base  [patients] appended 5 row(s) in 0.03s
+2026-09-03 12:17:03,445  INFO      eds_loader.connectors._sql_base  [patient_addresses] appended 8 row(s) in 0.07s
+2026-09-03 12:17:03,466  INFO      eds_loader.connectors._sql_base  [patient_insurance] appended 1 row(s) in 0.02s
+2026-09-03 12:17:03,493  INFO      eds_loader.connectors._sql_base  [patient_allergies] appended 3 row(s) in 0.03s
+2026-09-03 12:17:03,523  INFO      eds_loader.connectors._sql_base  [patient_emergency_contacts] appended 5 row(s) in 0.03s
+2026-09-03 12:17:03,552  INFO      eds_loader.connectors._sql_base  [immunizations] appended 5 row(s) in 0.03s
+2026-09-03 12:17:03,553  INFO      eds_loader.loader  Append load complete: 27 row(s) inserted across 6 dataset(s)
+2026-09-03 12:17:03,554  INFO      eds_loader.cli.main  Run complete: 27 row(s) across 6 table(s) in 0.3s
+2026-09-03 12:18:03,287  INFO      eds_loader.cli.main  eds-loader run invoked (config=/home/mohit/eds/eds_loader/loader_mysql_retailcustomer.yaml, dry_run=False)
+2026-09-03 12:18:03,293  INFO      eds_loader.cli.main  Config loaded: source=local_fs target=mysql tables=['customers', 'customer_addresses', 'customer_preferences', 'customer_loyalty', 'customer_personas'] enforce_constraints=True schema_required=True
+2026-09-03 12:18:03,294  INFO      eds_loader.loader  Reading schema.json from explicit schema_path: /home/mohit/eds/EDS/my-shop/schema.json
+2026-09-03 12:18:03,300  INFO      eds_loader.connectors.local_fs  Read customers: 5 row(s) from /home/mohit/eds/EDS/my-shop/output/customers.parquet
+2026-09-03 12:18:03,302  INFO      eds_loader.connectors.local_fs  Read customer_addresses: 6 row(s) from /home/mohit/eds/EDS/my-shop/output/customer_addresses.parquet
+2026-09-03 12:18:03,303  INFO      eds_loader.connectors.local_fs  Read customer_preferences: 5 row(s) from /home/mohit/eds/EDS/my-shop/output/customer_preferences.parquet
+2026-09-03 12:18:03,304  INFO      eds_loader.connectors.local_fs  Read customer_loyalty: 5 row(s) from /home/mohit/eds/EDS/my-shop/output/customer_loyalty.parquet
+2026-09-03 12:18:03,305  INFO      eds_loader.connectors.local_fs  Read customer_personas: 5 row(s) from /home/mohit/eds/EDS/my-shop/output/customer_personas.parquet
+2026-09-03 12:18:03,305  INFO      eds_loader.loader  Read 5 dataset(s) from source for append
+2026-09-03 12:18:03,325  INFO      eds_loader.connectors._sql_base  Connected to eds_user@10.20.20.106:3306/retail_customerdb for append
+2026-09-03 12:18:03,375  INFO      eds_loader.connectors._sql_base  [customers] appended 5 row(s) in 0.04s
+2026-09-03 12:18:03,417  INFO      eds_loader.connectors._sql_base  [customer_addresses] appended 6 row(s) in 0.04s
+2026-09-03 12:18:03,456  INFO      eds_loader.connectors._sql_base  [customer_preferences] appended 5 row(s) in 0.04s
+2026-09-03 12:18:03,482  INFO      eds_loader.connectors._sql_base  [customer_loyalty] appended 5 row(s) in 0.03s
+2026-09-03 12:18:03,506  INFO      eds_loader.connectors._sql_base  [customer_personas] appended 5 row(s) in 0.02s
+2026-09-03 12:18:03,507  INFO      eds_loader.loader  Append load complete: 26 row(s) inserted across 5 dataset(s)
+2026-09-03 12:18:03,508  INFO      eds_loader.cli.main  Run complete: 26 row(s) across 5 table(s) in 0.2s
+2026-09-03 15:23:10,785  INFO      eds_loader.cli.main  eds-loader run invoked (config=/home/mohit/eds/eds_loader/loader_postgres_healthbehav.yaml, dry_run=False)
+2026-09-03 15:23:10,791  INFO      eds_loader.cli.main  Config loaded: source=local_fs target=postgres tables=['encounters', 'appointments', 'admissions', 'vitals', 'lab_results', 'diagnoses', 'procedures', 'medications_prescribed', 'medication_administration', 'radiology_reports', 'discharge_summaries', 'referrals'] enforce_constraints=True schema_required=True
+2026-09-03 15:23:10,792  INFO      eds_loader.loader  Reading schema.json from explicit schema_path: /home/mohit/eds/EDS/my-new-hospital/schema.json
+2026-09-03 15:23:10,799  INFO      eds_loader.connectors.local_fs  Read encounters: 2961 row(s) from /home/mohit/eds/EDS/my-new-hospital/output/encounters.parquet
+2026-09-03 15:23:10,801  INFO      eds_loader.connectors.local_fs  Read appointments: 2388 row(s) from /home/mohit/eds/EDS/my-new-hospital/output/appointments.parquet
+2026-09-03 15:23:10,803  INFO      eds_loader.connectors.local_fs  Read admissions: 2961 row(s) from /home/mohit/eds/EDS/my-new-hospital/output/admissions.parquet
+2026-09-03 15:23:10,805  INFO      eds_loader.connectors.local_fs  Read vitals: 2651 row(s) from /home/mohit/eds/EDS/my-new-hospital/output/vitals.parquet
+2026-09-03 15:23:10,806  INFO      eds_loader.connectors.local_fs  Read lab_results: 2961 row(s) from /home/mohit/eds/EDS/my-new-hospital/output/lab_results.parquet
+2026-09-03 15:23:10,809  INFO      eds_loader.connectors.local_fs  Read diagnoses: 4770 row(s) from /home/mohit/eds/EDS/my-new-hospital/output/diagnoses.parquet
+2026-09-03 15:23:10,811  INFO      eds_loader.connectors.local_fs  Read procedures: 2236 row(s) from /home/mohit/eds/EDS/my-new-hospital/output/procedures.parquet
+2026-09-03 15:23:10,814  INFO      eds_loader.connectors.local_fs  Read medications_prescribed: 3488 row(s) from /home/mohit/eds/EDS/my-new-hospital/output/medications_prescribed.parquet
+2026-09-03 15:23:10,815  INFO      eds_loader.connectors.local_fs  Read medication_administration: 2961 row(s) from /home/mohit/eds/EDS/my-new-hospital/output/medication_administration.parquet
+2026-09-03 15:23:10,817  INFO      eds_loader.connectors.local_fs  Read radiology_reports: 2961 row(s) from /home/mohit/eds/EDS/my-new-hospital/output/radiology_reports.parquet
+2026-09-03 15:23:10,817  INFO      eds_loader.connectors.local_fs  Read discharge_summaries: 0 row(s) from /home/mohit/eds/EDS/my-new-hospital/output/discharge_summaries.parquet
+2026-09-03 15:23:10,819  INFO      eds_loader.connectors.local_fs  Read referrals: 2961 row(s) from /home/mohit/eds/EDS/my-new-hospital/output/referrals.parquet
+2026-09-03 15:23:10,819  INFO      eds_loader.loader  Read 12 dataset(s) from source for append
+2026-09-03 15:23:10,878  ERROR     eds_loader.loader  Load failed (attempt 1/1): Cannot connect to PostgreSQL at postgres@localhost:5432/healthcare_behav: connection failed: connection to server at "127.0.0.1", port 5432 failed: FATAL:  password authentication failed for user "postgres"
+connection to server at "127.0.0.1", port 5432 failed: FATAL:  password authentication failed for user "postgres"
+2026-09-03 15:23:10,878  ERROR     eds_loader.cli.main  Load failed after 0.1s: Cannot connect to PostgreSQL at postgres@localhost:5432/healthcare_behav: connection failed: connection to server at "127.0.0.1", port 5432 failed: FATAL:  password authentication failed for user "postgres"
+connection to server at "127.0.0.1", port 5432 failed: FATAL:  password authentication failed for user "postgres"
+2026-09-03 15:24:32,852  INFO      eds_loader.cli.main  eds-loader run invoked (config=/home/mohit/eds/eds_loader/loader_postgres_healthbehav.yaml, dry_run=False)
+2026-09-03 15:24:32,858  INFO      eds_loader.cli.main  Config loaded: source=local_fs target=postgres tables=['encounters', 'appointments', 'admissions', 'vitals', 'lab_results', 'diagnoses', 'procedures', 'medications_prescribed', 'medication_administration', 'radiology_reports', 'discharge_summaries', 'referrals'] enforce_constraints=True schema_required=True
+2026-09-03 15:24:32,859  INFO      eds_loader.loader  Reading schema.json from explicit schema_path: /home/mohit/eds/EDS/my-new-hospital/schema.json
+2026-09-03 15:24:32,866  INFO      eds_loader.connectors.local_fs  Read encounters: 2961 row(s) from /home/mohit/eds/EDS/my-new-hospital/output/encounters.parquet
+2026-09-03 15:24:32,868  INFO      eds_loader.connectors.local_fs  Read appointments: 2388 row(s) from /home/mohit/eds/EDS/my-new-hospital/output/appointments.parquet
+2026-09-03 15:24:32,870  INFO      eds_loader.connectors.local_fs  Read admissions: 2961 row(s) from /home/mohit/eds/EDS/my-new-hospital/output/admissions.parquet
+2026-09-03 15:24:32,874  INFO      eds_loader.connectors.local_fs  Read vitals: 2651 row(s) from /home/mohit/eds/EDS/my-new-hospital/output/vitals.parquet
+2026-09-03 15:24:32,879  INFO      eds_loader.connectors.local_fs  Read lab_results: 2961 row(s) from /home/mohit/eds/EDS/my-new-hospital/output/lab_results.parquet
+2026-09-03 15:24:32,881  INFO      eds_loader.connectors.local_fs  Read diagnoses: 4770 row(s) from /home/mohit/eds/EDS/my-new-hospital/output/diagnoses.parquet
+2026-09-03 15:24:32,882  INFO      eds_loader.connectors.local_fs  Read procedures: 2236 row(s) from /home/mohit/eds/EDS/my-new-hospital/output/procedures.parquet
+2026-09-03 15:24:32,884  INFO      eds_loader.connectors.local_fs  Read medications_prescribed: 3488 row(s) from /home/mohit/eds/EDS/my-new-hospital/output/medications_prescribed.parquet
+2026-09-03 15:24:32,885  INFO      eds_loader.connectors.local_fs  Read medication_administration: 2961 row(s) from /home/mohit/eds/EDS/my-new-hospital/output/medication_administration.parquet
+2026-09-03 15:24:32,887  INFO      eds_loader.connectors.local_fs  Read radiology_reports: 2961 row(s) from /home/mohit/eds/EDS/my-new-hospital/output/radiology_reports.parquet
+2026-09-03 15:24:32,888  INFO      eds_loader.connectors.local_fs  Read discharge_summaries: 0 row(s) from /home/mohit/eds/EDS/my-new-hospital/output/discharge_summaries.parquet
+2026-09-03 15:24:32,891  INFO      eds_loader.connectors.local_fs  Read referrals: 2961 row(s) from /home/mohit/eds/EDS/my-new-hospital/output/referrals.parquet
+2026-09-03 15:24:32,891  INFO      eds_loader.loader  Read 12 dataset(s) from source for append
+2026-09-03 15:24:32,952  INFO      eds_loader.connectors._sql_base  Connected to postgres@10.20.20.106:5432/healthcare_behav for append
+2026-09-03 15:24:33,324  INFO      eds_loader.connectors._sql_base  [encounters] appended 2961 row(s) in 0.36s
+2026-09-03 15:24:33,528  INFO      eds_loader.connectors._sql_base  [appointments] appended 2388 row(s) in 0.20s
+2026-09-03 15:24:33,734  INFO      eds_loader.connectors._sql_base  [admissions] appended 2961 row(s) in 0.21s
+2026-09-03 15:24:34,029  INFO      eds_loader.connectors._sql_base  [vitals] appended 2651 row(s) in 0.29s
+2026-09-03 15:24:34,155  INFO      eds_loader.connectors._sql_base  [lab_results] appended 2961 row(s) in 0.13s
+2026-09-03 15:24:34,372  INFO      eds_loader.connectors._sql_base  [diagnoses] appended 4770 row(s) in 0.22s
+2026-09-03 15:24:34,488  INFO      eds_loader.connectors._sql_base  [procedures] appended 2236 row(s) in 0.12s
+2026-09-03 15:24:34,657  INFO      eds_loader.connectors._sql_base  [medications_prescribed] appended 3488 row(s) in 0.17s
+2026-09-03 15:24:34,785  INFO      eds_loader.connectors._sql_base  [medication_administration] appended 2961 row(s) in 0.13s
+2026-09-03 15:24:34,900  INFO      eds_loader.connectors._sql_base  [radiology_reports] appended 2961 row(s) in 0.11s
+2026-09-03 15:24:34,912  INFO      eds_loader.connectors._sql_base  [discharge_summaries] appended 0 row(s) in 0.01s
+2026-09-03 15:24:35,012  INFO      eds_loader.connectors._sql_base  [referrals] appended 2961 row(s) in 0.10s
+2026-09-03 15:24:35,012  INFO      eds_loader.loader  Append load complete: 33299 row(s) inserted across 12 dataset(s)
+2026-09-03 15:24:35,013  INFO      eds_loader.cli.main  Run complete: 33299 row(s) across 12 table(s) in 2.2s
+2026-09-03 15:25:46,302  INFO      eds_loader.cli.main  eds-loader run invoked (config=/home/mohit/eds/eds_loader/loader_postgres_retailbehav.yaml, dry_run=False)
+2026-09-03 15:25:46,308  INFO      eds_loader.cli.main  Config loaded: source=local_fs target=postgres tables=['sessions', 'category_views', 'product_views', 'search_history', 'wishlists', 'shopping_carts', 'cart_items', 'reviews', 'order_status_history', 'shipments', 'shipment_items', 'shipment_status_history'] enforce_constraints=True schema_required=True
+2026-09-03 15:25:46,309  INFO      eds_loader.loader  Reading schema.json from explicit schema_path: /home/mohit/eds/EDS/my-new-shop/schema.json
+2026-09-03 15:25:46,316  INFO      eds_loader.connectors.local_fs  Read sessions: 2350 row(s) from /home/mohit/eds/EDS/my-new-shop/output/sessions.parquet
+2026-09-03 15:25:46,319  INFO      eds_loader.connectors.local_fs  Read category_views: 11656 row(s) from /home/mohit/eds/EDS/my-new-shop/output/category_views.parquet
+2026-09-03 15:25:46,325  INFO      eds_loader.connectors.local_fs  Read product_views: 36392 row(s) from /home/mohit/eds/EDS/my-new-shop/output/product_views.parquet
+2026-09-03 15:25:46,327  INFO      eds_loader.connectors.local_fs  Read search_history: 4823 row(s) from /home/mohit/eds/EDS/my-new-shop/output/search_history.parquet
+2026-09-03 15:25:46,328  INFO      eds_loader.connectors.local_fs  Read wishlists: 456 row(s) from /home/mohit/eds/EDS/my-new-shop/output/wishlists.parquet
+2026-09-03 15:25:46,329  INFO      eds_loader.connectors.local_fs  Read shopping_carts: 343 row(s) from /home/mohit/eds/EDS/my-new-shop/output/shopping_carts.parquet
+2026-09-03 15:25:46,330  INFO      eds_loader.connectors.local_fs  Read cart_items: 639 row(s) from /home/mohit/eds/EDS/my-new-shop/output/cart_items.parquet
+2026-09-03 15:25:46,331  INFO      eds_loader.connectors.local_fs  Read reviews: 0 row(s) from /home/mohit/eds/EDS/my-new-shop/output/reviews.parquet
+2026-09-03 15:25:46,332  INFO      eds_loader.connectors.local_fs  Read order_status_history: 29 row(s) from /home/mohit/eds/EDS/my-new-shop/output/order_status_history.parquet
+2026-09-03 15:25:46,333  INFO      eds_loader.connectors.local_fs  Read shipments: 15 row(s) from /home/mohit/eds/EDS/my-new-shop/output/shipments.parquet
+2026-09-03 15:25:46,334  INFO      eds_loader.connectors.local_fs  Read shipment_items: 26 row(s) from /home/mohit/eds/EDS/my-new-shop/output/shipment_items.parquet
+2026-09-03 15:25:46,335  INFO      eds_loader.connectors.local_fs  Read shipment_status_history: 22 row(s) from /home/mohit/eds/EDS/my-new-shop/output/shipment_status_history.parquet
+2026-09-03 15:25:46,335  INFO      eds_loader.loader  Read 12 dataset(s) from source for append
+2026-09-03 15:25:46,431  INFO      eds_loader.connectors._sql_base  Connected to postgres@10.20.20.106:5432/retail_behav for append
+2026-09-03 15:25:46,699  INFO      eds_loader.connectors._sql_base  [sessions] appended 2350 row(s) in 0.26s
+2026-09-03 15:25:47,107  INFO      eds_loader.connectors._sql_base  [category_views] appended 11656 row(s) in 0.41s
+2026-09-03 15:25:48,211  INFO      eds_loader.connectors._sql_base  [product_views] appended 36392 row(s) in 1.10s
+2026-09-03 15:25:48,393  INFO      eds_loader.connectors._sql_base  [search_history] appended 4823 row(s) in 0.18s
+2026-09-03 15:25:48,484  INFO      eds_loader.connectors._sql_base  [wishlists] appended 456 row(s) in 0.09s
+2026-09-03 15:25:48,560  INFO      eds_loader.connectors._sql_base  [shopping_carts] appended 343 row(s) in 0.08s
+2026-09-03 15:25:48,628  INFO      eds_loader.connectors._sql_base  [cart_items] appended 639 row(s) in 0.07s
+2026-09-03 15:25:48,660  INFO      eds_loader.connectors._sql_base  [reviews] appended 0 row(s) in 0.03s
+2026-09-03 15:25:48,714  INFO      eds_loader.connectors._sql_base  [order_status_history] appended 29 row(s) in 0.05s
+2026-09-03 15:25:48,763  INFO      eds_loader.connectors._sql_base  [shipments] appended 15 row(s) in 0.05s
+2026-09-03 15:25:48,814  INFO      eds_loader.connectors._sql_base  [shipment_items] appended 26 row(s) in 0.05s
+2026-09-03 15:25:48,866  INFO      eds_loader.connectors._sql_base  [shipment_status_history] appended 22 row(s) in 0.05s
+2026-09-03 15:25:48,866  INFO      eds_loader.loader  Append load complete: 56751 row(s) inserted across 12 dataset(s)
+2026-09-03 15:25:48,867  INFO      eds_loader.cli.main  Run complete: 56751 row(s) across 12 table(s) in 2.6s
+2026-09-03 15:29:15,814  INFO      eds_loader.cli.main  eds-loader run invoked (config=/home/mohit/eds/eds_loader/loader_postgres_healthbehav.yaml, dry_run=False)
+2026-09-03 15:29:15,820  INFO      eds_loader.cli.main  Config loaded: source=local_fs target=postgres tables=['encounters', 'appointments', 'admissions', 'vitals', 'lab_results', 'diagnoses', 'procedures', 'medications_prescribed', 'medication_administration', 'radiology_reports', 'discharge_summaries', 'referrals'] enforce_constraints=True schema_required=True
+2026-09-03 15:29:15,821  INFO      eds_loader.loader  Reading schema.json from explicit schema_path: /home/mohit/eds/EDS/my-hospital/schema.json
+2026-09-03 15:29:15,826  INFO      eds_loader.connectors.local_fs  Read encounters: 122 row(s) from /home/mohit/eds/EDS/my-hospital/output/encounters.parquet
+2026-09-03 15:29:15,828  INFO      eds_loader.connectors.local_fs  Read appointments: 102 row(s) from /home/mohit/eds/EDS/my-hospital/output/appointments.parquet
+2026-09-03 15:29:15,829  INFO      eds_loader.connectors.local_fs  Read admissions: 122 row(s) from /home/mohit/eds/EDS/my-hospital/output/admissions.parquet
+2026-09-03 15:29:15,831  INFO      eds_loader.connectors.local_fs  Read vitals: 110 row(s) from /home/mohit/eds/EDS/my-hospital/output/vitals.parquet
+2026-09-03 15:29:15,832  INFO      eds_loader.connectors.local_fs  Read lab_results: 122 row(s) from /home/mohit/eds/EDS/my-hospital/output/lab_results.parquet
+2026-09-03 15:29:15,835  INFO      eds_loader.connectors.local_fs  Read diagnoses: 199 row(s) from /home/mohit/eds/EDS/my-hospital/output/diagnoses.parquet
+2026-09-03 15:29:15,837  INFO      eds_loader.connectors.local_fs  Read procedures: 98 row(s) from /home/mohit/eds/EDS/my-hospital/output/procedures.parquet
+2026-09-03 15:29:15,839  INFO      eds_loader.connectors.local_fs  Read medications_prescribed: 131 row(s) from /home/mohit/eds/EDS/my-hospital/output/medications_prescribed.parquet
+2026-09-03 15:29:15,840  INFO      eds_loader.connectors.local_fs  Read medication_administration: 122 row(s) from /home/mohit/eds/EDS/my-hospital/output/medication_administration.parquet
+2026-09-03 15:29:15,842  INFO      eds_loader.connectors.local_fs  Read radiology_reports: 122 row(s) from /home/mohit/eds/EDS/my-hospital/output/radiology_reports.parquet
+2026-09-03 15:29:15,843  INFO      eds_loader.connectors.local_fs  Read discharge_summaries: 352 row(s) from /home/mohit/eds/EDS/my-hospital/output/discharge_summaries.parquet
+2026-09-03 15:29:15,843  INFO      eds_loader.connectors.local_fs  Read referrals: 122 row(s) from /home/mohit/eds/EDS/my-hospital/output/referrals.parquet
+2026-09-03 15:29:15,843  INFO      eds_loader.loader  Read 12 dataset(s) from source for append
+2026-09-03 15:29:15,903  INFO      eds_loader.connectors._sql_base  Connected to postgres@10.20.20.106:5432/healthcare_behav for append
+2026-09-03 15:29:15,942  INFO      eds_loader.connectors._sql_base  [encounters] appended 122 row(s) in 0.03s
+2026-09-03 15:29:15,970  INFO      eds_loader.connectors._sql_base  [appointments] appended 102 row(s) in 0.03s
+2026-09-03 15:29:16,003  INFO      eds_loader.connectors._sql_base  [admissions] appended 122 row(s) in 0.03s
+2026-09-03 15:29:16,029  INFO      eds_loader.connectors._sql_base  [vitals] appended 110 row(s) in 0.03s
+2026-09-03 15:29:16,068  INFO      eds_loader.connectors._sql_base  [lab_results] appended 122 row(s) in 0.04s
+2026-09-03 15:29:16,101  INFO      eds_loader.connectors._sql_base  [diagnoses] appended 199 row(s) in 0.03s
+2026-09-03 15:29:16,126  INFO      eds_loader.connectors._sql_base  [procedures] appended 98 row(s) in 0.02s
+2026-09-03 15:29:16,158  INFO      eds_loader.connectors._sql_base  [medications_prescribed] appended 131 row(s) in 0.03s
+2026-09-03 15:29:16,189  INFO      eds_loader.connectors._sql_base  [medication_administration] appended 122 row(s) in 0.03s
+2026-09-03 15:29:16,211  INFO      eds_loader.connectors._sql_base  [radiology_reports] appended 122 row(s) in 0.02s
+2026-09-03 15:29:16,244  INFO      eds_loader.connectors._sql_base  [discharge_summaries] appended 352 row(s) in 0.03s
+2026-09-03 15:29:16,259  INFO      eds_loader.connectors._sql_base  [referrals] appended 122 row(s) in 0.01s
+2026-09-03 15:29:16,259  INFO      eds_loader.loader  Append load complete: 1724 row(s) inserted across 12 dataset(s)
+2026-09-03 15:29:16,259  INFO      eds_loader.cli.main  Run complete: 1724 row(s) across 12 table(s) in 0.4s
+2026-09-03 15:29:40,912  INFO      eds_loader.cli.main  eds-loader run invoked (config=/home/mohit/eds/eds_loader/loader_postgres_retailbehav.yaml, dry_run=False)
+2026-09-03 15:29:40,918  INFO      eds_loader.cli.main  Config loaded: source=local_fs target=postgres tables=['sessions', 'category_views', 'product_views', 'search_history', 'wishlists', 'shopping_carts', 'cart_items', 'reviews', 'order_status_history', 'shipments', 'shipment_items', 'shipment_status_history'] enforce_constraints=True schema_required=True
+2026-09-03 15:29:40,919  INFO      eds_loader.loader  Reading schema.json from explicit schema_path: /home/mohit/eds/EDS/my-shop/schema.json
+2026-09-03 15:29:40,925  INFO      eds_loader.connectors.local_fs  Read sessions: 41 row(s) from /home/mohit/eds/EDS/my-shop/output/sessions.parquet
+2026-09-03 15:29:40,927  INFO      eds_loader.connectors.local_fs  Read category_views: 141 row(s) from /home/mohit/eds/EDS/my-shop/output/category_views.parquet
+2026-09-03 15:29:40,928  INFO      eds_loader.connectors.local_fs  Read product_views: 533 row(s) from /home/mohit/eds/EDS/my-shop/output/product_views.parquet
+2026-09-03 15:29:40,929  INFO      eds_loader.connectors.local_fs  Read search_history: 56 row(s) from /home/mohit/eds/EDS/my-shop/output/search_history.parquet
+2026-09-03 15:29:40,930  INFO      eds_loader.connectors.local_fs  Read wishlists: 3 row(s) from /home/mohit/eds/EDS/my-shop/output/wishlists.parquet
+2026-09-03 15:29:40,933  INFO      eds_loader.connectors.local_fs  Read shopping_carts: 6 row(s) from /home/mohit/eds/EDS/my-shop/output/shopping_carts.parquet
+2026-09-03 15:29:40,935  INFO      eds_loader.connectors.local_fs  Read cart_items: 13 row(s) from /home/mohit/eds/EDS/my-shop/output/cart_items.parquet
+2026-09-03 15:29:40,936  INFO      eds_loader.connectors.local_fs  Read reviews: 0 row(s) from /home/mohit/eds/EDS/my-shop/output/reviews.parquet
+2026-09-03 15:29:40,937  INFO      eds_loader.connectors.local_fs  Read order_status_history: 44 row(s) from /home/mohit/eds/EDS/my-shop/output/order_status_history.parquet
+2026-09-03 15:29:40,938  INFO      eds_loader.connectors.local_fs  Read shipments: 15 row(s) from /home/mohit/eds/EDS/my-shop/output/shipments.parquet
+2026-09-03 15:29:40,940  INFO      eds_loader.connectors.local_fs  Read shipment_items: 26 row(s) from /home/mohit/eds/EDS/my-shop/output/shipment_items.parquet
+2026-09-03 15:29:40,941  INFO      eds_loader.connectors.local_fs  Read shipment_status_history: 42 row(s) from /home/mohit/eds/EDS/my-shop/output/shipment_status_history.parquet
+2026-09-03 15:29:40,941  INFO      eds_loader.loader  Read 12 dataset(s) from source for append
+2026-09-03 15:29:41,116  INFO      eds_loader.connectors._sql_base  Connected to postgres@10.20.20.106:5432/retail_behav for append
+2026-09-03 15:29:41,161  INFO      eds_loader.connectors._sql_base  [sessions] appended 41 row(s) in 0.03s
+2026-09-03 15:29:41,183  INFO      eds_loader.connectors._sql_base  [category_views] appended 141 row(s) in 0.02s
+2026-09-03 15:29:41,230  INFO      eds_loader.connectors._sql_base  [product_views] appended 533 row(s) in 0.05s
+2026-09-03 15:29:41,243  INFO      eds_loader.connectors._sql_base  [search_history] appended 56 row(s) in 0.01s
+2026-09-03 15:29:41,259  INFO      eds_loader.connectors._sql_base  [wishlists] appended 3 row(s) in 0.02s
+2026-09-03 15:29:41,276  INFO      eds_loader.connectors._sql_base  [shopping_carts] appended 6 row(s) in 0.02s
+2026-09-03 15:29:41,296  INFO      eds_loader.connectors._sql_base  [cart_items] appended 13 row(s) in 0.02s
+2026-09-03 15:29:41,302  INFO      eds_loader.connectors._sql_base  [reviews] appended 0 row(s) in 0.00s
+2026-09-03 15:29:41,321  INFO      eds_loader.connectors._sql_base  [order_status_history] appended 44 row(s) in 0.02s
+2026-09-03 15:29:41,335  INFO      eds_loader.connectors._sql_base  [shipments] appended 15 row(s) in 0.01s
+2026-09-03 15:29:41,348  INFO      eds_loader.connectors._sql_base  [shipment_items] appended 26 row(s) in 0.01s
+2026-09-03 15:29:41,362  INFO      eds_loader.connectors._sql_base  [shipment_status_history] appended 42 row(s) in 0.01s
+2026-09-03 15:29:41,362  INFO      eds_loader.loader  Append load complete: 920 row(s) inserted across 12 dataset(s)
+2026-09-03 15:29:41,362  INFO      eds_loader.cli.main  Run complete: 920 row(s) across 12 table(s) in 0.4s
+2026-09-03 17:23:59,913  INFO      eds_loader.cli.main  eds-loader run invoked (config=/home/mohit/eds/eds_loader/loader_mongodb_retail_reference.yaml, dry_run=False)
+2026-09-03 17:23:59,919  INFO      eds_loader.cli.main  Config loaded: source=local_fs target=mongodb tables=['countries', 'states', 'cities', 'products', 'categories', 'brands', 'suppliers', 'warehouses', 'inventory', 'shipping_methods'] enforce_constraints=True schema_required=True
+2026-09-03 17:23:59,920  INFO      eds_loader.loader  Reading schema.json from explicit schema_path: /home/mohit/eds/EDS/my-new-shop/schema.json
+2026-09-03 17:23:59,926  INFO      eds_loader.connectors.local_fs  Read countries: 1 row(s) from /home/mohit/eds/EDS/my-new-shop/output/countries.parquet
+2026-09-03 17:23:59,928  INFO      eds_loader.connectors.local_fs  Read states: 51 row(s) from /home/mohit/eds/EDS/my-new-shop/output/states.parquet
+2026-09-03 17:23:59,929  INFO      eds_loader.connectors.local_fs  Read cities: 255 row(s) from /home/mohit/eds/EDS/my-new-shop/output/cities.parquet
+2026-09-03 17:23:59,931  INFO      eds_loader.connectors.local_fs  Read products: 1000 row(s) from /home/mohit/eds/EDS/my-new-shop/output/products.parquet
+2026-09-03 17:23:59,932  INFO      eds_loader.connectors.local_fs  Read categories: 168 row(s) from /home/mohit/eds/EDS/my-new-shop/output/categories.parquet
+2026-09-03 17:23:59,932  INFO      eds_loader.connectors.local_fs  Read brands: 50 row(s) from /home/mohit/eds/EDS/my-new-shop/output/brands.parquet
+2026-09-03 17:23:59,934  INFO      eds_loader.connectors.local_fs  Read suppliers: 25 row(s) from /home/mohit/eds/EDS/my-new-shop/output/suppliers.parquet
+2026-09-03 17:23:59,935  INFO      eds_loader.connectors.local_fs  Read warehouses: 10 row(s) from /home/mohit/eds/EDS/my-new-shop/output/warehouses.parquet
+2026-09-03 17:23:59,937  INFO      eds_loader.connectors.local_fs  Read inventory: 3000 row(s) from /home/mohit/eds/EDS/my-new-shop/output/inventory.parquet
+2026-09-03 17:23:59,938  INFO      eds_loader.connectors.local_fs  Read shipping_methods: 9 row(s) from /home/mohit/eds/EDS/my-new-shop/output/shipping_methods.parquet
+2026-09-03 17:23:59,939  INFO      eds_loader.loader  Read 10 dataset(s) from source for append
+2026-09-03 17:24:10,023  ERROR     eds_loader.connectors.mongodb  [countries] append failed: 10.20.20.106:27017: [Errno 111] Connection refused (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms), Timeout: 10.0s, Topology Description: <TopologyDescription id: 6a995fd792675f92cddfadb9, topology_type: Unknown, servers: [<ServerDescription ('10.20.20.106', 27017) server_type: Unknown, rtt: None, error=AutoReconnect('10.20.20.106:27017: [Errno 111] Connection refused (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms)')>]>
+2026-09-03 17:24:10,024  ERROR     eds_loader.loader  Load failed (attempt 1/1): Failed to append dataset 'countries' into collection 'countries' in health_referencedb@10.20.20.106: 10.20.20.106:27017: [Errno 111] Connection refused (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms), Timeout: 10.0s, Topology Description: <TopologyDescription id: 6a995fd792675f92cddfadb9, topology_type: Unknown, servers: [<ServerDescription ('10.20.20.106', 27017) server_type: Unknown, rtt: None, error=AutoReconnect('10.20.20.106:27017: [Errno 111] Connection refused (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms)')>]>
+2026-09-03 17:24:10,025  ERROR     eds_loader.cli.main  Load failed after 10.1s: Failed to append dataset 'countries' into collection 'countries' in health_referencedb@10.20.20.106: 10.20.20.106:27017: [Errno 111] Connection refused (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms), Timeout: 10.0s, Topology Description: <TopologyDescription id: 6a995fd792675f92cddfadb9, topology_type: Unknown, servers: [<ServerDescription ('10.20.20.106', 27017) server_type: Unknown, rtt: None, error=AutoReconnect('10.20.20.106:27017: [Errno 111] Connection refused (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms)')>]>
+2026-09-03 17:35:02,572  INFO      eds_loader.cli.main  eds-loader run invoked (config=/home/mohit/eds/eds_loader/loader_mongodb_retail_reference.yaml, dry_run=False)
+2026-09-03 17:35:02,578  INFO      eds_loader.cli.main  Config loaded: source=local_fs target=mongodb tables=['countries', 'states', 'cities', 'products', 'categories', 'brands', 'suppliers', 'warehouses', 'inventory', 'shipping_methods'] enforce_constraints=True schema_required=True
+2026-09-03 17:35:02,579  INFO      eds_loader.loader  Reading schema.json from explicit schema_path: /home/mohit/eds/EDS/my-new-shop/schema.json
+2026-09-03 17:35:02,584  INFO      eds_loader.connectors.local_fs  Read countries: 1 row(s) from /home/mohit/eds/EDS/my-new-shop/output/countries.parquet
+2026-09-03 17:35:02,585  INFO      eds_loader.connectors.local_fs  Read states: 51 row(s) from /home/mohit/eds/EDS/my-new-shop/output/states.parquet
+2026-09-03 17:35:02,587  INFO      eds_loader.connectors.local_fs  Read cities: 255 row(s) from /home/mohit/eds/EDS/my-new-shop/output/cities.parquet
+2026-09-03 17:35:02,588  INFO      eds_loader.connectors.local_fs  Read products: 1000 row(s) from /home/mohit/eds/EDS/my-new-shop/output/products.parquet
+2026-09-03 17:35:02,589  INFO      eds_loader.connectors.local_fs  Read categories: 168 row(s) from /home/mohit/eds/EDS/my-new-shop/output/categories.parquet
+2026-09-03 17:35:02,591  INFO      eds_loader.connectors.local_fs  Read brands: 50 row(s) from /home/mohit/eds/EDS/my-new-shop/output/brands.parquet
+2026-09-03 17:35:02,592  INFO      eds_loader.connectors.local_fs  Read suppliers: 25 row(s) from /home/mohit/eds/EDS/my-new-shop/output/suppliers.parquet
+2026-09-03 17:35:02,593  INFO      eds_loader.connectors.local_fs  Read warehouses: 10 row(s) from /home/mohit/eds/EDS/my-new-shop/output/warehouses.parquet
+2026-09-03 17:35:02,595  INFO      eds_loader.connectors.local_fs  Read inventory: 3000 row(s) from /home/mohit/eds/EDS/my-new-shop/output/inventory.parquet
+2026-09-03 17:35:02,596  INFO      eds_loader.connectors.local_fs  Read shipping_methods: 9 row(s) from /home/mohit/eds/EDS/my-new-shop/output/shipping_methods.parquet
+2026-09-03 17:35:02,596  INFO      eds_loader.loader  Read 10 dataset(s) from source for append
+2026-09-03 17:35:02,644  INFO      eds_loader.connectors.mongodb  [countries] appended 1 doc(s) in 0.04s
+2026-09-03 17:35:02,679  INFO      eds_loader.connectors.mongodb  [states] appended 51 doc(s) in 0.03s
+2026-09-03 17:35:02,737  INFO      eds_loader.connectors.mongodb  [cities] appended 255 doc(s) in 0.06s
+2026-09-03 17:35:02,852  INFO      eds_loader.connectors.mongodb  [products] appended 1000 doc(s) in 0.12s
+2026-09-03 17:35:02,888  INFO      eds_loader.connectors.mongodb  [categories] appended 168 doc(s) in 0.04s
+2026-09-03 17:35:02,924  INFO      eds_loader.connectors.mongodb  [brands] appended 50 doc(s) in 0.04s
+2026-09-03 17:35:02,950  INFO      eds_loader.connectors.mongodb  [suppliers] appended 25 doc(s) in 0.03s
+2026-09-03 17:35:02,980  INFO      eds_loader.connectors.mongodb  [warehouses] appended 10 doc(s) in 0.03s
+2026-09-03 17:35:03,142  INFO      eds_loader.connectors.mongodb  [inventory] appended 3000 doc(s) in 0.16s
+2026-09-03 17:35:03,175  INFO      eds_loader.connectors.mongodb  [shipping_methods] appended 9 doc(s) in 0.03s
+2026-09-03 17:35:03,175  INFO      eds_loader.loader  Append load complete: 4569 row(s) inserted across 10 dataset(s)
+2026-09-03 17:35:03,179  INFO      eds_loader.cli.main  Run complete: 4569 row(s) across 10 table(s) in 0.6s
+2026-09-03 17:36:59,498  INFO      eds_loader.cli.main  eds-loader run invoked (config=/home/mohit/eds/eds_loader/loader_mongodb_retail_reference.yaml, dry_run=False)
+2026-09-03 17:36:59,504  INFO      eds_loader.cli.main  Config loaded: source=local_fs target=mongodb tables=['countries', 'states', 'cities', 'products', 'categories', 'brands', 'suppliers', 'warehouses', 'inventory', 'shipping_methods'] enforce_constraints=True schema_required=True
+2026-09-03 17:36:59,505  INFO      eds_loader.loader  Reading schema.json from explicit schema_path: /home/mohit/eds/EDS/my-new-shop/schema.json
+2026-09-03 17:36:59,511  INFO      eds_loader.connectors.local_fs  Read countries: 1 row(s) from /home/mohit/eds/EDS/my-new-shop/output/countries.parquet
+2026-09-03 17:36:59,512  INFO      eds_loader.connectors.local_fs  Read states: 51 row(s) from /home/mohit/eds/EDS/my-new-shop/output/states.parquet
+2026-09-03 17:36:59,513  INFO      eds_loader.connectors.local_fs  Read cities: 255 row(s) from /home/mohit/eds/EDS/my-new-shop/output/cities.parquet
+2026-09-03 17:36:59,514  INFO      eds_loader.connectors.local_fs  Read products: 1000 row(s) from /home/mohit/eds/EDS/my-new-shop/output/products.parquet
+2026-09-03 17:36:59,516  INFO      eds_loader.connectors.local_fs  Read categories: 168 row(s) from /home/mohit/eds/EDS/my-new-shop/output/categories.parquet
+2026-09-03 17:36:59,518  INFO      eds_loader.connectors.local_fs  Read brands: 50 row(s) from /home/mohit/eds/EDS/my-new-shop/output/brands.parquet
+2026-09-03 17:36:59,519  INFO      eds_loader.connectors.local_fs  Read suppliers: 25 row(s) from /home/mohit/eds/EDS/my-new-shop/output/suppliers.parquet
+2026-09-03 17:36:59,520  INFO      eds_loader.connectors.local_fs  Read warehouses: 10 row(s) from /home/mohit/eds/EDS/my-new-shop/output/warehouses.parquet
+2026-09-03 17:36:59,522  INFO      eds_loader.connectors.local_fs  Read inventory: 3000 row(s) from /home/mohit/eds/EDS/my-new-shop/output/inventory.parquet
+2026-09-03 17:36:59,523  INFO      eds_loader.connectors.local_fs  Read shipping_methods: 9 row(s) from /home/mohit/eds/EDS/my-new-shop/output/shipping_methods.parquet
+2026-09-03 17:36:59,523  INFO      eds_loader.loader  Read 10 dataset(s) from source for append
+2026-09-03 17:36:59,567  INFO      eds_loader.connectors.mongodb  [countries] appended 1 doc(s) in 0.04s
+2026-09-03 17:36:59,596  INFO      eds_loader.connectors.mongodb  [states] appended 51 doc(s) in 0.03s
+2026-09-03 17:36:59,640  INFO      eds_loader.connectors.mongodb  [cities] appended 255 doc(s) in 0.04s
+2026-09-03 17:36:59,771  INFO      eds_loader.connectors.mongodb  [products] appended 1000 doc(s) in 0.13s
+2026-09-03 17:36:59,809  INFO      eds_loader.connectors.mongodb  [categories] appended 168 doc(s) in 0.04s
+2026-09-03 17:36:59,838  INFO      eds_loader.connectors.mongodb  [brands] appended 50 doc(s) in 0.03s
+2026-09-03 17:36:59,867  INFO      eds_loader.connectors.mongodb  [suppliers] appended 25 doc(s) in 0.03s
+2026-09-03 17:36:59,894  INFO      eds_loader.connectors.mongodb  [warehouses] appended 10 doc(s) in 0.03s
+2026-09-03 17:37:00,071  INFO      eds_loader.connectors.mongodb  [inventory] appended 3000 doc(s) in 0.18s
+2026-09-03 17:37:00,100  INFO      eds_loader.connectors.mongodb  [shipping_methods] appended 9 doc(s) in 0.03s
+2026-09-03 17:37:00,101  INFO      eds_loader.loader  Append load complete: 4569 row(s) inserted across 10 dataset(s)
+2026-09-03 17:37:00,104  INFO      eds_loader.cli.main  Run complete: 4569 row(s) across 10 table(s) in 0.6s
+2026-09-03 17:38:59,315  INFO      eds_loader.cli.main  eds-loader run invoked (config=/home/mohit/eds/eds_loader/loader_mongodb_health_reference.yaml, dry_run=False)
+2026-09-03 17:38:59,321  INFO      eds_loader.cli.main  Config loaded: source=local_fs target=mongodb tables=['countries', 'states', 'cities', 'providers', 'provider_departments', 'provider_specialties', 'departments', 'specialties', 'room_types', 'facilities', 'medications', 'diagnosis_codes', 'procedure_codes'] enforce_constraints=True schema_required=True
+2026-09-03 17:38:59,322  INFO      eds_loader.loader  Reading schema.json from explicit schema_path: /home/mohit/eds/EDS/my-new-hospital/schema.json
+2026-09-03 17:38:59,328  INFO      eds_loader.connectors.local_fs  Read countries: 1 row(s) from /home/mohit/eds/EDS/my-new-hospital/output/countries.parquet
+2026-09-03 17:38:59,330  INFO      eds_loader.connectors.local_fs  Read states: 20 row(s) from /home/mohit/eds/EDS/my-new-hospital/output/states.parquet
+2026-09-03 17:38:59,331  INFO      eds_loader.connectors.local_fs  Read cities: 20 row(s) from /home/mohit/eds/EDS/my-new-hospital/output/cities.parquet
+2026-09-03 17:38:59,332  INFO      eds_loader.connectors.local_fs  Read providers: 50 row(s) from /home/mohit/eds/EDS/my-new-hospital/output/providers.parquet
+2026-09-03 17:38:59,333  INFO      eds_loader.connectors.local_fs  Read provider_departments: 95 row(s) from /home/mohit/eds/EDS/my-new-hospital/output/provider_departments.parquet
+2026-09-03 17:38:59,335  INFO      eds_loader.connectors.local_fs  Read provider_specialties: 104 row(s) from /home/mohit/eds/EDS/my-new-hospital/output/provider_specialties.parquet
+2026-09-03 17:38:59,336  INFO      eds_loader.connectors.local_fs  Read departments: 15 row(s) from /home/mohit/eds/EDS/my-new-hospital/output/departments.parquet
+2026-09-03 17:38:59,337  INFO      eds_loader.connectors.local_fs  Read specialties: 20 row(s) from /home/mohit/eds/EDS/my-new-hospital/output/specialties.parquet
+2026-09-03 17:38:59,338  INFO      eds_loader.connectors.local_fs  Read room_types: 5 row(s) from /home/mohit/eds/EDS/my-new-hospital/output/room_types.parquet
+2026-09-03 17:38:59,338  INFO      eds_loader.connectors.local_fs  Read facilities: 8 row(s) from /home/mohit/eds/EDS/my-new-hospital/output/facilities.parquet
+2026-09-03 17:38:59,339  INFO      eds_loader.connectors.local_fs  Read medications: 50 row(s) from /home/mohit/eds/EDS/my-new-hospital/output/medications.parquet
+2026-09-03 17:38:59,340  INFO      eds_loader.connectors.local_fs  Read diagnosis_codes: 50 row(s) from /home/mohit/eds/EDS/my-new-hospital/output/diagnosis_codes.parquet
+2026-09-03 17:38:59,341  INFO      eds_loader.connectors.local_fs  Read procedure_codes: 30 row(s) from /home/mohit/eds/EDS/my-new-hospital/output/procedure_codes.parquet
+2026-09-03 17:38:59,341  INFO      eds_loader.loader  Read 13 dataset(s) from source for append
+2026-09-03 17:38:59,382  INFO      eds_loader.connectors.mongodb  [countries] appended 1 doc(s) in 0.04s
+2026-09-03 17:38:59,412  INFO      eds_loader.connectors.mongodb  [states] appended 20 doc(s) in 0.03s
+2026-09-03 17:38:59,441  INFO      eds_loader.connectors.mongodb  [cities] appended 20 doc(s) in 0.03s
+2026-09-03 17:38:59,472  INFO      eds_loader.connectors.mongodb  [providers] appended 50 doc(s) in 0.03s
+2026-09-03 17:38:59,503  INFO      eds_loader.connectors.mongodb  [provider_departments] appended 95 doc(s) in 0.03s
+2026-09-03 17:38:59,533  INFO      eds_loader.connectors.mongodb  [provider_specialties] appended 104 doc(s) in 0.03s
+2026-09-03 17:38:59,565  INFO      eds_loader.connectors.mongodb  [departments] appended 15 doc(s) in 0.03s
+2026-09-03 17:38:59,599  INFO      eds_loader.connectors.mongodb  [specialties] appended 20 doc(s) in 0.03s
+2026-09-03 17:38:59,628  INFO      eds_loader.connectors.mongodb  [room_types] appended 5 doc(s) in 0.03s
+2026-09-03 17:38:59,655  INFO      eds_loader.connectors.mongodb  [facilities] appended 8 doc(s) in 0.03s
+2026-09-03 17:38:59,687  INFO      eds_loader.connectors.mongodb  [medications] appended 50 doc(s) in 0.03s
+2026-09-03 17:38:59,716  INFO      eds_loader.connectors.mongodb  [diagnosis_codes] appended 50 doc(s) in 0.03s
+2026-09-03 17:38:59,744  INFO      eds_loader.connectors.mongodb  [procedure_codes] appended 30 doc(s) in 0.03s
+2026-09-03 17:38:59,745  INFO      eds_loader.loader  Append load complete: 468 row(s) inserted across 13 dataset(s)
+2026-09-03 17:38:59,750  INFO      eds_loader.cli.main  Run complete: 468 row(s) across 13 table(s) in 0.4s
+2026-09-03 17:40:40,230  INFO      eds_loader.cli.main  eds-loader run invoked (config=/home/mohit/eds/eds_loader/loader_mongodb_health_reference.yaml, dry_run=False)
+2026-09-03 17:40:40,236  INFO      eds_loader.cli.main  Config loaded: source=local_fs target=mongodb tables=['countries', 'states', 'cities', 'providers', 'provider_departments', 'provider_specialties', 'departments', 'specialties', 'room_types', 'facilities', 'medications', 'diagnosis_codes', 'procedure_codes'] enforce_constraints=True schema_required=True
+2026-09-03 17:40:40,237  INFO      eds_loader.loader  Reading schema.json from explicit schema_path: /home/mohit/eds/EDS/my-hospital/schema.json
+2026-09-03 17:40:40,243  INFO      eds_loader.connectors.local_fs  Read countries: 1 row(s) from /home/mohit/eds/EDS/my-hospital/output/countries.parquet
+2026-09-03 17:40:40,244  INFO      eds_loader.connectors.local_fs  Read states: 20 row(s) from /home/mohit/eds/EDS/my-hospital/output/states.parquet
+2026-09-03 17:40:40,246  INFO      eds_loader.connectors.local_fs  Read cities: 20 row(s) from /home/mohit/eds/EDS/my-hospital/output/cities.parquet
+2026-09-03 17:40:40,247  INFO      eds_loader.connectors.local_fs  Read providers: 50 row(s) from /home/mohit/eds/EDS/my-hospital/output/providers.parquet
+2026-09-03 17:40:40,248  INFO      eds_loader.connectors.local_fs  Read provider_departments: 95 row(s) from /home/mohit/eds/EDS/my-hospital/output/provider_departments.parquet
+2026-09-03 17:40:40,249  INFO      eds_loader.connectors.local_fs  Read provider_specialties: 104 row(s) from /home/mohit/eds/EDS/my-hospital/output/provider_specialties.parquet
+2026-09-03 17:40:40,250  INFO      eds_loader.connectors.local_fs  Read departments: 15 row(s) from /home/mohit/eds/EDS/my-hospital/output/departments.parquet
+2026-09-03 17:40:40,251  INFO      eds_loader.connectors.local_fs  Read specialties: 20 row(s) from /home/mohit/eds/EDS/my-hospital/output/specialties.parquet
+2026-09-03 17:40:40,252  INFO      eds_loader.connectors.local_fs  Read room_types: 5 row(s) from /home/mohit/eds/EDS/my-hospital/output/room_types.parquet
+2026-09-03 17:40:40,253  INFO      eds_loader.connectors.local_fs  Read facilities: 8 row(s) from /home/mohit/eds/EDS/my-hospital/output/facilities.parquet
+2026-09-03 17:40:40,254  INFO      eds_loader.connectors.local_fs  Read medications: 50 row(s) from /home/mohit/eds/EDS/my-hospital/output/medications.parquet
+2026-09-03 17:40:40,255  INFO      eds_loader.connectors.local_fs  Read diagnosis_codes: 50 row(s) from /home/mohit/eds/EDS/my-hospital/output/diagnosis_codes.parquet
+2026-09-03 17:40:40,255  INFO      eds_loader.connectors.local_fs  Read procedure_codes: 30 row(s) from /home/mohit/eds/EDS/my-hospital/output/procedure_codes.parquet
+2026-09-03 17:40:40,255  INFO      eds_loader.loader  Read 13 dataset(s) from source for append
+2026-09-03 17:40:40,276  INFO      eds_loader.connectors.mongodb  [countries] appended 1 doc(s) in 0.02s
+2026-09-03 17:40:40,279  INFO      eds_loader.connectors.mongodb  [states] appended 20 doc(s) in 0.00s
+2026-09-03 17:40:40,282  INFO      eds_loader.connectors.mongodb  [cities] appended 20 doc(s) in 0.00s
+2026-09-03 17:40:40,302  INFO      eds_loader.connectors.mongodb  [providers] appended 50 doc(s) in 0.02s
+2026-09-03 17:40:40,309  INFO      eds_loader.connectors.mongodb  [provider_departments] appended 95 doc(s) in 0.01s
+2026-09-03 17:40:40,315  INFO      eds_loader.connectors.mongodb  [provider_specialties] appended 104 doc(s) in 0.01s
+2026-09-03 17:40:40,319  INFO      eds_loader.connectors.mongodb  [departments] appended 15 doc(s) in 0.00s
+2026-09-03 17:40:40,322  INFO      eds_loader.connectors.mongodb  [specialties] appended 20 doc(s) in 0.00s
+2026-09-03 17:40:40,326  INFO      eds_loader.connectors.mongodb  [room_types] appended 5 doc(s) in 0.00s
+2026-09-03 17:40:40,328  INFO      eds_loader.connectors.mongodb  [facilities] appended 8 doc(s) in 0.00s
+2026-09-03 17:40:40,332  INFO      eds_loader.connectors.mongodb  [medications] appended 50 doc(s) in 0.00s
+2026-09-03 17:40:40,336  INFO      eds_loader.connectors.mongodb  [diagnosis_codes] appended 50 doc(s) in 0.00s
+2026-09-03 17:40:40,343  INFO      eds_loader.connectors.mongodb  [procedure_codes] appended 30 doc(s) in 0.01s
+2026-09-03 17:40:40,343  INFO      eds_loader.loader  Append load complete: 468 row(s) inserted across 13 dataset(s)
+2026-09-03 17:40:40,346  INFO      eds_loader.cli.main  Run complete: 468 row(s) across 13 table(s) in 0.1s
+2026-09-03 18:18:21,864  INFO      eds_loader.cli.main  eds-loader run invoked (config=/home/mohit/eds/eds_loader/loader_mongodb_health_reference.yaml, dry_run=False)
+2026-09-03 18:18:21,870  INFO      eds_loader.cli.main  Config loaded: source=local_fs target=mongodb tables=['countries', 'states', 'cities', 'providers', 'provider_departments', 'provider_specialties', 'departments', 'specialties', 'room_types', 'facilities', 'medications', 'diagnosis_codes', 'procedure_codes'] enforce_constraints=True schema_required=True
+2026-09-03 18:18:21,871  INFO      eds_loader.loader  Reading schema.json from explicit schema_path: /home/mohit/eds/EDS/my-new-hospital/schema.json
+2026-09-03 18:18:21,872  INFO      eds_loader.loader  No state file — performing initial full upsert (/home/mohit/eds/eds_loader/.loader_mongodb_health_reference_state.json)
+2026-09-03 18:18:21,877  INFO      eds_loader.connectors.local_fs  Read countries: 1 row(s) from /home/mohit/eds/EDS/my-new-hospital/output/countries.parquet
+2026-09-03 18:18:21,879  INFO      eds_loader.connectors.local_fs  Read states: 20 row(s) from /home/mohit/eds/EDS/my-new-hospital/output/states.parquet
+2026-09-03 18:18:21,880  INFO      eds_loader.connectors.local_fs  Read cities: 20 row(s) from /home/mohit/eds/EDS/my-new-hospital/output/cities.parquet
+2026-09-03 18:18:21,881  INFO      eds_loader.connectors.local_fs  Read providers: 50 row(s) from /home/mohit/eds/EDS/my-new-hospital/output/providers.parquet
+2026-09-03 18:18:21,882  INFO      eds_loader.connectors.local_fs  Read provider_departments: 95 row(s) from /home/mohit/eds/EDS/my-new-hospital/output/provider_departments.parquet
+2026-09-03 18:18:21,883  INFO      eds_loader.connectors.local_fs  Read provider_specialties: 104 row(s) from /home/mohit/eds/EDS/my-new-hospital/output/provider_specialties.parquet
+2026-09-03 18:18:21,884  INFO      eds_loader.connectors.local_fs  Read departments: 15 row(s) from /home/mohit/eds/EDS/my-new-hospital/output/departments.parquet
+2026-09-03 18:18:21,885  INFO      eds_loader.connectors.local_fs  Read specialties: 20 row(s) from /home/mohit/eds/EDS/my-new-hospital/output/specialties.parquet
+2026-09-03 18:18:21,886  INFO      eds_loader.connectors.local_fs  Read room_types: 5 row(s) from /home/mohit/eds/EDS/my-new-hospital/output/room_types.parquet
+2026-09-03 18:18:21,887  INFO      eds_loader.connectors.local_fs  Read facilities: 8 row(s) from /home/mohit/eds/EDS/my-new-hospital/output/facilities.parquet
+2026-09-03 18:18:21,887  INFO      eds_loader.connectors.local_fs  Read medications: 50 row(s) from /home/mohit/eds/EDS/my-new-hospital/output/medications.parquet
+2026-09-03 18:18:21,888  INFO      eds_loader.connectors.local_fs  Read diagnosis_codes: 50 row(s) from /home/mohit/eds/EDS/my-new-hospital/output/diagnosis_codes.parquet
+2026-09-03 18:18:21,889  INFO      eds_loader.connectors.local_fs  Read procedure_codes: 30 row(s) from /home/mohit/eds/EDS/my-new-hospital/output/procedure_codes.parquet
+2026-09-03 18:18:21,889  INFO      eds_loader.loader  Read 13 dataset(s) from source
+2026-09-03 18:18:21,892  INFO      eds_loader.loader  [countries] first run — will upsert 1 row(s)
+2026-09-03 18:18:21,892  INFO      eds_loader.loader  [states] first run — will upsert 20 row(s)
+2026-09-03 18:18:21,893  INFO      eds_loader.loader  [cities] first run — will upsert 20 row(s)
+2026-09-03 18:18:21,894  INFO      eds_loader.loader  [providers] first run — will upsert 50 row(s)
+2026-09-03 18:18:21,895  INFO      eds_loader.loader  [provider_departments] first run — will upsert 95 row(s)
+2026-09-03 18:18:21,895  INFO      eds_loader.loader  [provider_specialties] first run — will upsert 104 row(s)
+2026-09-03 18:18:21,896  INFO      eds_loader.loader  [departments] first run — will upsert 15 row(s)
+2026-09-03 18:18:21,896  INFO      eds_loader.loader  [specialties] first run — will upsert 20 row(s)
+2026-09-03 18:18:21,898  INFO      eds_loader.loader  [room_types] first run — will upsert 5 row(s)
+2026-09-03 18:18:21,898  INFO      eds_loader.loader  [facilities] first run — will upsert 8 row(s)
+2026-09-03 18:18:21,899  INFO      eds_loader.loader  [medications] first run — will upsert 50 row(s)
+2026-09-03 18:18:21,900  INFO      eds_loader.loader  [diagnosis_codes] first run — will upsert 50 row(s)
+2026-09-03 18:18:21,901  INFO      eds_loader.loader  [procedure_codes] first run — will upsert 30 row(s)
+2026-09-03 18:18:21,910  INFO      eds_loader.connectors.mongodb  Connected to MongoDB 10.20.20.106:27017/health_referencedb for upsert
+2026-09-03 18:18:21,910  WARNING   eds_loader.connectors.mongodb  [countries] No primary key in schema — falling back to full replace
+2026-09-03 18:18:21,954  INFO      eds_loader.connectors.mongodb  [countries] full-replace wrote 1 document(s) in 0.04s
+2026-09-03 18:18:21,955  WARNING   eds_loader.connectors.mongodb  [states] No primary key in schema — falling back to full replace
+2026-09-03 18:18:21,985  INFO      eds_loader.connectors.mongodb  [states] full-replace wrote 20 document(s) in 0.03s
+2026-09-03 18:18:21,986  WARNING   eds_loader.connectors.mongodb  [cities] No primary key in schema — falling back to full replace
+2026-09-03 18:18:22,017  INFO      eds_loader.connectors.mongodb  [cities] full-replace wrote 20 document(s) in 0.03s
+2026-09-03 18:18:22,017  WARNING   eds_loader.connectors.mongodb  [providers] No primary key in schema — falling back to full replace
+2026-09-03 18:18:22,057  INFO      eds_loader.connectors.mongodb  [providers] full-replace wrote 50 document(s) in 0.04s
+2026-09-03 18:18:22,058  WARNING   eds_loader.connectors.mongodb  [provider_departments] No primary key in schema — falling back to full replace
+2026-09-03 18:18:22,094  INFO      eds_loader.connectors.mongodb  [provider_departments] full-replace wrote 95 document(s) in 0.04s
+2026-09-03 18:18:22,094  WARNING   eds_loader.connectors.mongodb  [provider_specialties] No primary key in schema — falling back to full replace
+2026-09-03 18:18:22,132  INFO      eds_loader.connectors.mongodb  [provider_specialties] full-replace wrote 104 document(s) in 0.04s
+2026-09-03 18:18:22,132  WARNING   eds_loader.connectors.mongodb  [departments] No primary key in schema — falling back to full replace
+2026-09-03 18:18:22,168  INFO      eds_loader.connectors.mongodb  [departments] full-replace wrote 15 document(s) in 0.04s
+2026-09-03 18:18:22,169  WARNING   eds_loader.connectors.mongodb  [specialties] No primary key in schema — falling back to full replace
+2026-09-03 18:18:22,211  INFO      eds_loader.connectors.mongodb  [specialties] full-replace wrote 20 document(s) in 0.04s
+2026-09-03 18:18:22,212  WARNING   eds_loader.connectors.mongodb  [room_types] No primary key in schema — falling back to full replace
+2026-09-03 18:18:22,242  INFO      eds_loader.connectors.mongodb  [room_types] full-replace wrote 5 document(s) in 0.03s
+2026-09-03 18:18:22,242  WARNING   eds_loader.connectors.mongodb  [facilities] No primary key in schema — falling back to full replace
+2026-09-03 18:18:22,269  INFO      eds_loader.connectors.mongodb  [facilities] full-replace wrote 8 document(s) in 0.03s
+2026-09-03 18:18:22,269  WARNING   eds_loader.connectors.mongodb  [medications] No primary key in schema — falling back to full replace
+2026-09-03 18:18:22,301  INFO      eds_loader.connectors.mongodb  [medications] full-replace wrote 50 document(s) in 0.03s
+2026-09-03 18:18:22,301  WARNING   eds_loader.connectors.mongodb  [diagnosis_codes] No primary key in schema — falling back to full replace
+2026-09-03 18:18:22,336  INFO      eds_loader.connectors.mongodb  [diagnosis_codes] full-replace wrote 50 document(s) in 0.03s
+2026-09-03 18:18:22,336  WARNING   eds_loader.connectors.mongodb  [procedure_codes] No primary key in schema — falling back to full replace
+2026-09-03 18:18:22,368  INFO      eds_loader.connectors.mongodb  [procedure_codes] full-replace wrote 30 document(s) in 0.03s
+2026-09-03 18:18:22,369  INFO      eds_loader.loader  State saved → /home/mohit/eds/eds_loader/.loader_mongodb_health_reference_state.json
+2026-09-03 18:18:22,369  INFO      eds_loader.loader  Incremental load complete: 468 row(s) affected
+2026-09-03 18:18:22,373  INFO      eds_loader.cli.main  Run complete: 468 row(s) across 13 table(s) in 0.5s
+2026-09-03 18:18:55,259  INFO      eds_loader.cli.main  eds-loader run invoked (config=/home/mohit/eds/eds_loader/loader_mongodb_health_reference.yaml, dry_run=False)
+2026-09-03 18:18:55,265  INFO      eds_loader.cli.main  Config loaded: source=local_fs target=mongodb tables=['countries', 'states', 'cities', 'providers', 'provider_departments', 'provider_specialties', 'departments', 'specialties', 'room_types', 'facilities', 'medications', 'diagnosis_codes', 'procedure_codes'] enforce_constraints=True schema_required=True
+2026-09-03 18:18:55,266  INFO      eds_loader.loader  Reading schema.json from explicit schema_path: /home/mohit/eds/EDS/my-hospital/schema.json
+2026-09-03 18:18:55,266  INFO      eds_loader.loader  State loaded from /home/mohit/eds/eds_loader/.loader_mongodb_health_reference_state.json (last run: 2026-09-03T12:48:22.368454+00:00)
+2026-09-03 18:18:55,271  INFO      eds_loader.connectors.local_fs  Read countries: 1 row(s) from /home/mohit/eds/EDS/my-hospital/output/countries.parquet
+2026-09-03 18:18:55,273  INFO      eds_loader.connectors.local_fs  Read states: 20 row(s) from /home/mohit/eds/EDS/my-hospital/output/states.parquet
+2026-09-03 18:18:55,274  INFO      eds_loader.connectors.local_fs  Read cities: 20 row(s) from /home/mohit/eds/EDS/my-hospital/output/cities.parquet
+2026-09-03 18:18:55,275  INFO      eds_loader.connectors.local_fs  Read providers: 50 row(s) from /home/mohit/eds/EDS/my-hospital/output/providers.parquet
+2026-09-03 18:18:55,276  INFO      eds_loader.connectors.local_fs  Read provider_departments: 95 row(s) from /home/mohit/eds/EDS/my-hospital/output/provider_departments.parquet
+2026-09-03 18:18:55,280  INFO      eds_loader.connectors.local_fs  Read provider_specialties: 104 row(s) from /home/mohit/eds/EDS/my-hospital/output/provider_specialties.parquet
+2026-09-03 18:18:55,282  INFO      eds_loader.connectors.local_fs  Read departments: 15 row(s) from /home/mohit/eds/EDS/my-hospital/output/departments.parquet
+2026-09-03 18:18:55,284  INFO      eds_loader.connectors.local_fs  Read specialties: 20 row(s) from /home/mohit/eds/EDS/my-hospital/output/specialties.parquet
+2026-09-03 18:18:55,285  INFO      eds_loader.connectors.local_fs  Read room_types: 5 row(s) from /home/mohit/eds/EDS/my-hospital/output/room_types.parquet
+2026-09-03 18:18:55,287  INFO      eds_loader.connectors.local_fs  Read facilities: 8 row(s) from /home/mohit/eds/EDS/my-hospital/output/facilities.parquet
+2026-09-03 18:18:55,288  INFO      eds_loader.connectors.local_fs  Read medications: 50 row(s) from /home/mohit/eds/EDS/my-hospital/output/medications.parquet
+2026-09-03 18:18:55,289  INFO      eds_loader.connectors.local_fs  Read diagnosis_codes: 50 row(s) from /home/mohit/eds/EDS/my-hospital/output/diagnosis_codes.parquet
+2026-09-03 18:18:55,289  INFO      eds_loader.connectors.local_fs  Read procedure_codes: 30 row(s) from /home/mohit/eds/EDS/my-hospital/output/procedure_codes.parquet
+2026-09-03 18:18:55,290  INFO      eds_loader.loader  Read 13 dataset(s) from source
+2026-09-03 18:18:55,291  INFO      eds_loader.loader  [countries] Hash unchanged — skipping
+2026-09-03 18:18:55,295  INFO      eds_loader.loader  [states] Hash unchanged — skipping
+2026-09-03 18:18:55,297  INFO      eds_loader.loader  [cities] Hash unchanged — skipping
+2026-09-03 18:18:55,298  INFO      eds_loader.loader  [providers] Hash unchanged — skipping
+2026-09-03 18:18:55,299  INFO      eds_loader.loader  [provider_departments] Hash unchanged — skipping
+2026-09-03 18:18:55,300  INFO      eds_loader.loader  [provider_specialties] Hash unchanged — skipping
+2026-09-03 18:18:55,301  INFO      eds_loader.loader  [departments] Hash unchanged — skipping
+2026-09-03 18:18:55,302  INFO      eds_loader.loader  [specialties] Hash unchanged — skipping
+2026-09-03 18:18:55,303  INFO      eds_loader.loader  [room_types] Hash unchanged — skipping
+2026-09-03 18:18:55,303  INFO      eds_loader.loader  [facilities] Hash unchanged — skipping
+2026-09-03 18:18:55,304  INFO      eds_loader.loader  [medications] Hash unchanged — skipping
+2026-09-03 18:18:55,305  INFO      eds_loader.loader  [diagnosis_codes] Hash unchanged — skipping
+2026-09-03 18:18:55,306  INFO      eds_loader.loader  [procedure_codes] Hash unchanged — skipping
+2026-09-03 18:18:55,306  INFO      eds_loader.loader  All 13 dataset(s) unchanged — nothing to write
+2026-09-03 18:18:55,307  INFO      eds_loader.cli.main  Run complete: 0 row(s) across 0 table(s) in 0.0s
+2026-09-03 18:26:25,647  INFO      eds_loader.cli.main  eds-loader run invoked (config=/home/mohit/eds/eds_loader/loader_mongodb_retail_reference.yaml, dry_run=False)
+2026-09-03 18:26:25,653  INFO      eds_loader.cli.main  Config loaded: source=local_fs target=mongodb tables=['countries', 'states', 'cities', 'products', 'categories', 'brands', 'suppliers', 'warehouses', 'inventory', 'shipping_methods'] enforce_constraints=True schema_required=True
+2026-09-03 18:26:25,654  INFO      eds_loader.loader  Reading schema.json from explicit schema_path: /home/mohit/eds/EDS/my-shop/schema.json
+2026-09-03 18:26:25,655  INFO      eds_loader.loader  No state file — performing initial full upsert (/home/mohit/eds/eds_loader/.loader_mongodb_retail_reference_state.json)
+2026-09-03 18:26:25,660  INFO      eds_loader.connectors.local_fs  Read countries: 1 row(s) from /home/mohit/eds/EDS/my-shop/output/countries.parquet
+2026-09-03 18:26:25,662  INFO      eds_loader.connectors.local_fs  Read states: 51 row(s) from /home/mohit/eds/EDS/my-shop/output/states.parquet
+2026-09-03 18:26:25,663  INFO      eds_loader.connectors.local_fs  Read cities: 255 row(s) from /home/mohit/eds/EDS/my-shop/output/cities.parquet
+2026-09-03 18:26:25,665  INFO      eds_loader.connectors.local_fs  Read products: 1000 row(s) from /home/mohit/eds/EDS/my-shop/output/products.parquet
+2026-09-03 18:26:25,666  INFO      eds_loader.connectors.local_fs  Read categories: 168 row(s) from /home/mohit/eds/EDS/my-shop/output/categories.parquet
+2026-09-03 18:26:25,667  INFO      eds_loader.connectors.local_fs  Read brands: 50 row(s) from /home/mohit/eds/EDS/my-shop/output/brands.parquet
+2026-09-03 18:26:25,668  INFO      eds_loader.connectors.local_fs  Read suppliers: 25 row(s) from /home/mohit/eds/EDS/my-shop/output/suppliers.parquet
+2026-09-03 18:26:25,669  INFO      eds_loader.connectors.local_fs  Read warehouses: 10 row(s) from /home/mohit/eds/EDS/my-shop/output/warehouses.parquet
+2026-09-03 18:26:25,671  INFO      eds_loader.connectors.local_fs  Read inventory: 3000 row(s) from /home/mohit/eds/EDS/my-shop/output/inventory.parquet
+2026-09-03 18:26:25,672  INFO      eds_loader.connectors.local_fs  Read shipping_methods: 9 row(s) from /home/mohit/eds/EDS/my-shop/output/shipping_methods.parquet
+2026-09-03 18:26:25,672  INFO      eds_loader.loader  Read 10 dataset(s) from source
+2026-09-03 18:26:25,675  INFO      eds_loader.loader  [countries] first run — will upsert 1 row(s)
+2026-09-03 18:26:25,678  INFO      eds_loader.loader  [states] first run — will upsert 51 row(s)
+2026-09-03 18:26:25,679  INFO      eds_loader.loader  [cities] first run — will upsert 255 row(s)
+2026-09-03 18:26:25,681  INFO      eds_loader.loader  [products] first run — will upsert 1000 row(s)
+2026-09-03 18:26:25,682  INFO      eds_loader.loader  [categories] first run — will upsert 168 row(s)
+2026-09-03 18:26:25,683  INFO      eds_loader.loader  [brands] first run — will upsert 50 row(s)
+2026-09-03 18:26:25,685  INFO      eds_loader.loader  [suppliers] first run — will upsert 25 row(s)
+2026-09-03 18:26:25,686  INFO      eds_loader.loader  [warehouses] first run — will upsert 10 row(s)
+2026-09-03 18:26:25,688  INFO      eds_loader.loader  [inventory] first run — will upsert 3000 row(s)
+2026-09-03 18:26:25,689  INFO      eds_loader.loader  [shipping_methods] first run — will upsert 9 row(s)
+2026-09-03 18:26:25,694  INFO      eds_loader.connectors.mongodb  Connected to MongoDB 10.20.20.106:27017/retail_referencedb for upsert
+2026-09-03 18:26:25,694  WARNING   eds_loader.connectors.mongodb  [countries] No primary key in schema — falling back to full replace
+2026-09-03 18:26:25,734  INFO      eds_loader.connectors.mongodb  [countries] full-replace wrote 1 document(s) in 0.04s
+2026-09-03 18:26:25,734  WARNING   eds_loader.connectors.mongodb  [states] No primary key in schema — falling back to full replace
+2026-09-03 18:26:25,764  INFO      eds_loader.connectors.mongodb  [states] full-replace wrote 51 document(s) in 0.03s
+2026-09-03 18:26:25,764  WARNING   eds_loader.connectors.mongodb  [cities] No primary key in schema — falling back to full replace
+2026-09-03 18:26:25,813  INFO      eds_loader.connectors.mongodb  [cities] full-replace wrote 255 document(s) in 0.05s
+2026-09-03 18:26:25,813  WARNING   eds_loader.connectors.mongodb  [products] No primary key in schema — falling back to full replace
+2026-09-03 18:26:25,959  INFO      eds_loader.connectors.mongodb  [products] full-replace wrote 1000 document(s) in 0.15s
+2026-09-03 18:26:25,959  WARNING   eds_loader.connectors.mongodb  [categories] No primary key in schema — falling back to full replace
+2026-09-03 18:26:26,008  INFO      eds_loader.connectors.mongodb  [categories] full-replace wrote 168 document(s) in 0.05s
+2026-09-03 18:26:26,008  WARNING   eds_loader.connectors.mongodb  [brands] No primary key in schema — falling back to full replace
+2026-09-03 18:26:26,040  INFO      eds_loader.connectors.mongodb  [brands] full-replace wrote 50 document(s) in 0.03s
+2026-09-03 18:26:26,040  WARNING   eds_loader.connectors.mongodb  [suppliers] No primary key in schema — falling back to full replace
+2026-09-03 18:26:26,069  INFO      eds_loader.connectors.mongodb  [suppliers] full-replace wrote 25 document(s) in 0.03s
+2026-09-03 18:26:26,069  WARNING   eds_loader.connectors.mongodb  [warehouses] No primary key in schema — falling back to full replace
+2026-09-03 18:26:26,097  INFO      eds_loader.connectors.mongodb  [warehouses] full-replace wrote 10 document(s) in 0.03s
+2026-09-03 18:26:26,097  WARNING   eds_loader.connectors.mongodb  [inventory] No primary key in schema — falling back to full replace
+2026-09-03 18:26:26,272  INFO      eds_loader.connectors.mongodb  [inventory] full-replace wrote 3000 document(s) in 0.17s
+2026-09-03 18:26:26,272  WARNING   eds_loader.connectors.mongodb  [shipping_methods] No primary key in schema — falling back to full replace
+2026-09-03 18:26:26,303  INFO      eds_loader.connectors.mongodb  [shipping_methods] full-replace wrote 9 document(s) in 0.03s
+2026-09-03 18:26:26,304  INFO      eds_loader.loader  State saved → /home/mohit/eds/eds_loader/.loader_mongodb_retail_reference_state.json
+2026-09-03 18:26:26,304  INFO      eds_loader.loader  Incremental load complete: 4569 row(s) affected
+2026-09-03 18:26:26,307  INFO      eds_loader.cli.main  Run complete: 4569 row(s) across 10 table(s) in 0.7s
+2026-09-03 18:27:31,079  INFO      eds_loader.cli.main  eds-loader run invoked (config=/home/mohit/eds/eds_loader/loader_mongodb_health_reference.yaml, dry_run=False)
+2026-09-03 18:27:31,085  INFO      eds_loader.cli.main  Config loaded: source=local_fs target=mongodb tables=['countries', 'states', 'cities', 'providers', 'provider_departments', 'provider_specialties', 'departments', 'specialties', 'room_types', 'facilities', 'medications', 'diagnosis_codes', 'procedure_codes'] enforce_constraints=True schema_required=True
+2026-09-03 18:27:31,086  INFO      eds_loader.loader  Reading schema.json from explicit schema_path: /home/mohit/eds/EDS/my-hospital/schema.json
+2026-09-03 18:27:31,087  INFO      eds_loader.loader  State loaded from /home/mohit/eds/eds_loader/.loader_mongodb_health_reference_state.json (last run: 2026-09-03T12:48:55.306711+00:00)
+2026-09-03 18:27:31,092  INFO      eds_loader.connectors.local_fs  Read countries: 1 row(s) from /home/mohit/eds/EDS/my-hospital/output/countries.parquet
+2026-09-03 18:27:31,094  INFO      eds_loader.connectors.local_fs  Read states: 20 row(s) from /home/mohit/eds/EDS/my-hospital/output/states.parquet
+2026-09-03 18:27:31,095  INFO      eds_loader.connectors.local_fs  Read cities: 20 row(s) from /home/mohit/eds/EDS/my-hospital/output/cities.parquet
+2026-09-03 18:27:31,096  INFO      eds_loader.connectors.local_fs  Read providers: 50 row(s) from /home/mohit/eds/EDS/my-hospital/output/providers.parquet
+2026-09-03 18:27:31,097  INFO      eds_loader.connectors.local_fs  Read provider_departments: 95 row(s) from /home/mohit/eds/EDS/my-hospital/output/provider_departments.parquet
+2026-09-03 18:27:31,098  INFO      eds_loader.connectors.local_fs  Read provider_specialties: 104 row(s) from /home/mohit/eds/EDS/my-hospital/output/provider_specialties.parquet
+2026-09-03 18:27:31,100  INFO      eds_loader.connectors.local_fs  Read departments: 15 row(s) from /home/mohit/eds/EDS/my-hospital/output/departments.parquet
+2026-09-03 18:27:31,102  INFO      eds_loader.connectors.local_fs  Read specialties: 20 row(s) from /home/mohit/eds/EDS/my-hospital/output/specialties.parquet
+2026-09-03 18:27:31,103  INFO      eds_loader.connectors.local_fs  Read room_types: 5 row(s) from /home/mohit/eds/EDS/my-hospital/output/room_types.parquet
+2026-09-03 18:27:31,104  INFO      eds_loader.connectors.local_fs  Read facilities: 8 row(s) from /home/mohit/eds/EDS/my-hospital/output/facilities.parquet
+2026-09-03 18:27:31,105  INFO      eds_loader.connectors.local_fs  Read medications: 50 row(s) from /home/mohit/eds/EDS/my-hospital/output/medications.parquet
+2026-09-03 18:27:31,106  INFO      eds_loader.connectors.local_fs  Read diagnosis_codes: 50 row(s) from /home/mohit/eds/EDS/my-hospital/output/diagnosis_codes.parquet
+2026-09-03 18:27:31,107  INFO      eds_loader.connectors.local_fs  Read procedure_codes: 30 row(s) from /home/mohit/eds/EDS/my-hospital/output/procedure_codes.parquet
+2026-09-03 18:27:31,107  INFO      eds_loader.loader  Read 13 dataset(s) from source
+2026-09-03 18:27:31,109  INFO      eds_loader.loader  [countries] Hash unchanged — skipping
+2026-09-03 18:27:31,110  INFO      eds_loader.loader  [states] Hash unchanged — skipping
+2026-09-03 18:27:31,110  INFO      eds_loader.loader  [cities] Hash unchanged — skipping
+2026-09-03 18:27:31,111  INFO      eds_loader.loader  [providers] Hash unchanged — skipping
+2026-09-03 18:27:31,112  INFO      eds_loader.loader  [provider_departments] Hash unchanged — skipping
+2026-09-03 18:27:31,112  INFO      eds_loader.loader  [provider_specialties] Hash unchanged — skipping
+2026-09-03 18:27:31,113  INFO      eds_loader.loader  [departments] Hash unchanged — skipping
+2026-09-03 18:27:31,113  INFO      eds_loader.loader  [specialties] Hash unchanged — skipping
+2026-09-03 18:27:31,114  INFO      eds_loader.loader  [room_types] Hash unchanged — skipping
+2026-09-03 18:27:31,115  INFO      eds_loader.loader  [facilities] Hash unchanged — skipping
+2026-09-03 18:27:31,115  INFO      eds_loader.loader  [medications] Hash unchanged — skipping
+2026-09-03 18:27:31,116  INFO      eds_loader.loader  [diagnosis_codes] Hash unchanged — skipping
+2026-09-03 18:27:31,117  INFO      eds_loader.loader  [procedure_codes] Hash unchanged — skipping
+2026-09-03 18:27:31,117  INFO      eds_loader.loader  All 13 dataset(s) unchanged — nothing to write
+2026-09-03 18:27:31,119  INFO      eds_loader.cli.main  Run complete: 0 row(s) across 0 table(s) in 0.0s
+2026-09-03 18:28:00,174  INFO      eds_loader.cli.main  eds-loader run invoked (config=/home/mohit/eds/eds_loader/loader_mongodb_health_reference.yaml, dry_run=False)
+2026-09-03 18:28:00,180  INFO      eds_loader.cli.main  Config loaded: source=local_fs target=mongodb tables=['countries', 'states', 'cities', 'providers', 'provider_departments', 'provider_specialties', 'departments', 'specialties', 'room_types', 'facilities', 'medications', 'diagnosis_codes', 'procedure_codes'] enforce_constraints=True schema_required=True
+2026-09-03 18:28:00,181  INFO      eds_loader.loader  Reading schema.json from explicit schema_path: /home/mohit/eds/EDS/my-new-hospital/schema.json
+2026-09-03 18:28:00,181  INFO      eds_loader.loader  State loaded from /home/mohit/eds/eds_loader/.loader_mongodb_health_reference_state.json (last run: 2026-09-03T12:57:31.117841+00:00)
+2026-09-03 18:28:00,186  INFO      eds_loader.connectors.local_fs  Read countries: 1 row(s) from /home/mohit/eds/EDS/my-new-hospital/output/countries.parquet
+2026-09-03 18:28:00,188  INFO      eds_loader.connectors.local_fs  Read states: 20 row(s) from /home/mohit/eds/EDS/my-new-hospital/output/states.parquet
+2026-09-03 18:28:00,189  INFO      eds_loader.connectors.local_fs  Read cities: 20 row(s) from /home/mohit/eds/EDS/my-new-hospital/output/cities.parquet
+2026-09-03 18:28:00,190  INFO      eds_loader.connectors.local_fs  Read providers: 50 row(s) from /home/mohit/eds/EDS/my-new-hospital/output/providers.parquet
+2026-09-03 18:28:00,191  INFO      eds_loader.connectors.local_fs  Read provider_departments: 95 row(s) from /home/mohit/eds/EDS/my-new-hospital/output/provider_departments.parquet
+2026-09-03 18:28:00,191  INFO      eds_loader.connectors.local_fs  Read provider_specialties: 104 row(s) from /home/mohit/eds/EDS/my-new-hospital/output/provider_specialties.parquet
+2026-09-03 18:28:00,194  INFO      eds_loader.connectors.local_fs  Read departments: 15 row(s) from /home/mohit/eds/EDS/my-new-hospital/output/departments.parquet
+2026-09-03 18:28:00,195  INFO      eds_loader.connectors.local_fs  Read specialties: 20 row(s) from /home/mohit/eds/EDS/my-new-hospital/output/specialties.parquet
+2026-09-03 18:28:00,196  INFO      eds_loader.connectors.local_fs  Read room_types: 5 row(s) from /home/mohit/eds/EDS/my-new-hospital/output/room_types.parquet
+2026-09-03 18:28:00,197  INFO      eds_loader.connectors.local_fs  Read facilities: 8 row(s) from /home/mohit/eds/EDS/my-new-hospital/output/facilities.parquet
+2026-09-03 18:28:00,199  INFO      eds_loader.connectors.local_fs  Read medications: 50 row(s) from /home/mohit/eds/EDS/my-new-hospital/output/medications.parquet
+2026-09-03 18:28:00,200  INFO      eds_loader.connectors.local_fs  Read diagnosis_codes: 50 row(s) from /home/mohit/eds/EDS/my-new-hospital/output/diagnosis_codes.parquet
+2026-09-03 18:28:00,201  INFO      eds_loader.connectors.local_fs  Read procedure_codes: 30 row(s) from /home/mohit/eds/EDS/my-new-hospital/output/procedure_codes.parquet
+2026-09-03 18:28:00,201  INFO      eds_loader.loader  Read 13 dataset(s) from source
+2026-09-03 18:28:00,203  INFO      eds_loader.loader  [countries] Hash unchanged — skipping
+2026-09-03 18:28:00,203  INFO      eds_loader.loader  [states] Hash unchanged — skipping
+2026-09-03 18:28:00,204  INFO      eds_loader.loader  [cities] Hash unchanged — skipping
+2026-09-03 18:28:00,206  INFO      eds_loader.loader  [providers] Hash unchanged — skipping
+2026-09-03 18:28:00,207  INFO      eds_loader.loader  [provider_departments] Hash unchanged — skipping
+2026-09-03 18:28:00,209  INFO      eds_loader.loader  [provider_specialties] Hash unchanged — skipping
+2026-09-03 18:28:00,210  INFO      eds_loader.loader  [departments] Hash unchanged — skipping
+2026-09-03 18:28:00,211  INFO      eds_loader.loader  [specialties] Hash unchanged — skipping
+2026-09-03 18:28:00,212  INFO      eds_loader.loader  [room_types] Hash unchanged — skipping
+2026-09-03 18:28:00,212  INFO      eds_loader.loader  [facilities] Hash unchanged — skipping
+2026-09-03 18:28:00,213  INFO      eds_loader.loader  [medications] Hash unchanged — skipping
+2026-09-03 18:28:00,214  INFO      eds_loader.loader  [diagnosis_codes] Hash unchanged — skipping
+2026-09-03 18:28:00,215  INFO      eds_loader.loader  [procedure_codes] Hash unchanged — skipping
+2026-09-03 18:28:00,215  INFO      eds_loader.loader  All 13 dataset(s) unchanged — nothing to write
+2026-09-03 18:28:00,216  INFO      eds_loader.cli.main  Run complete: 0 row(s) across 0 table(s) in 0.0s

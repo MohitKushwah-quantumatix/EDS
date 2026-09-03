@@ -17,8 +17,8 @@ source:
 
 target:
   kind: mongodb
-  host: 10.20.20.107           # required
-  database: health          # required
+  host: 10.20.20.106           # required
+  database: health_referencedb          # required
   # username: eds_loader          # optional -- omit for unauthenticated connections
   # password_env: EDS_MONGO_PASSWORD
   port: 27017               # optional -- default: 27017
@@ -27,7 +27,21 @@ target:
 # ---------------------------------------------------------------------------
 # Dataset selection
 # ---------------------------------------------------------------------------
-tables: []                  # empty = load every dataset in schema.json
+tables: [
+    countries,
+    states,
+    cities,
+    providers,
+    provider_departments,
+    provider_specialties,
+    departments,
+    specialties,
+    room_types,
+    facilities,
+    medications,
+    diagnosis_codes,
+    procedure_codes,
+]                  # empty = load every dataset in schema.json
                             # or specify a subset: [customers, orders, products]
 
 # ---------------------------------------------------------------------------
@@ -47,7 +61,7 @@ schema_path: /home/mohit/eds/EDS/my-hospital/schema.json             # optional 
 #   append      — insert-only: never drops or updates existing rows.
 #                 Use when source files contain ONLY today's new rows and you
 #                 want the target DB to grow continuously, day by day.
-load_mode: full         # full | incremental | append
+load_mode: incremental         # full | incremental | append
 
 # ---------------------------------------------------------------------------
 # Incremental load options (only used when load_mode: incremental)
@@ -134,10 +148,10 @@ parallelism: 1              # number of datasets to load concurrently (default: 
 # to register the scheduled task on Windows Task Scheduler or Linux crontab.
 #
 # style 1: simple (no cron knowledge needed)
-# schedule:
-#   time: "02:00"              # HH:MM in 24-hour format
-#   timezone: Asia/Kolkata     # IANA timezone name
-#   frequency: daily           # daily | every_other_day | weekly | monthly
+schedule:
+  time: "12:22"              # HH:MM in 24-hour format
+  timezone: Asia/Kolkata     # IANA timezone name
+  frequency: daily           # daily | every_other_day | weekly | monthly
 #   # on_day: Monday           # required when frequency: weekly
 #   # on_date: 1               # required when frequency: monthly (1-28)
 #
@@ -160,6 +174,6 @@ parallelism: 1              # number of datasets to load concurrently (default: 
 #     - "2026-10-24"
 #
 # retry if the run fails (optional)
-#   retry_on_failure: true
-#   retry_after_minutes: 30
-#   max_retries: 2
+  retry_on_failure: true
+  retry_after_minutes: 5
+  max_retries: 3
