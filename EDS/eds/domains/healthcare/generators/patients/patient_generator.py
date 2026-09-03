@@ -8,6 +8,7 @@ import random
 import polars as pl
 
 from eds.core.random_streams import make_rng
+from eds.core.encoding import encode_hash
 
 __all__ = ["generate_patients"]
 
@@ -42,8 +43,8 @@ def generate_patients(
             "full_name": f"{first_name} {last_name}",
             "gender": gender,
             "date_of_birth": date_of_birth,
-            "email": f"patient{i}@example.com",
-            "phone": f"+91{rng.randint(7000000000, 9999999999)}",
+            "email": encode_hash(f"patient{i}@example.com"),
+            "phone": encode_hash(f"+91{rng.randint(7000000000, 9999999999)}"),
             "registration_date": registration_date,
             "status": status,
             "insurance_type": insurance_type,

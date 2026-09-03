@@ -6,7 +6,7 @@ start_date: 2026-01-01
 end_date: 2026-01-03
 
 # --- Testing Mode ---
-cron_interval_minutes: 2
+cron_interval_minutes: 1
 
 # --- Production Mode ---
 # Uncomment below and comment above for real-world deployment
@@ -19,16 +19,16 @@ domains:
     project_dir: my-shop
     seed: 42
     start_date: 2026-01-01
-    end_date: 2026-12-31
-    # cron_interval_minutes: 2
-    cron_daily_time: "12:00"
+    end_date: 2026-01-01
+    cron_interval_minutes: 1
+    # cron_daily_time: "12:00"
 
   - domain: healthcare
     project_dir: my-hospital
     seed: 42
     start_date: 2026-01-01
-    end_date: 2026-12-31
-    # cron_interval_minutes: 2
-    cron_daily_time: "12:00"
+    end_date: 2026-01-01
+    cron_interval_minutes: 1
+    # cron_daily_time: "12:00"
 
 

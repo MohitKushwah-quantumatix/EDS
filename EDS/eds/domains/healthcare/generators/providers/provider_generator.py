@@ -7,6 +7,7 @@ from datetime import datetime, timedelta
 import polars as pl
 
 from eds.core.random_streams import make_rng
+from eds.core.encoding import encode_hash
 
 __all__ = ["generate_providers"]
 
@@ -43,7 +44,7 @@ def generate_providers(
             "provider_type": provider_type,
             "specialty_id": specialty_id,
             "department_id": department_id,
-            "license_number": f"LIC-{rng.randint(100000, 999999)}",
+            "license_number": encode_hash(f"LIC-{rng.randint(100000, 999999)}"),
             "status": "ACTIVE",
             "hire_date": hire_date,
             "termination_date": None,

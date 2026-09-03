@@ -9,6 +9,7 @@ import polars as pl
 
 from eds.config import SimulationConfig
 from eds.core.random_streams import make_rng, resolve_seed
+from eds.core.encoding import encode_hash
 
 __all__ = ["generate_patient_emergency_contacts"]
 
@@ -44,8 +45,8 @@ def generate_patient_emergency_contacts(
             "patient_id": int(pat["patient_id"]),
             "contact_name": str(f"Contact {i + 1}"),
             "relationship": str(rng.choice(RELATIONSHIPS)),
-            "phone_number": str(f"+91987654321{i % 10}"),
-            "email": str(f"contact{i + 1}@example.com"),
+            "phone_number": encode_hash(str(f"+91987654321{i % 10}")),
+            "email": encode_hash(str(f"contact{i + 1}@example.com")),
             "is_primary": True,
             "created_at": datetime.strptime(pat["registration_date"].isoformat(), "%Y-%m-%d"),
         })
