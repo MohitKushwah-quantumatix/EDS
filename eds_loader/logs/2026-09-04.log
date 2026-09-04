@@ -1,0 +1,91 @@
+2026-09-04 12:15:03,411  INFO      eds_loader.cli.main  eds-loader run invoked (config=/home/mohit/eds/eds_loader/loader_mssql_retailfin.yaml, dry_run=False)
+2026-09-04 12:15:03,418  INFO      eds_loader.cli.main  Config loaded: source=local_fs target=mssql tables=['orders', 'order_lines', 'payments', 'payment_methods', 'payment_status_history', 'returns', 'return_items', 'return_reasons', 'return_status_history', 'tax_codes', 'coupon_types', 'checkout'] enforce_constraints=True schema_required=True
+2026-09-04 12:15:03,419  INFO      eds_loader.loader  Reading schema.json from explicit schema_path: /home/mohit/eds/EDS/my-shop/schema.json
+2026-09-04 12:15:03,449  INFO      eds_loader.connectors.local_fs  Read orders: 20 row(s) from /home/mohit/eds/EDS/my-shop/output/orders.parquet
+2026-09-04 12:15:03,452  INFO      eds_loader.connectors.local_fs  Read order_lines: 32 row(s) from /home/mohit/eds/EDS/my-shop/output/order_lines.parquet
+2026-09-04 12:15:03,455  INFO      eds_loader.connectors.local_fs  Read payments: 20 row(s) from /home/mohit/eds/EDS/my-shop/output/payments.parquet
+2026-09-04 12:15:03,457  INFO      eds_loader.connectors.local_fs  Read payment_methods: 13 row(s) from /home/mohit/eds/EDS/my-shop/output/payment_methods.parquet
+2026-09-04 12:15:03,459  INFO      eds_loader.connectors.local_fs  Read payment_status_history: 35 row(s) from /home/mohit/eds/EDS/my-shop/output/payment_status_history.parquet
+2026-09-04 12:15:03,460  INFO      eds_loader.connectors.local_fs  Read returns: 0 row(s) from /home/mohit/eds/EDS/my-shop/output/returns.parquet
+2026-09-04 12:15:03,461  INFO      eds_loader.connectors.local_fs  Read return_items: 0 row(s) from /home/mohit/eds/EDS/my-shop/output/return_items.parquet
+2026-09-04 12:15:03,463  INFO      eds_loader.connectors.local_fs  Read return_reasons: 5 row(s) from /home/mohit/eds/EDS/my-shop/output/return_reasons.parquet
+2026-09-04 12:15:03,465  INFO      eds_loader.connectors.local_fs  Read return_status_history: 0 row(s) from /home/mohit/eds/EDS/my-shop/output/return_status_history.parquet
+2026-09-04 12:15:03,467  INFO      eds_loader.connectors.local_fs  Read tax_codes: 7 row(s) from /home/mohit/eds/EDS/my-shop/output/tax_codes.parquet
+2026-09-04 12:15:03,468  INFO      eds_loader.connectors.local_fs  Read coupon_types: 8 row(s) from /home/mohit/eds/EDS/my-shop/output/coupon_types.parquet
+2026-09-04 12:15:03,471  INFO      eds_loader.connectors.local_fs  Read checkout: 128 row(s) from /home/mohit/eds/EDS/my-shop/output/checkout.parquet
+2026-09-04 12:15:03,471  INFO      eds_loader.loader  Read 12 dataset(s) from source for append
+2026-09-04 12:15:03,511  ERROR     eds_loader.loader  Load failed (attempt 1/1): Cannot connect to MSSQL at SA@localhost:1433/retail_finance: ('42000', '[42000] [Microsoft][ODBC Driver 18 for SQL Server][SQL Server]Cannot open database "retail_finance" requested by the login. The login failed. (4060) (SQLDriverConnect)')
+If this is a driver error, confirm 'ODBC Driver 18 for SQL Server' is installed (list installed drivers with `python -c "import pyodbc; print(pyodbc.drivers())"`).
+2026-09-04 12:15:03,511  ERROR     eds_loader.cli.main  Load failed after 0.1s: Cannot connect to MSSQL at SA@localhost:1433/retail_finance: ('42000', '[42000] [Microsoft][ODBC Driver 18 for SQL Server][SQL Server]Cannot open database "retail_finance" requested by the login. The login failed. (4060) (SQLDriverConnect)')
+If this is a driver error, confirm 'ODBC Driver 18 for SQL Server' is installed (list installed drivers with `python -c "import pyodbc; print(pyodbc.drivers())"`).
+2026-09-04 12:16:03,316  INFO      eds_loader.cli.main  eds-loader run invoked (config=/home/mohit/eds/eds_loader/loader_mssql_healthfin.yaml, dry_run=False)
+2026-09-04 12:16:03,323  INFO      eds_loader.cli.main  Config loaded: source=local_fs target=mssql tables=['billing', 'billing_codes', 'claims', 'insurance_plans'] enforce_constraints=True schema_required=True
+2026-09-04 12:16:03,324  INFO      eds_loader.loader  Reading schema.json from explicit schema_path: /home/mohit/eds/EDS/my-hospital/schema.json
+2026-09-04 12:16:03,329  INFO      eds_loader.connectors.local_fs  Read billing: 645 row(s) from /home/mohit/eds/EDS/my-hospital/output/billing.parquet
+2026-09-04 12:16:03,331  INFO      eds_loader.connectors.local_fs  Read billing_codes: 15 row(s) from /home/mohit/eds/EDS/my-hospital/output/billing_codes.parquet
+2026-09-04 12:16:03,332  INFO      eds_loader.connectors.local_fs  Read claims: 526 row(s) from /home/mohit/eds/EDS/my-hospital/output/claims.parquet
+2026-09-04 12:16:03,333  INFO      eds_loader.connectors.local_fs  Read insurance_plans: 10 row(s) from /home/mohit/eds/EDS/my-hospital/output/insurance_plans.parquet
+2026-09-04 12:16:03,333  INFO      eds_loader.loader  Read 4 dataset(s) from source for append
+2026-09-04 12:16:03,349  ERROR     eds_loader.loader  Load failed (attempt 1/1): Cannot connect to MSSQL at SA@localhost:1433/healthcare_finance: ('42000', '[42000] [Microsoft][ODBC Driver 18 for SQL Server][SQL Server]Cannot open database "healthcare_finance" requested by the login. The login failed. (4060) (SQLDriverConnect)')
+If this is a driver error, confirm 'ODBC Driver 18 for SQL Server' is installed (list installed drivers with `python -c "import pyodbc; print(pyodbc.drivers())"`).
+2026-09-04 12:16:03,349  ERROR     eds_loader.cli.main  Load failed after 0.0s: Cannot connect to MSSQL at SA@localhost:1433/healthcare_finance: ('42000', '[42000] [Microsoft][ODBC Driver 18 for SQL Server][SQL Server]Cannot open database "healthcare_finance" requested by the login. The login failed. (4060) (SQLDriverConnect)')
+If this is a driver error, confirm 'ODBC Driver 18 for SQL Server' is installed (list installed drivers with `python -c "import pyodbc; print(pyodbc.drivers())"`).
+2026-09-04 12:17:03,125  INFO      eds_loader.cli.main  eds-loader run invoked (config=/home/mohit/eds/eds_loader/loader_mysql_healthpatient.yaml, dry_run=False)
+2026-09-04 12:17:03,132  INFO      eds_loader.cli.main  Config loaded: source=local_fs target=mysql tables=['patients', 'patient_addresses', 'patient_insurance', 'patient_allergies', 'patient_emergency_contacts', 'immunizations'] enforce_constraints=True schema_required=True
+2026-09-04 12:17:03,133  INFO      eds_loader.loader  Reading schema.json from explicit schema_path: /home/mohit/eds/EDS/my-hospital/schema.json
+2026-09-04 12:17:03,139  INFO      eds_loader.connectors.local_fs  Read patients: 1000 row(s) from /home/mohit/eds/EDS/my-hospital/output/patients.parquet
+2026-09-04 12:17:03,141  INFO      eds_loader.connectors.local_fs  Read patient_addresses: 1508 row(s) from /home/mohit/eds/EDS/my-hospital/output/patient_addresses.parquet
+2026-09-04 12:17:03,142  INFO      eds_loader.connectors.local_fs  Read patient_insurance: 1000 row(s) from /home/mohit/eds/EDS/my-hospital/output/patient_insurance.parquet
+2026-09-04 12:17:03,143  INFO      eds_loader.connectors.local_fs  Read patient_allergies: 609 row(s) from /home/mohit/eds/EDS/my-hospital/output/patient_allergies.parquet
+2026-09-04 12:17:03,144  INFO      eds_loader.connectors.local_fs  Read patient_emergency_contacts: 1000 row(s) from /home/mohit/eds/EDS/my-hospital/output/patient_emergency_contacts.parquet
+2026-09-04 12:17:03,145  INFO      eds_loader.connectors.local_fs  Read immunizations: 1000 row(s) from /home/mohit/eds/EDS/my-hospital/output/immunizations.parquet
+2026-09-04 12:17:03,145  INFO      eds_loader.loader  Read 6 dataset(s) from source for append
+2026-09-04 12:17:07,741  ERROR     eds_loader.loader  Load failed (attempt 1/1): Cannot connect to MySQL at eds_user@10.20.20.106:3306/healthcare_patientdb: (1049, "Unknown database 'healthcare_patientdb'")
+2026-09-04 12:17:07,741  ERROR     eds_loader.cli.main  Load failed after 4.6s: Cannot connect to MySQL at eds_user@10.20.20.106:3306/healthcare_patientdb: (1049, "Unknown database 'healthcare_patientdb'")
+2026-09-04 12:18:02,515  INFO      eds_loader.cli.main  eds-loader run invoked (config=/home/mohit/eds/eds_loader/loader_mysql_retailcustomer.yaml, dry_run=False)
+2026-09-04 12:18:02,521  INFO      eds_loader.cli.main  Config loaded: source=local_fs target=mysql tables=['customers', 'customer_addresses', 'customer_preferences', 'customer_loyalty', 'customer_personas'] enforce_constraints=True schema_required=True
+2026-09-04 12:18:02,522  INFO      eds_loader.loader  Reading schema.json from explicit schema_path: /home/mohit/eds/EDS/my-shop/schema.json
+2026-09-04 12:18:02,529  INFO      eds_loader.connectors.local_fs  Read customers: 1000 row(s) from /home/mohit/eds/EDS/my-shop/output/customers.parquet
+2026-09-04 12:18:02,531  INFO      eds_loader.connectors.local_fs  Read customer_addresses: 1495 row(s) from /home/mohit/eds/EDS/my-shop/output/customer_addresses.parquet
+2026-09-04 12:18:02,532  INFO      eds_loader.connectors.local_fs  Read customer_preferences: 1000 row(s) from /home/mohit/eds/EDS/my-shop/output/customer_preferences.parquet
+2026-09-04 12:18:02,533  INFO      eds_loader.connectors.local_fs  Read customer_loyalty: 1000 row(s) from /home/mohit/eds/EDS/my-shop/output/customer_loyalty.parquet
+2026-09-04 12:18:02,535  INFO      eds_loader.connectors.local_fs  Read customer_personas: 1000 row(s) from /home/mohit/eds/EDS/my-shop/output/customer_personas.parquet
+2026-09-04 12:18:02,535  INFO      eds_loader.loader  Read 5 dataset(s) from source for append
+2026-09-04 12:18:02,552  ERROR     eds_loader.loader  Load failed (attempt 1/1): Cannot connect to MySQL at eds_user@10.20.20.106:3306/retail_customerdb: (1049, "Unknown database 'retail_customerdb'")
+2026-09-04 12:18:02,552  ERROR     eds_loader.cli.main  Load failed after 0.0s: Cannot connect to MySQL at eds_user@10.20.20.106:3306/retail_customerdb: (1049, "Unknown database 'retail_customerdb'")
+2026-09-04 12:19:03,319  INFO      eds_loader.cli.main  eds-loader run invoked (config=/home/mohit/eds/eds_loader/loader_postgres_healthbehav.yaml, dry_run=False)
+2026-09-04 12:19:03,325  INFO      eds_loader.cli.main  Config loaded: source=local_fs target=postgres tables=['encounters', 'appointments', 'admissions', 'vitals', 'lab_results', 'diagnoses', 'procedures', 'medications_prescribed', 'medication_administration', 'radiology_reports', 'discharge_summaries', 'referrals'] enforce_constraints=True schema_required=True
+2026-09-04 12:19:03,326  INFO      eds_loader.loader  Reading schema.json from explicit schema_path: /home/mohit/eds/EDS/my-hospital/schema.json
+2026-09-04 12:19:03,333  INFO      eds_loader.connectors.local_fs  Read encounters: 2961 row(s) from /home/mohit/eds/EDS/my-hospital/output/encounters.parquet
+2026-09-04 12:19:03,335  INFO      eds_loader.connectors.local_fs  Read appointments: 2388 row(s) from /home/mohit/eds/EDS/my-hospital/output/appointments.parquet
+2026-09-04 12:19:03,337  INFO      eds_loader.connectors.local_fs  Read admissions: 2961 row(s) from /home/mohit/eds/EDS/my-hospital/output/admissions.parquet
+2026-09-04 12:19:03,338  INFO      eds_loader.connectors.local_fs  Read vitals: 2651 row(s) from /home/mohit/eds/EDS/my-hospital/output/vitals.parquet
+2026-09-04 12:19:03,340  INFO      eds_loader.connectors.local_fs  Read lab_results: 2961 row(s) from /home/mohit/eds/EDS/my-hospital/output/lab_results.parquet
+2026-09-04 12:19:03,341  INFO      eds_loader.connectors.local_fs  Read diagnoses: 4770 row(s) from /home/mohit/eds/EDS/my-hospital/output/diagnoses.parquet
+2026-09-04 12:19:03,342  INFO      eds_loader.connectors.local_fs  Read procedures: 2236 row(s) from /home/mohit/eds/EDS/my-hospital/output/procedures.parquet
+2026-09-04 12:19:03,344  INFO      eds_loader.connectors.local_fs  Read medications_prescribed: 3488 row(s) from /home/mohit/eds/EDS/my-hospital/output/medications_prescribed.parquet
+2026-09-04 12:19:03,345  INFO      eds_loader.connectors.local_fs  Read medication_administration: 2961 row(s) from /home/mohit/eds/EDS/my-hospital/output/medication_administration.parquet
+2026-09-04 12:19:03,346  INFO      eds_loader.connectors.local_fs  Read radiology_reports: 2961 row(s) from /home/mohit/eds/EDS/my-hospital/output/radiology_reports.parquet
+2026-09-04 12:19:03,347  INFO      eds_loader.connectors.local_fs  Read discharge_summaries: 0 row(s) from /home/mohit/eds/EDS/my-hospital/output/discharge_summaries.parquet
+2026-09-04 12:19:03,350  INFO      eds_loader.connectors.local_fs  Read referrals: 2961 row(s) from /home/mohit/eds/EDS/my-hospital/output/referrals.parquet
+2026-09-04 12:19:03,350  INFO      eds_loader.loader  Read 12 dataset(s) from source for append
+2026-09-04 12:19:03,555  ERROR     eds_loader.loader  Load failed (attempt 1/1): Cannot connect to PostgreSQL at postgres@10.20.20.106:5432/healthcare_behav: connection failed: connection to server at "10.20.20.106", port 5432 failed: FATAL:  database "healthcare_behav" does not exist
+2026-09-04 12:19:03,555  ERROR     eds_loader.cli.main  Load failed after 0.2s: Cannot connect to PostgreSQL at postgres@10.20.20.106:5432/healthcare_behav: connection failed: connection to server at "10.20.20.106", port 5432 failed: FATAL:  database "healthcare_behav" does not exist
+2026-09-04 12:20:03,330  INFO      eds_loader.cli.main  eds-loader run invoked (config=/home/mohit/eds/eds_loader/loader_postgres_retailbehav.yaml, dry_run=False)
+2026-09-04 12:20:03,337  INFO      eds_loader.cli.main  Config loaded: source=local_fs target=postgres tables=['sessions', 'category_views', 'product_views', 'search_history', 'wishlists', 'shopping_carts', 'cart_items', 'reviews', 'order_status_history', 'shipments', 'shipment_items', 'shipment_status_history'] enforce_constraints=True schema_required=True
+2026-09-04 12:20:03,338  INFO      eds_loader.loader  Reading schema.json from explicit schema_path: /home/mohit/eds/EDS/my-shop/schema.json
+2026-09-04 12:20:03,344  INFO      eds_loader.connectors.local_fs  Read sessions: 2350 row(s) from /home/mohit/eds/EDS/my-shop/output/sessions.parquet
+2026-09-04 12:20:03,347  INFO      eds_loader.connectors.local_fs  Read category_views: 11656 row(s) from /home/mohit/eds/EDS/my-shop/output/category_views.parquet
+2026-09-04 12:20:03,353  INFO      eds_loader.connectors.local_fs  Read product_views: 36392 row(s) from /home/mohit/eds/EDS/my-shop/output/product_views.parquet
+2026-09-04 12:20:03,355  INFO      eds_loader.connectors.local_fs  Read search_history: 4823 row(s) from /home/mohit/eds/EDS/my-shop/output/search_history.parquet
+2026-09-04 12:20:03,356  INFO      eds_loader.connectors.local_fs  Read wishlists: 456 row(s) from /home/mohit/eds/EDS/my-shop/output/wishlists.parquet
+2026-09-04 12:20:03,357  INFO      eds_loader.connectors.local_fs  Read shopping_carts: 343 row(s) from /home/mohit/eds/EDS/my-shop/output/shopping_carts.parquet
+2026-09-04 12:20:03,358  INFO      eds_loader.connectors.local_fs  Read cart_items: 639 row(s) from /home/mohit/eds/EDS/my-shop/output/cart_items.parquet
+2026-09-04 12:20:03,358  INFO      eds_loader.connectors.local_fs  Read reviews: 0 row(s) from /home/mohit/eds/EDS/my-shop/output/reviews.parquet
+2026-09-04 12:20:03,359  INFO      eds_loader.connectors.local_fs  Read order_status_history: 29 row(s) from /home/mohit/eds/EDS/my-shop/output/order_status_history.parquet
+2026-09-04 12:20:03,359  INFO      eds_loader.connectors.local_fs  Read shipments: 15 row(s) from /home/mohit/eds/EDS/my-shop/output/shipments.parquet
+2026-09-04 12:20:03,360  INFO      eds_loader.connectors.local_fs  Read shipment_items: 26 row(s) from /home/mohit/eds/EDS/my-shop/output/shipment_items.parquet
+2026-09-04 12:20:03,360  INFO      eds_loader.connectors.local_fs  Read shipment_status_history: 22 row(s) from /home/mohit/eds/EDS/my-shop/output/shipment_status_history.parquet
+2026-09-04 12:20:03,360  INFO      eds_loader.loader  Read 12 dataset(s) from source for append
+2026-09-04 12:20:03,414  ERROR     eds_loader.loader  Load failed (attempt 1/1): Cannot connect to PostgreSQL at postgres@10.20.20.106:5432/retail_behav: connection failed: connection to server at "10.20.20.106", port 5432 failed: FATAL:  database "retail_behav" does not exist
+2026-09-04 12:20:03,414  ERROR     eds_loader.cli.main  Load failed after 0.1s: Cannot connect to PostgreSQL at postgres@10.20.20.106:5432/retail_behav: connection failed: connection to server at "10.20.20.106", port 5432 failed: FATAL:  database "retail_behav" does not exist
