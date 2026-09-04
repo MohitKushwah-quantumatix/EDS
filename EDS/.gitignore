@@ -27,6 +27,45 @@ output/
 *.parquet
 *.duckdb
 
+# EDS simulation state (contains full business data — do not commit)
+**/.internal/
+**/simulation.db
+**/backup.json
+**/manifest.json
+
+# eds-loader runtime files
+*.eds_loader_task.ps1          # generated Windows Task Scheduler wrapper
+.eds_loader_task.ps1
+*_state.json                   # incremental load state (hash tracking)
+.eds_loader_runs.jsonl         # run history log
+run_metrics.json               # per-run metrics
+
+# Logs and rejected rows
+logs/
+rejected/
+*.log
+*.task.log
+
+# Secrets — NEVER commit these
+.env
+.env.*
+secrets.yaml
+secrets.json
+*_secrets.*
+
+# loader.yaml files that contain inline passwords (use password_env instead)
+# Uncomment if your loader.yaml has inline passwords:
+# loader.yaml
+
+# Encryption key (if accidentally written to file)
+*.key
+*.pem
+eds_encrypt_key*
+
+# Docker build artifacts
+docker/generated/
+docker/output/
+
 # Editors and OS
 .idea/
 .vscode/
