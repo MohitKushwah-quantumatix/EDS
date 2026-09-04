@@ -45,7 +45,59 @@ from typing import Literal
 
 from eds_loader.exceptions import ConfigError
 
-__all__ = ["ConnectorConfig", "LoaderConfig", "ScheduleConfig"]
+__all__ = ["ColumnEncryptionConfig", "ConnectorConfig", "LoaderConfig", "ScheduleConfig"]
+
+
+
+# ---------------------------------------------------------------------------
+# ColumnEncryptionConfig — column-level AES-256 encryption
+# ---------------------------------------------------------------------------
+
+class ColumnEncryptionConfig(BaseModel):
+    """Configuration for column-level AES-256 encryption at load time.
+
+    Encryption is performed on the Polars DataFrame **before** any connector
+    writes, making it fully database-agnostic (PostgreSQL, MySQL, MongoDB, S3…).
+
+    The encrypted value is stored as a URL-safe base64 string in the target.
+    Use ``eds-loader decrypt`` to recover the original plaintext.
+
+    Example::
+
+        column_encryption:
+          key_env: EDS_ENCRYPT_KEY
+          tables:
+            customers:
+              - email
+              - phone
+            payments:
+              - card_number
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    key_env: str = Field(
+        default="EDS_ENCRYPT_KEY",
+        description="Name of the environment variable holding the Fernet key.",
+    )
+    algorithm: str = Field(
+        default="fernet",
+        description="Encryption algorithm. Currently only 'fernet' (AES-128-CBC + HMAC-SHA256) is supported.",
+    )
+    tables: dict[str, list[str]] = Field(
+        default_factory=dict,
+        description="Mapping of table name to list of column names to encrypt.",
+    )
+
+    @field_validator("algorithm")
+    @classmethod
+    def _check_algorithm(cls, v: str) -> str:
+        if v != "fernet":
+            raise ValueError(
+                f"Unsupported encryption algorithm {v!r}. "
+                "Only 'fernet' is currently supported."
+            )
+        return v
 
 
 # ---------------------------------------------------------------------------
@@ -484,6 +536,14 @@ class LoaderConfig(BaseModel):
             "Optional schedule configuration. When set, run "
             "'eds-loader schedule -c <this-file>' to register the scheduled task "
             "on the host OS (Windows Task Scheduler or Linux crontab)."
+        ),
+    )
+    column_encryption: ColumnEncryptionConfig | None = Field(
+        default=None,
+        description=(
+            "Optional column-level encryption. When set, specified columns are "
+            "AES-256 encrypted before writing to any target. "
+            "Generate a key with: eds-loader keygen"
         ),
     )
 

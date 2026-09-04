@@ -34,6 +34,7 @@ dependencies = [
   "pydantic>=2.7",
   "typer>=0.12",
   "pyyaml>=6.0",
+  "cryptography>=42.0",                          # column-level AES-256 encryption
   "tzdata>=2024.1; sys_platform == 'win32'",   # IANA timezone database for Windows
 ]
 

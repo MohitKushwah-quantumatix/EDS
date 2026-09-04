@@ -1014,3 +1014,161 @@ def schedule_cmd(
     typer.echo("")
     _ok(f"Schedule registered. Run 'eds-loader schedule -c {config.name} --status' to verify.")
     typer.echo("")
+
+
+# ---------------------------------------------------------------------------
+# keygen command
+# ---------------------------------------------------------------------------
+
+@app.command("keygen")
+def keygen_cmd() -> None:
+    """Generate a new AES-256 encryption key for column-level encryption.
+
+    Run this command ONCE ever.  Save the printed key as the EDS_ENCRYPT_KEY
+    environment variable — losing the key makes all encrypted data permanently
+    unreadable.
+    """
+    from eds_loader._encryption import generate_key
+
+    key = generate_key()
+
+    typer.echo("")
+    typer.echo("  Generating AES-256 (Fernet) encryption key...")
+    typer.echo("")
+    typer.echo("  Your key (save this — shown only once):")
+    typer.echo("")
+    typer.echo(f"    {key}")
+    typer.echo("")
+    typer.echo("  " + "-" * 60)
+    typer.echo("  Save as environment variable:")
+    typer.echo("")
+    typer.echo("  Windows (PowerShell — run as Administrator):")
+    typer.echo(
+        f'    [System.Environment]::SetEnvironmentVariable('
+        f'"EDS_ENCRYPT_KEY", "{key}", "User")'
+    )
+    typer.echo("")
+    typer.echo("  Ubuntu / Linux:")
+    typer.echo(f'    echo \'export EDS_ENCRYPT_KEY="{key}"\' >> ~/.bashrc')
+    typer.echo("    source ~/.bashrc")
+    typer.echo("")
+    typer.echo("  " + "-" * 60)
+    typer.echo("  Then add to your loader.yaml:")
+    typer.echo("")
+    typer.echo("    column_encryption:")
+    typer.echo("      key_env: EDS_ENCRYPT_KEY")
+    typer.echo("      tables:")
+    typer.echo("        customers:")
+    typer.echo("          - email")
+    typer.echo("          - phone")
+    typer.echo("")
+    _ok("Key generated. Store it safely — it cannot be recovered if lost.")
+    typer.echo("")
+
+
+# ---------------------------------------------------------------------------
+# decrypt command
+# ---------------------------------------------------------------------------
+
+@app.command("decrypt")
+def decrypt_cmd(
+    config: Annotated[
+        Path,
+        typer.Option("--config", "-c", help="Path to loader.yaml with column_encryption section."),
+    ],
+    value: Annotated[
+        str | None,
+        typer.Option("--value", "-v", help="Single encrypted base64 token to decrypt."),
+    ] = None,
+    table: Annotated[
+        str | None,
+        typer.Option("--table", "-t", help="Table name to decrypt (reads from source)."),
+    ] = None,
+    output: Annotated[
+        Path | None,
+        typer.Option("--output", "-o", help="Write decrypted CSV to this path."),
+    ] = None,
+) -> None:
+    """Decrypt column-encrypted values using the key from loader.yaml.
+
+    Examples:
+
+        # Decrypt a single encrypted token
+        eds-loader decrypt -c loader.yaml --value "gAAAAABh3x..."
+
+        # Decrypt all encrypted columns of a table and save to CSV
+        eds-loader decrypt -c loader.yaml --table customers --output decrypted.csv
+    """
+    config_path = config.resolve()
+    try:
+        cfg = LoaderConfig.from_yaml(config_path)
+    except Exception as exc:
+        _fail(f"Config error: {exc}")
+        raise typer.Exit(_EXIT_CONFIG_ERROR)
+
+    enc_cfg = cfg.column_encryption
+    if enc_cfg is None:
+        _fail("No column_encryption section found in config. Nothing to decrypt.")
+        raise typer.Exit(_EXIT_CONFIG_ERROR)
+
+    from cryptography.fernet import Fernet
+    from eds_loader._encryption import decrypt_value, decrypt_dataframe, load_key
+
+    try:
+        key = load_key(enc_cfg.key_env)
+        fernet = Fernet(key)
+    except LoadError as exc:
+        _fail(str(exc))
+        raise typer.Exit(_EXIT_CONFIG_ERROR)
+
+    # --- Mode 1: single value ---
+    if value is not None:
+        try:
+            plain = decrypt_value(value, fernet)
+            typer.echo(f"\n  Decrypted: {plain}\n")
+        except LoadError as exc:
+            _fail(str(exc))
+            raise typer.Exit(_EXIT_LOAD_ERROR)
+        return
+
+    # --- Mode 2: full table ---
+    if table is None:
+        _fail("Provide --value for a single token or --table to decrypt a full table.")
+        raise typer.Exit(_EXIT_CONFIG_ERROR)
+
+    if table not in enc_cfg.tables:
+        _fail(
+            f"Table {table!r} is not listed under column_encryption.tables in loader.yaml. "
+            f"Encrypted tables: {', '.join(enc_cfg.tables) or '(none)'}"
+        )
+        raise typer.Exit(_EXIT_CONFIG_ERROR)
+
+    columns = enc_cfg.tables[table]
+
+    try:
+        from eds_loader.connectors.registry import get_connector
+        from eds_loader.connectors.base import Readable
+        source = get_connector(cfg.source.kind, cfg.source.extra_fields())
+        if not isinstance(source, Readable):
+            _fail(f"Source connector {cfg.source.kind!r} does not support reading.")
+            raise typer.Exit(_EXIT_CONFIG_ERROR)
+        datasets = source.read_datasets(names=[table])
+    except Exception as exc:
+        _fail(f"Failed to read source: {exc}")
+        raise typer.Exit(_EXIT_LOAD_ERROR)
+
+    if table not in datasets:
+        _fail(f"Table {table!r} not found in source.")
+        raise typer.Exit(_EXIT_LOAD_ERROR)
+
+    try:
+        df = decrypt_dataframe(datasets[table], columns, fernet)
+    except LoadError as exc:
+        _fail(str(exc))
+        raise typer.Exit(_EXIT_LOAD_ERROR)
+
+    if output:
+        df.write_csv(str(output))
+        _ok(f"Decrypted {df.height} row(s) from {table!r} -> {output}")
+    else:
+        typer.echo(df.to_pandas().to_string(index=False))

@@ -270,6 +270,48 @@ def _chunk_df(df: Any, batch_size: int | None) -> list[Any]:
     return [df.slice(i, batch_size) for i in range(0, df.height, batch_size)]
 
 
+def _apply_encryption(
+    datasets: dict[str, Any],
+    config: "LoaderConfig",
+) -> dict[str, Any]:
+    """Encrypt configured columns in each dataset before writing.
+
+    If ``config.column_encryption`` is ``None`` returns *datasets* unchanged
+    (zero overhead for configs without encryption).
+
+    Args:
+        datasets: Dataset name -> Polars DataFrame mapping.
+        config:   The active :class:`LoaderConfig`.
+
+    Returns:
+        Mapping with encrypted DataFrames for configured tables, all others
+        passed through unchanged.
+
+    Raises:
+        LoadError: If the key env-var is missing or a column is not found.
+    """
+    enc_cfg = config.column_encryption
+    if enc_cfg is None or not enc_cfg.tables:
+        return datasets
+
+    from cryptography.fernet import Fernet
+    from eds_loader._encryption import encrypt_dataframe, load_key
+
+    key = load_key(enc_cfg.key_env)
+    fernet = Fernet(key)
+
+    result = dict(datasets)  # shallow copy — only replace encrypted tables
+    for table_name, columns in enc_cfg.tables.items():
+        if table_name not in result:
+            logger.debug(
+                "[encryption] Table %r not in loaded datasets — skipping", table_name
+            )
+            continue
+        logger.info("[encryption] Encrypting %d column(s) in %r", len(columns), table_name)
+        result[table_name] = encrypt_dataframe(result[table_name], columns, fernet)
+    return result
+
+
 # ---------------------------------------------------------------------------
 # Full load
 # ---------------------------------------------------------------------------
@@ -315,6 +357,9 @@ def _load_impl(config: LoaderConfig) -> LoadResult:
         {k: v for k, v in schema_metadata.items() if k in validated}
         if config.enforce_constraints else {}
     )
+
+    # Encrypt configured columns before writing
+    validated = _apply_encryption(validated, config)
 
     # Parallel or sequential write
     if config.parallelism > 1:
@@ -442,6 +487,9 @@ def _incremental_load_impl(
         if config.enforce_constraints and schema_metadata else {}
     )
 
+    # Encrypt configured columns before writing
+    changed = _apply_encryption(changed, config)
+
     upsert_results = target.upsert_datasets(changed, effective_metadata)
 
     # Handle delete_mode
@@ -538,6 +586,9 @@ def _append_load_impl(config: LoaderConfig) -> LoadResult:
         {k: v for k, v in schema_metadata.items() if k in validated}
         if config.enforce_constraints else {}
     )
+
+    # Encrypt configured columns before writing
+    validated = _apply_encryption(validated, config)
 
     append_results = target.append_datasets(validated, effective_metadata)
 

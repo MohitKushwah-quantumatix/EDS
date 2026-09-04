@@ -355,6 +355,35 @@ parallelism: 1              # number of datasets to load concurrently (default: 
 #   retry_on_failure: true
 #   retry_after_minutes: 30
 #   max_retries: 2
+
+# ---------------------------------------------------------------------------
+# Column-level encryption  (optional)
+# ---------------------------------------------------------------------------
+# Encrypt specific columns before writing to ANY target (database-agnostic).
+# The encrypted value is stored as a base64 string in the target column.
+#
+# Step 1 — generate your key (run ONCE ever):
+#   eds-loader keygen
+#
+# Step 2 — save the key as an environment variable:
+#   Windows:  [System.Environment]::SetEnvironmentVariable("EDS_ENCRYPT_KEY", "<key>", "User")
+#   Ubuntu:   echo 'export EDS_ENCRYPT_KEY="<key>"' >> ~/.bashrc && source ~/.bashrc
+#
+# Step 3 — uncomment and configure below, then run normally:
+#   eds-loader run -c <this-file>
+#
+# Step 4 — to decrypt a value later:
+#   eds-loader decrypt -c <this-file> --value "gAAAAABh3x..."
+#   eds-loader decrypt -c <this-file> --table customers --output decrypted.csv
+#
+# column_encryption:
+#   key_env: EDS_ENCRYPT_KEY      # env var holding your Fernet key
+#   tables:
+#     customers:
+#       - email                   # encrypt the email column
+#       - phone                   # encrypt the phone column
+#     payments:
+#       - card_number
 """
 
 # ---------------------------------------------------------------------------
