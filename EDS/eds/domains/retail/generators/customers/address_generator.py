@@ -100,6 +100,8 @@ def iter_address_batches(
         latitudes: list[float] = []
         longitudes: list[float] = []
         created: list[datetime] = []
+        effective: list[date] = []
+        end: list[date | None] = []
 
         for customer_id in id_range:
             city_index = home_cities[customer_id - 1]
@@ -128,6 +130,8 @@ def iter_address_batches(
                 primary_flags.append(is_primary)
                 latitudes.append(_jitter(rng, geography.latitudes[city_index]))
                 longitudes.append(_jitter(rng, geography.longitudes[city_index]))
+                effective.append(config.reference_date)
+                end.append(None)
                 created.append(
                     datetime.combine(
                         config.earliest_registration_date
@@ -152,6 +156,8 @@ def iter_address_batches(
                 "is_primary": primary_flags,
                 "latitude": latitudes,
                 "longitude": longitudes,
+                "effective_date": effective,
+                "end_date": end,
                 "created_at": created,
             },
         )

@@ -73,6 +73,17 @@ MASTER_DATA_TABLES = {
     },
 }
 
+SCD_TABLES = {
+    "retail": {
+        "customers", "customer_addresses", "customer_preferences",
+        "customer_loyalty", "products", "suppliers",
+    },
+    "healthcare": {
+        "patients", "patient_addresses", "patient_insurance",
+        "providers", "provider_departments", "provider_specialties",
+    },
+}
+
 
 def _checkpoint_path(project_dir: Path) -> Path:
     return project_dir / CHECKPOINT_FILE
@@ -268,12 +279,11 @@ def _pick_date_column(df: pl.DataFrame) -> str | None:
 
 def _export_daily_data(adapter: SQLiteAdapter, project_dir: Path, domain: str, target_date: date, is_first_day: bool) -> Path:
     output_dir = project_dir / "output"
-    if output_dir.exists():
-        shutil.rmtree(output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
 
     all_data = adapter.read_all()
     master_tables = MASTER_DATA_TABLES.get(domain, set())
+    scd_tables = SCD_TABLES.get(domain, set())
 
     schema = {}
 
@@ -288,7 +298,7 @@ def _export_daily_data(adapter: SQLiteAdapter, project_dir: Path, domain: str, t
             df.write_parquet(dest, compression="snappy")
             continue
 
-        if name in master_tables:
+        if name in master_tables or name in scd_tables:
             dest = output_dir / f"{name}.parquet"
             df.write_parquet(dest, compression="snappy")
             continue

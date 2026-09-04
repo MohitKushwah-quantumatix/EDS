@@ -169,6 +169,7 @@ def iter_product_batches(
     config: MasterDataConfig,
     inputs: ProductInputs,
     seed: int,
+    reference_date: date,
     currency_code: str = "USD",
 ) -> Iterator[pl.DataFrame]:
     """Yield products in batches of ``config.batch_size``.
@@ -206,6 +207,8 @@ def iter_product_batches(
         heights: list[float] = []
         statuses: list[str] = []
         returnable_flags: list[bool] = []
+        effective_dates: list[date] = []
+        end_dates: list[date | None] = []
 
         for _ in range(size):
             leaf_index = rng.randrange(len(inputs.leaf_category_ids))
@@ -241,6 +244,8 @@ def iter_product_batches(
             heights.append(height)
             statuses.append(str(rng.choices(_STATUSES, weights=_STATUS_WEIGHTS, k=1)[0]))
             returnable_flags.append(rng.random() < returnable_odds)
+            effective_dates.append(reference_date)
+            end_dates.append(None)
 
             next_product_id += 1
 
@@ -264,6 +269,8 @@ def iter_product_batches(
                 "height_cm": heights,
                 "status": statuses,
                 "is_returnable": returnable_flags,
+                "effective_date": effective_dates,
+                "end_date": end_dates,
             },
         )
         remaining -= size
@@ -276,6 +283,7 @@ def generate_products(
     suppliers: pl.DataFrame,
     tax_codes: pl.DataFrame,
     seed: int,
+    reference_date: date,
     currency_code: str = "USD",
 ) -> pl.DataFrame:
     """Generate the complete products dataset.
@@ -296,5 +304,5 @@ def generate_products(
         ValueError: If any upstream dataset is empty.
     """
     inputs = ProductInputs(categories, brands, suppliers, tax_codes)
-    batches = list(iter_product_batches(config, inputs, seed, currency_code))
+    batches = list(iter_product_batches(config, inputs, seed, reference_date, currency_code))
     return pl.concat(batches, how="vertical") if batches else empty_frame(PRODUCTS)

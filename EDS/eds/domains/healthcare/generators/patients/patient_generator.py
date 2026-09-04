@@ -49,16 +49,20 @@ def generate_patients(
             "status": status,
             "insurance_type": insurance_type,
             "primary_facility_id": facility_id,
+            "effective_date": config.reference_date,
+            "end_date": None,
             "created_at": config.reference_date,
             "updated_at": config.reference_date,
         })
 
     df = pl.DataFrame(rows)
-    # Ensure date types match schema
-    df = df.with_columns([
-        pl.col("date_of_birth").cast(pl.Date()),
-        pl.col("registration_date").cast(pl.Date()),
-        pl.col("created_at").cast(pl.Datetime("us")),
-        pl.col("updated_at").cast(pl.Datetime("us")),
-    ])
+    if df.height > 0:
+        df = df.with_columns([
+            pl.col("date_of_birth").cast(pl.Date()),
+            pl.col("registration_date").cast(pl.Date()),
+            pl.col("effective_date").cast(pl.Date()),
+            pl.col("end_date").cast(pl.Date()),
+            pl.col("created_at").cast(pl.Datetime("us")),
+            pl.col("updated_at").cast(pl.Datetime("us")),
+        ])
     return df

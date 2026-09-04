@@ -374,6 +374,11 @@ def _cron_job_exists() -> bool:
 
 
 def _install_cron_job(daily_time: str) -> None:
+    # Skip cron job installation on Windows
+    if os.name == "nt":
+        print(f"[cron] Skipping cron job installation on Windows. Please use Task Scheduler to run the script daily at {daily_time}.")
+        return
+
     hour, minute = daily_time.split(":")
     cron_cmd = _get_cron_command(daily_time)
     cron_entry = f"{minute} {hour} * * * {cron_cmd} {_CRON_MARKER}"
@@ -390,9 +395,13 @@ def _install_cron_job(daily_time: str) -> None:
         f.write(new_crontab)
         tmp_path = f.name
 
-    subprocess.run(["crontab", tmp_path], check=True)
-    os.unlink(tmp_path)
-    print(f"[cron] Installed daily cron job at {daily_time}")
+    try:
+        subprocess.run(["crontab", tmp_path], check=True)
+        print(f"[cron] Installed daily cron job at {daily_time}")
+    except Exception as e:
+        print(f"[cron] Warning: could not install cron job: {e}")
+    finally:
+        os.unlink(tmp_path)
 
 
 def _remove_cron_job() -> None:

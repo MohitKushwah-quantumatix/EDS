@@ -62,6 +62,8 @@ PRODUCTS = Dataset(
         "height_cm": pl.Float64(),
         "status": pl.String(),
         "is_returnable": pl.Boolean(),
+        "effective_date": pl.Date(),
+        "end_date": pl.Date(),
     },
     primary_key="product_id",
     foreign_keys=(

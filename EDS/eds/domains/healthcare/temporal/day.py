@@ -99,7 +99,7 @@ def advance_day(
         return DayOfBusiness(generated, generated, settings, is_founding=True)
 
     generated = _evolve(stage, settings, context, upstream, history)
-    return DayOfBusiness(generated, merge_history(history, generated), settings, is_founding=False)
+    return DayOfBusiness(generated, merge_history(history, generated, reference_date=context.business_date), settings, is_founding=False)
 
 
 def _founding(stage: str, history: Mapping[str, pl.DataFrame]) -> bool:

@@ -31,6 +31,8 @@ def generate_provider_specialties(
                 "provider_id": provider_id,
                 "specialty_id": specialty_id,
                 "certification_date": cert_date,
+                "effective_date": datetime.strptime(cert_date, "%Y-%m-%d").date(),
+                "end_date": None,
                 "created_at": datetime.strptime(cert_date, "%Y-%m-%d"),
             })
             ps_id += 1
@@ -39,6 +41,8 @@ def generate_provider_specialties(
     if df.height > 0:
         df = df.with_columns([
             pl.col("certification_date").str.strptime(pl.Date(), "%Y-%m-%d"),
+            pl.col("effective_date").cast(pl.Date()),
+            pl.col("end_date").cast(pl.Date()),
             pl.col("created_at").cast(pl.Datetime("us")),
         ])
     return df

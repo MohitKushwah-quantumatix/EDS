@@ -69,6 +69,7 @@ def generate_suppliers(
     config: MasterDataConfig,
     cities: pl.DataFrame,
     seed: int,
+    reference_date: date,
     locale: str = "en_US",
 ) -> pl.DataFrame:
     """Generate the suppliers dataset.
@@ -105,6 +106,8 @@ def generate_suppliers(
     lead_times: list[int] = []
     reliability: list[float] = []
     active_flags: list[bool] = []
+    effective_dates: list[date] = []
+    end_dates: list[date | None] = []
 
     for supplier_id in range(1, config.supplier_count + 1):
         tier = rng.choices(_TIERS, weights=_TIER_WEIGHTS, k=1)[0]
@@ -124,6 +127,8 @@ def generate_suppliers(
         lead_times.append(rng.randint(lead_low, lead_high))
         reliability.append(round(rng.uniform(reliability_low, reliability_high), 4))
         active_flags.append(rng.random() >= _INACTIVE_PROBABILITY)
+        effective_dates.append(reference_date)
+        end_dates.append(None)
 
     return build_frame(
         SUPPLIERS,
@@ -139,5 +144,7 @@ def generate_suppliers(
             "lead_time_days": lead_times,
             "reliability_score": reliability,
             "is_active": active_flags,
+            "effective_date": effective_dates,
+            "end_date": end_dates,
         },
     )

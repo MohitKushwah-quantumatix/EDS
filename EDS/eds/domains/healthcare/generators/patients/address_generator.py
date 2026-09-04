@@ -38,6 +38,8 @@ def generate_addresses(
                 "is_primary": addr_idx == 0,
                 "latitude": rng.uniform(-90.0, 90.0),
                 "longitude": rng.uniform(-180.0, 180.0),
+                "effective_date": config.reference_date,
+                "end_date": None,
                 "created_at": datetime.strptime(config.reference_date.isoformat(), "%Y-%m-%d"),
             })
             address_id += 1
@@ -46,5 +48,7 @@ def generate_addresses(
     if df.height > 0:
         df = df.with_columns([
             pl.col("created_at").cast(pl.Datetime("us")),
+            pl.col("effective_date").cast(pl.Date()),
+            pl.col("end_date").cast(pl.Date()),
         ])
     return df

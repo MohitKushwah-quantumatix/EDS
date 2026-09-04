@@ -22,6 +22,8 @@ SUPPLIERS = Dataset(
         "lead_time_days": pl.Int64(),
         "reliability_score": pl.Float64(),
         "is_active": pl.Boolean(),
+        "effective_date": pl.Date(),
+        "end_date": pl.Date(),
     },
     primary_key="supplier_id",
     foreign_keys=(

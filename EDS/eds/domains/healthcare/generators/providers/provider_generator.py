@@ -48,6 +48,8 @@ def generate_providers(
             "status": "ACTIVE",
             "hire_date": hire_date,
             "termination_date": None,
+            "effective_date": datetime.strptime(hire_date, "%Y-%m-%d").date(),
+            "end_date": None,
             "created_at": datetime.strptime(hire_date, "%Y-%m-%d"),
         })
 
@@ -56,6 +58,8 @@ def generate_providers(
         df = df.with_columns([
             pl.col("hire_date").str.strptime(pl.Date(), "%Y-%m-%d"),
             pl.col("termination_date").cast(pl.Date()),
+            pl.col("effective_date").cast(pl.Date()),
+            pl.col("end_date").cast(pl.Date()),
             pl.col("created_at").cast(pl.Datetime("us")),
         ])
     return df

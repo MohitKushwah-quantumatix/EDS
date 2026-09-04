@@ -32,6 +32,7 @@ def generate_provider_departments(
                 "is_primary": idx == 0,
                 "start_date": config.reference_date,
                 "end_date": None,
+                "effective_date": config.reference_date,
                 "created_at": datetime.strptime(config.reference_date.isoformat(), "%Y-%m-%d"),
             })
             pd_id += 1
@@ -41,6 +42,7 @@ def generate_provider_departments(
         df = df.with_columns([
             pl.col("start_date").cast(pl.Date()),
             pl.col("end_date").cast(pl.Date()),
+            pl.col("effective_date").cast(pl.Date()),
             pl.col("created_at").cast(pl.Datetime("us")),
         ])
     return df

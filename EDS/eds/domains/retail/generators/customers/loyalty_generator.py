@@ -152,6 +152,8 @@ def iter_loyalty_batches(
                 "points_balance": points,
                 "enrollment_date": enrolments,
                 "status": batch_statuses,
+                "effective_date": [config.reference_date] * len(loyalty_ids),
+                "end_date": [None] * len(loyalty_ids),
             },
         )
 

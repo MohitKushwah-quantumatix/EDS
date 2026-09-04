@@ -82,7 +82,9 @@
     "contact_phone": "String",
     "lead_time_days": "Int64",
     "reliability_score": "Float64",
-    "is_active": "Boolean"
+    "is_active": "Boolean",
+    "effective_date": "Date",
+    "end_date": "Date"
   },
   "warehouses": {
     "warehouse_id": "Int64",
@@ -129,7 +131,9 @@
     "width_cm": "Float64",
     "height_cm": "Float64",
     "status": "String",
-    "is_returnable": "Boolean"
+    "is_returnable": "Boolean",
+    "effective_date": "Date",
+    "end_date": "Date"
   },
   "inventory": {
     "inventory_id": "Int64",
@@ -162,6 +166,8 @@
     "acquisition_channel": "String",
     "risk_score": "Float64",
     "lifecycle_stage": "String",
+    "effective_date": "Date",
+    "end_date": "Date",
     "created_at": "Datetime(time_unit='us', time_zone=None)",
     "updated_at": "Datetime(time_unit='us', time_zone=None)"
   },
@@ -178,6 +184,8 @@
     "is_primary": "Boolean",
     "latitude": "Float64",
     "longitude": "Float64",
+    "effective_date": "Date",
+    "end_date": "Date",
     "created_at": "Datetime(time_unit='us', time_zone=None)"
   },
   "customer_preferences": {
@@ -189,6 +197,8 @@
     "preferred_language": "String",
     "preferred_currency": "String",
     "timezone": "String",
+    "effective_date": "Date",
+    "end_date": "Date",
     "created_at": "Datetime(time_unit='us', time_zone=None)"
   },
   "customer_loyalty": {
@@ -198,7 +208,9 @@
     "tier": "String",
     "points_balance": "Int64",
     "enrollment_date": "Date",
-    "status": "String"
+    "status": "String",
+    "effective_date": "Date",
+    "end_date": "Date"
   },
   "customer_personas": {
     "persona_id": "Int64",

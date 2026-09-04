@@ -1,10 +1,10 @@
 {
-  "created_at": "2026-09-03T10:38:29.132122+00:00",
+  "created_at": "2026-09-04T09:48:44.372495+00:00",
   "domain": "retail",
   "manifest_version": 1,
   "name": "Retail Project",
   "platform_contract_version": 1,
   "platform_version": "0.1.0",
-  "project_id": "3ac7fab6dc734a6481b30b25bcb3e777",
+  "project_id": "0bca753b7f704ba5a7085091416e8a3a",
   "seed": 42
 }

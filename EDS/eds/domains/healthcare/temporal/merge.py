@@ -24,6 +24,7 @@ Four temporality kinds are recognised:
 
 from __future__ import annotations
 
+from datetime import date
 from typing import Mapping
 
 import polars as pl
@@ -33,9 +34,21 @@ from eds.domains.healthcare.temporal.temporality import Temporality, temporality
 
 __all__ = ["merge_dataset", "merge_history"]
 
+_SCD_TABLES = frozenset({
+    "patients",
+    "patient_addresses",
+    "patient_insurance",
+    "providers",
+    "provider_departments",
+    "provider_specialties",
+})
+
 
 def merge_dataset(
-    name: str, history: pl.DataFrame | None, produced: pl.DataFrame
+    name: str,
+    history: pl.DataFrame | None,
+    produced: pl.DataFrame,
+    reference_date: date | None = None,
 ) -> pl.DataFrame:
     """Merge a day's rows into history.
 
@@ -43,6 +56,8 @@ def merge_dataset(
         name: Dataset name.
         history: What already exists, or ``None``.
         produced: The day's rows.
+        reference_date: The current simulation date. Required for SCD Type 2
+            tables to close superseded rows.
 
     Returns:
         The merged history.
@@ -68,13 +83,17 @@ def merge_dataset(
 
 
 def merge_history(
-    history: Mapping[str, pl.DataFrame], produced: Mapping[str, pl.DataFrame]
+    history: Mapping[str, pl.DataFrame],
+    produced: Mapping[str, pl.DataFrame],
+    reference_date: date | None = None,
 ) -> dict[str, pl.DataFrame]:
     """Merge a day's datasets into history.
 
     Args:
         history: What already exists, keyed by dataset name.
-        produced: The day's datasets, keyed by dataset name.
+        produced: What today generated, keyed by dataset name.
+        reference_date: The current simulation date. Required for SCD Type 2
+            tables to close superseded rows.
 
     Returns:
         The merged history, keyed by dataset name.
@@ -82,5 +101,23 @@ def merge_history(
     result = {}
     for name, day_frame in produced.items():
         hist = history.get(name)
-        result[name] = merge_dataset(name, hist, day_frame)
+        if name in _SCD_TABLES and reference_date is not None and hist is not None and not hist.is_empty():
+            hist = _close_superseded(hist, day_frame, reference_date, name)
+        result[name] = merge_dataset(name, hist, day_frame, reference_date)
     return result
+
+
+def _close_superseded(history: pl.DataFrame, produced: pl.DataFrame, reference_date: date, name: str) -> pl.DataFrame:
+    """Set end_date on history rows whose PK appears in today's rows."""
+    if "end_date" not in history.columns or "effective_date" not in history.columns:
+        return history
+
+    key = healthcare_dataset(name).primary_key
+    pk_today = produced.select(key).unique()
+    superseded = history.join(pk_today, on=key, how="inner")
+    if superseded.is_empty():
+        return history
+
+    superseded = superseded.with_columns(pl.lit(reference_date).cast(pl.Date()).alias("end_date"))
+    remaining = history.join(pk_today, on=key, how="anti")
+    return pl.concat([remaining, superseded], how="vertical").sort([key, "effective_date"])

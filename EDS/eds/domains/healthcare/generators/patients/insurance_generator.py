@@ -41,6 +41,7 @@ def generate_insurance(
             "effective_date": effective_date,
             "expiration_date": expiration_date,
             "is_primary": True,
+            "end_date": None,
             "created_at": datetime.strptime(effective_date, "%Y-%m-%d"),
         })
         insurance_id += 1
@@ -50,6 +51,7 @@ def generate_insurance(
         df = df.with_columns([
             pl.col("effective_date").str.strptime(pl.Date(), "%Y-%m-%d"),
             pl.col("expiration_date").str.strptime(pl.Date(), "%Y-%m-%d"),
+            pl.col("end_date").cast(pl.Date()),
             pl.col("created_at").cast(pl.Datetime("us")),
         ])
     return df

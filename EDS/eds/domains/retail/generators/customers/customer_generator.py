@@ -458,6 +458,8 @@ def iter_customer_batches(
                 "acquisition_channel": channels,
                 "risk_score": risk_scores,
                 "lifecycle_stage": stages,
+                "effective_date": [config.reference_date] * len(customer_ids),
+                "end_date": [None] * len(customer_ids),
                 "created_at": created,
                 "updated_at": updated,
             },

@@ -123,6 +123,7 @@ def generate_master_data(config: SimulationConfig) -> MasterData:
     locale = config.platform.locale
     settings = config.master_data
     currency = _primary_currency(config)
+    reference_date = config.customers.reference_date
 
     countries = generate_countries(settings)
     states = generate_states(settings)
@@ -134,12 +135,12 @@ def generate_master_data(config: SimulationConfig) -> MasterData:
     coupon_types = generate_coupon_types()
     return_reasons = generate_return_reasons()
 
-    suppliers = generate_suppliers(settings, cities, seed, locale)
+    suppliers = generate_suppliers(settings, cities, seed, reference_date, locale)
     warehouses = generate_warehouses(settings, cities, seed)
 
     categories = generate_categories(settings)
     brands = generate_brands(settings, countries, seed, locale)
-    products = generate_products(settings, categories, brands, suppliers, tax_codes, seed, currency)
+    products = generate_products(settings, categories, brands, suppliers, tax_codes, seed, reference_date, currency)
 
     inventory = generate_inventory(settings, products, warehouses, seed)
 

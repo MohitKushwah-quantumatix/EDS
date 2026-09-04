@@ -48,6 +48,8 @@ def iter_preference_batches(
     home_cities = assign_home_cities(config, geography, seed)
 
     created: list[datetime] = []
+    effective: list[date] = []
+    end: list[date | None] = []
     for id_range in customer_id_batches(config):
         preference_ids: list[int] = []
         customer_ids: list[int] = []
@@ -61,8 +63,6 @@ def iter_preference_batches(
         for customer_id in id_range:
             city_index = home_cities[customer_id - 1]
 
-            # One preference record per customer, so the identifier can share
-            # the customer id rather than needing its own counter.
             preference_ids.append(customer_id)
             customer_ids.append(customer_id)
             email_opt_in.append(rng.random() < _EMAIL_OPT_IN_RATE)
@@ -71,6 +71,8 @@ def iter_preference_batches(
             languages.append(geography.language_for_city(city_index))
             currencies.append(geography.currency_for_city(city_index))
             timezones.append(geography.timezones[city_index])
+            effective.append(config.reference_date)
+            end.append(None)
             created.append(
                 datetime.combine(
                     config.earliest_registration_date
@@ -90,6 +92,8 @@ def iter_preference_batches(
                 "preferred_language": languages,
                 "preferred_currency": currencies,
                 "timezone": timezones,
+                "effective_date": effective,
+                "end_date": end,
                 "created_at": created,
             },
         )
